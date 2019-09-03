@@ -1,0 +1,4 @@
+python-libsbml>=5.18.0
+Django>=2.2
+pyparsing>=2.2.0
+gunicorn

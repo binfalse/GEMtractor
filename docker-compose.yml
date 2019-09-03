@@ -1,0 +1,21 @@
+version: '3'
+
+services:
+  enalyzer-py:
+    build: .
+    container_name: enalyzer-py
+    volumes:
+      - ./src:/code
+    ports:
+      - "80"
+
+  enalyzer-web:
+    image: nginx
+    container_name: enalyzer-web
+    depends_on:
+      - enalyzer-py
+    ports:
+      - "80:80"
+    volumes:
+      - ./src/static:/var/www/static
+      - ./nginx.conf:/etc/nginx/nginx.conf

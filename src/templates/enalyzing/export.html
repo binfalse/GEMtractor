@@ -1,0 +1,93 @@
+{% extends "enalyzing/skeleton.html" %}
+{% block enalyzing %}
+{% load template_tags %}
+<h1>Step 3. Export Your Model</h1>
+
+
+<form class="w3-container" id="export_form" method="POST">
+  
+      {% csrf_token %}
+    <div class="w3-red">
+      {{ form.non_field_errors }}
+ </div>  
+       <div class="w3-row">
+         <div class="w3-half w3-container">
+  <p>
+    <div class="w3-red">
+    {{ form.network_type.errors }}
+ </div>  
+<label for="{{ form.network_type.id_for_label }}">Export the ...</label>
+{{ form.network_type|addclass:'w3-select' }}
+</p>
+  </div>
+  <div class="w3-half w3-container">
+  
+  
+  <p>
+    <div class="w3-red">
+    {{ form.network_format.errors }}
+ </div>  
+<label for="form.network_format.id_for_label">Export as ...</label>
+{{ form.network_format|addclass:'w3-select' }}
+</p>
+  </div>
+</div>
+
+
+       <div class="w3-row">
+         <div class="w3-half w3-container">
+  <p>    <div class="w3-red">
+
+    {{ form.remove_reaction_genes_removed.errors }}
+</div>
+    {{ form.remove_reaction_genes_removed|addclass:'w3-check' }}
+<label for="{{ form.remove_reaction_genes_removed.id_for_label }}">Remove reactions, whose genes were all removed</label>
+</p>
+
+
+
+  <p>    <div class="w3-red">
+
+    {{ form.remove_reaction_missing_species.errors }}
+</div>
+    {{ form.remove_reaction_missing_species|addclass:'w3-check' }}
+<label for="{{ form.remove_reaction_missing_species.id_for_label }}">Remove reactions, in which at least one species was removed</label>
+</p>
+  
+  
+
+  <p>
+    <button class="w3-btn w3-flat-nephritis">Download</button>
+</p>
+  </div>
+  <div class="w3-half w3-container">
+    Which Format to choose?
+    <ul>
+      <li>SBML: blah blah, useful for blah blah</li>
+      <li>GraphML: blah blah, useful for blah blah</li>
+      <li>DOT: blah blah, useful for blah blah</li>
+      <li>GML: blah blah, useful for blah blah</li>
+    </ul>
+
+  </div>
+  </div>
+
+</form>
+<script>
+  token = '{{ csrf_token }}';
+  network_type_id = '{{ form.network_type.id_for_label }}';
+  remove_reaction_genes_removed_id = '{{ form.remove_reaction_genes_removed.id_for_label }}'
+  prepareExport ();
+</script>
+
+
+
+download provenance
+
+
+
+
+DELETE MY MODEL
+
+{% endblock %}
+

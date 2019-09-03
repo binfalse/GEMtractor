@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>ENAlyzer helps you analysing enzyme networks</h1>
+
+
+<div class="w3-green w3-padding">
+  If you remove a species, it will be removed from the reaction (the reaction may be wrong afterwards...!). you need to make sure to remove the reactions as well, if that is your goal. reactions with missing species will be coloured red. a species will not be deleted, as it might be used in other entities -> thus, filtered models may contain ghost species!
+</div>
+
+<div class="w3-green w3-padding">
+  faq
+  <ul>
+    <li>why do genes have such a strange name?</li>
+   <li>what if no gene is associated to a reaction? if no gene -> genename = reaction name</li>
+    <li>how can i discard "useless" metabolites (like h or h2o)?</li>
+    <li></li>
+    <li></li>
+  </ul>
+</div>
+
+<div class="w3-green w3-padding">
+  wording:
+  <ul>
+    <li>inconsistent? or attention raising? (discuss also other table headers)</li>
+    <li>complexity in filter page</li>
+    <li></li>
+    <li></li>
+    <li></li>
+  </ul>
+</div>
+
+<div class="w3-green w3-padding">
+  todo:
+  <ul>
+    <li>somehow mention the mouseovers... (if on desktop)</li>
+    <li>fix javascript semicolons</li>
+    <li>describe and implement batch filtering</li>
+    <li>fix logging</li>
+    <li>python documentation</li>
+    <li>fix imports</li>
+    <li>apply license</li>
+    <li># TODO</li>
+    <li>clean up storage</li>
+    <li>test export options</li>
+    <li>/api/status to recache bigg models etc -> monitoring</li>
+    <li>test wrong bigg urls etc -> exceptions catched and properly shown?</li>
+    <li>fix function names (ppin!??)</li>
+    <li>merge the two modules</li>
+    <li>note: if you export EN as SBML, we'll implicitely create "reactions", which are not really existent...</li>
+    <li></li>
+    <li></li>
+    <li></li>
+    <li></li>
+    <li></li>
+    
+  </ul>
+</div>
+
+some intro
+
+<h2>Technical notes</h2>
+that's how we do it....
+
+only available for linux
+but also as docker image
+-> easy setup with advanced privace
+
+
+you need to accept cookies
+
+we may restart the service at any time, so be quick filtering ;-)
+
+<pre>
+Upload: to /api/upload -> returns id
+
+/api/network
+ - model (url or id)
+ - returns network information in json
+
+/api/call
+ - model (url or id)
+ - filters
+ - type rn or gn
+ - format (json, graphml, gml, dot, sbml -- with extra knowledge etc)
+
+
+/api/filter/reactions
+/api/filter/species
+/api/filter/genes
+-> upload a file and return filtered stuff as json
+
+
+
+filtering for something, will remove everything where something appears:
+-> removing a species will remove all reactions that this species is involved in
+
+
+</pre>
+<h2>API</h2>
+use this and that
+{% endblock %}

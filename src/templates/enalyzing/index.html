@@ -1,0 +1,64 @@
+{% extends "enalyzing/skeleton.html" %}
+{% block enalyzing %}
+
+
+<h1>Step 1: Select a model</h1>
+
+<p>
+To start your analysis you need to select a model.
+You can either choose a model from a public repository or upload your own model:
+</p>
+
+<div class="w3-bar w3-flat-silver">
+  <div class="w3-bar-item w3-hide-small">Choose Method:</div>
+  <button id="choose-public-model-tab" class="w3-bar-item w3-button w3-flat-clouds" onclick="tab('choose-public-model', 'choose-public-model-tab')">Public Model</button>
+  <button id="upload-model-tab" class="w3-bar-item w3-button" onclick="tab('upload-model', 'upload-model-tab')">Upload Model</button>
+</div>
+<div id="error" class="w3-container w3-red w3-padding"></div>
+
+<div class="w3-margin">
+  <div id="choose-public-model" class="">
+    <p>We currently support the following databases:</p>
+    <div class="w3-bar w3-flat-silver">
+      <div class="w3-bar-item w3-hide-small">Choose Database:</div>
+      <button id="choose-public-model-bigg-tab" class="w3-bar-item w3-button w3-flat-clouds" onclick="tab('choose-bigg', 'choose-public-model-bigg-tab')">BIGG</button>
+      <button id="choose-public-model-biomodels-tab" class="w3-bar-item w3-button" onclick="tab('choose-biomodels', 'choose-public-model-biomodels-tab')">Biomodels</button>
+    </div>
+    <div class="w3-margin">
+      <div id="choose-bigg" class="">
+        <div id="bigg_loading"><i class="fa fa-spinner w3-spin"></i> loading network</div>
+        <table class="w3-table w3-striped sortable" style="display:none">
+           <thead>
+             <th>ID</th>
+             <th>Organism</th>
+             <th>Metabolites</th>
+             <th>Reactions</th>
+             <th>Genes</th>
+           </thead>
+           <tbody id="bigg-table"></tbody>
+        </table>
+      </div>
+      <div id="choose-biomodels" style="display:none" class="">
+        to be implemented.... curl https://www.ebi.ac.uk/biomodels/search?format=json&query=genome+scale+metabolic+model | python -mjson.tool
+      </div>
+    </div>
+  </div>
+  <div id="upload-model" style="display:none" class="">
+    <p>Upload a custom model from your system:</p>
+    <form method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      <input type="file" name="custom-model">
+    <button type="submit">Upload</button>
+    </form>
+  </div>
+</div>
+
+
+<script>
+  token = '{{ csrf_token }}';
+  filter_url = "{% url 'enalyzing:filter' %}";
+  prepareIndex ();
+</script>
+
+
+{% endblock %}

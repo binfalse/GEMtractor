@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block content %}
+{% if 3 < 4 %}
+3 ist kleiner 4
+{% else %}
+anders
+{% endif %}
+{{ test }}
+
+{{ net }}
+
+<form action="{% url 'index:filter' %}" method="post">
+{% csrf_token %}
+<input type="submit" value="Vote">
+</form>
+
+{% endblock %}

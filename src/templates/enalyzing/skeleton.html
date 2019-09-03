@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block content %}
+
+{% if error %}
+ <div class="w3-panel w3-red">
+<p>{{error}}</p>
+</div>  
+{% endif %}
+
+{% if model_name %}
+
+<div class="w3-bar w3-flat-silver">
+  <div class="w3-bar-item w3-hide-small">Model: {{model_name}}</div>
+<a href="{% url 'enalyzing:index' %}" class="w3-bar-item {% if current_url == 'enalyzing/' %}w3-flat-clouds{% endif %} w3-hide-small">Select other model</a>
+<a href="{% url 'enalyzing:index' %}" class="w3-bar-item {% if current_url == 'enalyzing/' %}w3-flat-clouds{% endif %} w3-hide-large">Select model</a>
+<a href="{% url 'enalyzing:filter' %}" class="w3-bar-item {% if current_url == 'enalyzing/filter' %}w3-flat-clouds{% endif %}">Filter</a>
+<a href="{% url 'enalyzing:export' %}" class="w3-bar-item {% if current_url == 'enalyzing/export' %}w3-flat-clouds{% endif %}">Export</a>
+</div>
+
+
+
+{% endif %}
+
+
+
+
+{% block enalyzing %}{% endblock %}
+
+
+{% endblock %}

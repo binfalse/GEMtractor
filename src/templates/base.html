@@ -1,0 +1,47 @@
+{% load static %}
+{# HTML5 declaration #}
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Enalyzer: {% block title %}{% endblock %}</title>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<script src="{% static 'js/jquery-3.4.1.min.js' %}"></script>
+		<script src="{% static 'js/main.js' %}"></script>
+		<link rel="stylesheet" href="{% static 'css/w3.css' %}" type="text/css" />
+		<link rel="stylesheet" href="{% static 'css/w3-colors-flat.css' %}" type="text/css" />
+		<link rel="stylesheet" href="{% static 'css/main.css' %}" type="text/css" />
+		<link rel="stylesheet" href="{% static 'css/fontawesome-5.10.1.css' %}" type="text/css" />
+	</head>
+	<body class="w3-flat-clouds">
+		
+		<div class="w3-top">
+			<div class="w3-bar w3-flat-midnight-blue w3-card w3-center">
+				<a class="w3-bar-item w3-button w3-padding-large w3-hide-medium w3-hide-large w3-right" href="javascript:void(0)" onclick="myFunction()" title="Toggle Navigation Menu"><i class="fa fa-bars"></i></a>
+				<a href="/" class="w3-bar-item w3-button w3-padding-large">Home</a>
+				<a href="/enalyzing" class="w3-bar-item w3-button w3-padding-large w3-hide-small">ENAlyze</a>
+				<a href="/doc" class="w3-bar-item w3-button w3-padding-large w3-hide-small">Documentation</a>
+				<a href="/imprint" class="w3-bar-item w3-button w3-padding-large w3-hide-small">Imprint</a>
+			</div>
+		</div>
+		
+		
+		<div id="navMobi" class="w3-bar-block w3-flat-midnight-blue w3-hide w3-hide-large w3-hide-medium w3-top">
+			<a href="/enalyzing" class="w3-bar-item w3-button w3-padding-large" onclick="myFunction()">ENAlyze</a>
+			<a href="/doc" class="w3-bar-item w3-button w3-padding-large" onclick="myFunction()">Documentation</a>
+			<a href="/imprint" class="w3-bar-item w3-button w3-padding-large" onclick="myFunction()">Imprint</a>
+		</div>
+		
+		
+		<div class="w3-content">
+			<div class="w3-container w3-content w3-flat-wet-asphalt w3-padding-64 w3-margin-top w3-card-4">
+			{% block content %}{% endblock %}
+		</div>
+			
+		</div>
+		
+		<footer class="w3-container w3-padding-64 w3-center w3-opacity w3-xlarge">
+			<p class="w3-medium">clear this session will remove all data</p>
+		</footer>
+	</body>
+</html>
