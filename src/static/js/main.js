@@ -448,6 +448,48 @@ function prepareExport () {
 
 /**
  * 
+ * select_biomodel -- select a model from biomodels using ist model id
+ * will redirect to the filter page if successful
+ * 
+ * @param modelid the id of the model, such as MODEL1212060001 or BIOMD0000000469
+ * 
+ */
+function select_biomodel (modelid) {
+		if (!modelid.match (/^(BIOMD|MODEL)[0-9]{10}$/)) {
+			$("#error").show ().text ("Invalid model id. Please go to Biomodels to copy a valid model id, such as MODEL1212060001 or BIOMD0000000469.");
+			return
+		}
+		$("#error").hide ();
+		
+		$.ajax({
+			url: '/api/select_biomodel',
+			dataType: 'json',
+			method: "POST",
+			headers: {"X-CSRFToken": token},
+			data: JSON.stringify({
+				biomodels_id: modelid
+			}),
+			success: function (data) {
+				// successfully downloaded something, but was the request also successfull?
+				if (data.status != 'success') {
+					$("#error").show ().text ("Failed to select Biomodel: " + data.error);
+				$("#specific-biomodel-loading").hide ();
+					return;
+				}
+				// all right, let's move on to filtering
+				window.location = filter_url;
+			},
+			error: function (jqXHR, textStatus, errorThrown) {
+				$("#error").show ().text ("Failed to obtain Biomodel: " + errorThrown);
+				$("#specific-biomodel-loading").hide ();
+			}
+		});
+	
+}
+
+
+/**
+ * 
  * prepareIndex -- prepare the enalyzing index page
  * 
  * including download of bigg models and biomodels, binding click events to buttons, etc
@@ -514,9 +556,19 @@ function prepareIndex () {
     });
       
       
-      
-      
-        
+  // select a specific biomodel
+  $('#specific-biomodel').click (function () {
+		const modelid = $("#biomodelsid").val ().trim ();
+		if (!modelid.match (/^(BIOMD|MODEL)[0-9]{10}$/)) {
+			$("#error").show ().text ("Invalid model id. Please go to Biomodels to copy a valid model id, such as MODEL1212060001 or BIOMD0000000469.");
+			return
+		}
+		$("#error").hide ();
+		$("#specific-biomodel-loading").show ();
+		// select the model
+		select_biomodel (modelid);
+	});
+  
 	// download the biomodels list  
 	$.ajax({
         url: '/api/get_biomodels',
@@ -539,27 +591,7 @@ function prepareIndex () {
 				const modelid = $(this).text ();
 				$(this).html ("<i class='fa fa-spinner w3-spin'></i> loading model");
 				// select the model
-				$.ajax({
-					url: '/api/select_biomodel',
-					dataType: 'json',
-					method: "POST",
-					headers: {"X-CSRFToken": token},
-					data: JSON.stringify({
-						biomodels_id: modelid
-					}),
-					success: function (data) {
-						// successfully downloaded something, but was the request also successfull?
-						if (data.status != 'success') {
-							$("#error").show ().text ("Failed to select Biomodel: " + data.error);
-							return;
-						}
-						// all right, let's move on to filtering
-						window.location = filter_url;
-					},
-					error: function (jqXHR, textStatus, errorThrown) {
-						$("#error").show ().text ("Failed to obtain Biomodel: " + errorThrown);
-					}
-				});
+				select_biomodel (modelid);
 			});
           
           

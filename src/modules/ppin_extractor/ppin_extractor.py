@@ -44,7 +44,7 @@ class PpinExtractor:
         # self.__logger.setLevel(logging.DEBUG)
     
     def __get_expression_parser (self):
-        variables = pp.Word(pp.alphanums, pp.alphanums + "_-.") 
+        variables = pp.Word(pp.alphanums + "_-.") 
         condition = pp.Group(variables)
         return pp.infixNotation(condition,[("and", 2, pp.opAssoc.LEFT, ),("or", 2, pp.opAssoc.LEFT, ),])
 

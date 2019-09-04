@@ -6,7 +6,7 @@ import logging
 import json
 import os
 from django.http import JsonResponse, HttpResponse, Http404
-from modules.enalyzer_utils.utils import Utils, InvalidGeneExpression
+from modules.enalyzer_utils.utils import Utils, InvalidGeneExpression, InvalidBiomodelsId, UnableToRetrieveBiomodel
 from modules.ppin_extractor.ppin_extractor import PpinExtractor
 from modules.enalyzer_utils.constants import Constants
 import time
@@ -165,8 +165,12 @@ def select_biomodel (request):
     Utils.del_session_key (request, {}, Constants.SESSION_FILTER_GENES)
     return JsonResponse ({"status":"success"})
 
+  except UnableToRetrieveBiomodel  as e:
+      return JsonResponse ({"status":"failed","error":getattr(e, 'message', repr(e))})
+  except InvalidBiomodelsId  as e:
+      return JsonResponse ({"status":"failed","error":getattr(e, 'message', repr(e))})
   except urllib.error.HTTPError  as e:
-      return JsonResponse ({"status":"failed","error":str (getattr(e, 'code', repr(e))) + getattr(e, 'message', repr(e))})
+      return JsonResponse ({"status":"failed","error": "Does such a model exist? Can't download from Biomodels: " + str (getattr(e, 'code', repr(e))) + getattr(e, 'message', repr(e))})
   except urllib.error.URLError as e:
     if hasattr(e, 'reason'):
       return JsonResponse ({"status":"failed","error":str (getattr(e, 'reason', repr(e))) + getattr(e, 'message', repr(e))})

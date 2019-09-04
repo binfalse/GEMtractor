@@ -12,7 +12,7 @@ import re
 
 class InvalidBiggId (Exception): pass
 class InvalidBiomodelsId (Exception): pass
-class UnableToRetriebeBiomodel (Exception): pass
+class UnableToRetrieveBiomodel (Exception): pass
 class BreakLoops (Exception): pass
 class NotYetImplemented (Exception): pass
 class InvalidGeneExpression (Exception): pass
@@ -140,7 +140,7 @@ class Utils:
   
   @staticmethod
   def get_biomodel (model_id):
-    if not re.match('^[BM][A-Z0-9_-]+$', model_id):
+    if not re.match('^[BM][A-Z]+[0-9]{10}$', model_id):
       raise InvalidBiomodelsId ("this biomodels id is invalid: " + model_id)
       
     d = os.path.join (settings.STORAGE, "cache", "biomodels")
@@ -151,16 +151,19 @@ class Utils:
       urllib.request.urlretrieve ("https://www.ebi.ac.uk/biomodels/"+model_id+"?format=json", f)
     
     
-    with open(f, 'r') as json_data:
-      model = json.load(json_data)
-      sbmlfile = os.path.join (d, h + ".sbml")
-      if not os.path.isfile (sbmlfile) or time.time() - os.path.getmtime(sbmlfile) > settings.CACHE_BIOMODEL_FILE:
-        # print (type (model["files"]["main"][0]["name"]))
-        filename = model["files"]["main"][0]["name"]
-        # print (filename)
-        urllib.request.urlretrieve ("https://www.ebi.ac.uk/biomodels/model/download/"+model_id+"?filename="+filename, sbmlfile)
-      return sbmlfile
-    raise UnableToRetriebeBiomodel ("could not download biomodel: " + model_id)
+    try:
+      with open(f, 'r') as json_data:
+        model = json.load(json_data)
+        sbmlfile = os.path.join (d, h + ".sbml")
+        if not os.path.isfile (sbmlfile) or time.time() - os.path.getmtime(sbmlfile) > settings.CACHE_BIOMODEL_FILE:
+          # print (type (model["files"]["main"][0]["name"]))
+          filename = model["files"]["main"][0]["name"]
+          # print (filename)
+          urllib.request.urlretrieve ("https://www.ebi.ac.uk/biomodels/model/download/"+model_id+"?filename="+filename, sbmlfile)
+        return sbmlfile
+    except JSONDecodeError as e:
+      raise UnableToRetrieveBiomodel ("could not read biomodel: " + model_id + " -- json response is invalid")
+    raise UnableToRetrieveBiomodel ("could not download biomodel: " + model_id)
   
   @staticmethod
   def get_model_path (model_type, model_id, sessionid):
