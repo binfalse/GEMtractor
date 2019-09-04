@@ -3,63 +3,106 @@
 learn
 {% endblock %}
 {% block content %}
-<h1>ENAlyzer helps you analysing enzyme networks</h1>
+<h1>Documentation for the enalyzer</h1>
+
+<ul>
+	<li><a href="#faq">FAQ</a></li>
+	<li><a href="#api">API</a></li>
+	<li><a href="#build">Build and run your own enalyzer</a></li>
+</ul>
 
 
-<div class="w3-green w3-padding">
-  If you remove a species, it will be removed from the reaction (the reaction may be wrong afterwards...!). you need to make sure to remove the reactions as well, if that is your goal. reactions with missing species will be coloured red. a species will not be deleted, as it might be used in other entities -> thus, filtered models may contain ghost species!
-</div>
 
-<div class="w3-green w3-padding">
-  faq
+
+
+<div class="w3-padding w3-card w3-flat-clouds w3-margin" id="faq">
+  <h2>Frequently asked and invented questions</h2>
   <ul>
-    <li>why do genes have such a strange name?</li>
-   <li>what if no gene is associated to a reaction? if no gene -> genename = reaction name</li>
-    <li>how can i discard "useless" metabolites (like h or h2o)?</li>
-    <li></li>
-    <li></li>
+    <li><a href="#model-support">Which type of models does the enalyzer support?</a></li>
+    <li><a href="#gene-names">Why do genes have such a strange name?</a></li>
+    <li><a href="#gene-association">How does the enalyzer identify genes that are associated to a reaction?</a></li>
+	<li><a href="#no-gene-name">What if no gene is associated to a reaction?</a></li>
+    <li><a href="#">How can i discard currency metabolites (like H, H2O or ATP)?</a></li>
+    <li><a href="#"></a></li>
+    <li><a href="#"></a></li>
   </ul>
+  
+	<div class="w3-padding w3-card w3-flat-clouds w3-margin" id="model-support">
+		<h3>Which type of models does the enalyzer support?</h3>
+		<p>The enalyzer supports only models encoded using the <a href="https://sbml.org/">Systems Biology Markup Language (SBML) format</a>. SBML is a standard format for computer models of biological processes, based on XML. You can find many example models at the <a href="https://www.ebi.ac.uk/biomodels/">Biomodels Database</a> or at <a href="http://bigg.ucsd.edu/">BiGG Models</a>.</p>
+	</div>
+  
+	<div class="w3-padding w3-card w3-flat-clouds w3-margin" id="gene-association">
+		<h3>How does the enalyzer identify genes that are associated to a reaction?</h3>
+		<p>We currently support two formats of gene associations: The legacy SBML-notes annotations, and well-structured annotations using the <a href="http://sbml.org/Documents/Specifications/SBML_Level_3/Packages/fbc">FBC package</a> in SBML Level 3 documents.</p>
+		<p>An example of legacy SBML-notes annotations from <a href="https://www.ebi.ac.uk/biomodels/MODEL1011080003">MODEL1011080003</a>, which encodes for <small><code>438  or  330</code></small>:</p>
+<pre>
+&lt;reaction id="R_METSR_S1" [...]&gt;
+	&lt;notes&gt;
+		&lt;html:p&gt;<strong>GENE_ASSOCIATION: ( 438  or  330 )</strong>&lt;/html:p&gt;
+		&lt;html:p&gt;PROTEIN_ASSOCIATION: MsrA&lt;/html:p&gt;
+		&lt;html:p&gt;SUBSYSTEM: S_Amino_Acid_Metabolism&lt;/html:p&gt;
+		&lt;html:p&gt;PROTEIN_CLASS:&lt;/html:p&gt;
+	&lt;/notes&gt;
+	[...]
+&lt;/reaction&gt;
+</pre>
+		<p>An example of a well-structured gene associations using FBC from <a href="http://bigg.ucsd.edu/models/e_coli_core">e_coli_core</a>which encodes for <small><code>(G_b3738 and G_b3736 and G_b3737 and G_b3735 and G_b3733 and G_b3731 and G_b3732 and G_b3734) or (G_b3734 and G_b3732 and G_b3731 and G_b3733 and G_b3735 and G_b3737 and G_b3736 and G_b3738 and G_b3739)</code></small></p>
+<pre>
+&lt;reaction id="R_ATPS4r" [...]&gt;
+	[...]<strong>
+	&lt;fbc:geneProductAssociation
+	  xmlns:fbc="http://www.sbml.org/sbml/level3/version1/fbc/version2"&gt;
+	  &lt;fbc:or sboTerm="SBO:0000174"&gt;
+		&lt;fbc:and sboTerm="SBO:0000173"&gt;
+		  &lt;fbc:geneProductRef fbc:geneProduct="G_b3738" /&gt;
+		  &lt;fbc:geneProductRef fbc:geneProduct="G_b3736" /&gt;
+		  &lt;fbc:geneProductRef fbc:geneProduct="G_b3737" /&gt;
+		  &lt;fbc:geneProductRef fbc:geneProduct="G_b3735" /&gt;
+		  &lt;fbc:geneProductRef fbc:geneProduct="G_b3733" /&gt;
+		  &lt;fbc:geneProductRef fbc:geneProduct="G_b3731" /&gt;
+		  &lt;fbc:geneProductRef fbc:geneProduct="G_b3732" /&gt;
+		  &lt;fbc:geneProductRef fbc:geneProduct="G_b3734" /&gt;
+		&lt;/fbc:and&gt;
+		&lt;fbc:and sboTerm="SBO:0000173"&gt;
+		  &lt;fbc:geneProductRef fbc:geneProduct="G_b3734" /&gt;
+		  &lt;fbc:geneProductRef fbc:geneProduct="G_b3732" /&gt;
+		  &lt;fbc:geneProductRef fbc:geneProduct="G_b3731" /&gt;
+		  &lt;fbc:geneProductRef fbc:geneProduct="G_b3733" /&gt;
+		  &lt;fbc:geneProductRef fbc:geneProduct="G_b3735" /&gt;
+		  &lt;fbc:geneProductRef fbc:geneProduct="G_b3737" /&gt;
+		  &lt;fbc:geneProductRef fbc:geneProduct="G_b3736" /&gt;
+		  &lt;fbc:geneProductRef fbc:geneProduct="G_b3738" /&gt;
+		  &lt;fbc:geneProductRef fbc:geneProduct="G_b3739" /&gt;
+		&lt;/fbc:and&gt;
+	  &lt;/fbc:or&gt;
+	&lt;/fbc:geneProductAssociation&gt;</strong>
+	[...]
+&lt;/reaction&gt;
+</pre>
+	</div>
+  
+	<div class="w3-padding w3-card w3-flat-clouds w3-margin" id="gene-names">
+		<h3>Why do genes have such a strange name?</h3>
+		<p>The gene names used by the enalyzer are actually the gene's identifiers, typically generated by some kind of software. They are often just numbered with a optional prefix (such as g1, g2, g3 etc). See also <a href="#no-gene-name">What if no gene is associated to a reaction?</a></p>
+		<p>TODO: add mouseover for gene ids if FBC annotations are available, ass mouseover if the gene name is actually the reaction id because we didn't find a gene name</p>
+	</div>
+	
+	<div class="w3-padding w3-card w3-flat-clouds w3-margin" id="no-gene-name">
+		<h3>What if no gene is associated to a reaction?</h3>
+		<p>If the enalyzer cannot find a gene-association, it assumes there is only a single gene and gives it the id of the reaction. See also <a href="gene-association">How does the enalyzer identify genes that are associated to a reaction?</a></p>
+	</div>
+
 </div>
 
-<div class="w3-green w3-padding">
-  wording:
-  <ul>
-    <li>inconsistent? or attention raising? (discuss also other table headers)</li>
-    <li>complexity in filter page</li>
-    <li></li>
-    <li></li>
-    <li></li>
-  </ul>
+<div class="w3-padding w3-card w3-flat-clouds w3-margin" id="api">
+  <h2>API</h2>
 </div>
 
-<div class="w3-green w3-padding">
-  todo:
-  <ul>
-    <li>somehow mention the mouseovers... (if on desktop)</li>
-    <li>fix javascript semicolons</li>
-    <li>describe and implement batch filtering</li>
-    <li>fix logging</li>
-    <li>python documentation</li>
-    <li>fix imports</li>
-    <li>apply license</li>
-    <li># TODO</li>
-    <li>clean up storage</li>
-    <li>test export options</li>
-    <li>/api/status to recache bigg models etc -> monitoring</li>
-    <li>test wrong bigg urls etc -> exceptions catched and properly shown?</li>
-    <li>fix function names (ppin!??)</li>
-    <li>merge the two modules</li>
-    <li>note: if you export EN as SBML, we'll implicitely create "reactions", which are not really existent...</li>
-    <li></li>
-    <li></li>
-    <li></li>
-    <li></li>
-    <li></li>
-    
-  </ul>
+<div class="w3-padding w3-card w3-flat-clouds w3-margin" id="build">
+  <h2>Build and run your own enalyzer</h2>
 </div>
 
-some intro
 
 <h2>Technical notes</h2>
 that's how we do it....
