@@ -283,11 +283,15 @@ class Network:
     return n
       
       
-  def export_en_sbml (self, filename, model_id):
+  def export_en_sbml (self, filename, model_id, model_name = None):
     sbml = SBMLDocument ()
-    model = sbml.createModel (model_id + "-enalyzed")
+    model = sbml.createModel ()
     if model is None:
       return False
+    model.setId (model_id + "_enalyzed_EnzymeNetwork")
+    if model_name is None:
+      model_name = model_id
+    model.setName ("enalyzed EnzymeNetwork of " + model_name)
     
     nodemap = {}
     

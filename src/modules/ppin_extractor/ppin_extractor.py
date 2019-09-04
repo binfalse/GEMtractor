@@ -142,6 +142,13 @@ class PpinExtractor:
       if sbml.getNumErrors() > 0:
         raise IOError ("model seems to be invalid")
       model = sbml.getModel()
+      name = model.getName ()
+      if name is None:
+          name = model.getId()
+      model.setId (model.getId() + "_enalyzed_ReactionNetwork")
+      model.setName ("enalyzed ReactionNetwork of " + name)
+      
+      
       
       if filter_species is not None or filter_reactions is not None or filter_genes is not None:
         try:
