@@ -9,11 +9,16 @@
 
 <div id="filtercontainer" style="display:none">
   <p>
-  Your model's <i>complexity</i> can be described by the following number of entities:
+  The following table displays the number of entities in your model, which
+  <ul>
+	  <li><strong>original:</strong> number of entities in the originally selected model</li>
+	  <li><strong>filtered:</strong> number of entities in the model with applied filters</li>
+	  <li><strong>inconsistent:</strong> entities that may need special attention when applying the current filter</li>
+  </ul>
   </p>
   <table class="w3-table w3-bordered">
   <tr>
-    <th>entity</th>
+    <th></th>
     <th>original</th>
     <th>filtered</th>
     <th>inconsistent</th>
@@ -41,24 +46,25 @@
   <h2>Reduce Model Size</h2>
 
   <p>
-    You can now discard a subset of model entities to reduce the model size .
-    With the reduced model you can for example concentrate on FBA results or knock out experiments.
+    You can now discard a subset of the model's entities (species, reactions, or genes) to reduce the model size.
+    With the reduced model you can for example concentrate on FBA results or simulate knock out experiments.
     Filtering a model may decrease subsequent computations dramatically.
   </p>
 
 
   <div class="w3-bar w3-flat-silver">
     <div class="w3-bar-item w3-hide-small">Filter:</div>
-    <button id="filter-species-tab" class="w3-bar-item w3-button w3-flat-clouds" onclick="tab('filter-species', 'filter-species-tab')">Species</button>
+    <button id="filter-species-tab" class="w3-bar-item w3-button" onclick="tab('filter-species', 'filter-species-tab')">Species</button>
     <button id="filter-reaction-tab" class="w3-bar-item w3-button" onclick="tab('filter-reaction', 'filter-reaction-tab')">Reaction</button>
     <button id="filter-gene-tab" class="w3-bar-item w3-button" onclick="tab('filter-gene', 'filter-gene-tab')">Gene</button>
     <button id="filter-batch-tab" class="w3-bar-item w3-button" onclick="tab('filter-batch', 'filter-batch-tab')">Batch</button>
   </div>
 
-<p>You may sort the following table by clicking on the header cell.</p>
 
     <div id="filter-tables" class="w3-margin">
-      <div id="filter-species" class="w3-responsive">
+      <div id="filter-species" class="w3-responsive" style="display:none">
+		<p>You may sort the following table by clicking on the header cell.</p>
+        <p>A red row indicates, that the corresponding species does not participate in any reaction anymore, so you may want to exclude it as well? If uncheck a species, it will not be removed from the entire model, but it will be removed from all reactions (it may still be used in other entities, such as functions or triggers). However, there may be ghost species afterwards, not participating in any reaction.</p>
         <table class="w3-table w3-striped sortable notfirst">
            <thead>
              <th>include</th>
@@ -68,9 +74,10 @@
            </thead>
            <tbody id="species-table"></tbody>
         </table>
-        <p>A red row indicates, that the corresponding species does not participate in any reaction anymore, so you may want to exclude it as well. If you remove a species, it will not be removed from the entire model, but it will be removed from all reactions (it may still be used in other enitites). thus, there may be ghost species, not participating in any reaction.</p>
       </div>
       <div id="filter-reaction" class="w3-responsive" style="display:none" class="">
+		<p>You may sort the following table by clicking on the header cell.</p>
+        <p>A red row indicates, that your filter would keep the reaction in the model, but some (or all) of it's species and/or all associated genes were removed. So you may want to exclude the reaction as well? If you export the <em>reaction network</em> and you removed all it's species, the reaction will be removed as well. If you export the <em>enzyme network,</em> the reaction will be removed if all it's species are removed or all it's genes are removed.</p>
         <table class="w3-table w3-striped sortable notfirst">
            <thead>
              <th>include</th>
@@ -81,9 +88,10 @@
            </thead>
            <tbody id="reaction-table"></tbody>
         </table>
-        <p>A red row indicates, that your filter would keep the reaction in the model while some (or all) of it's species  and/or associated genes were removed. If you export the chemical reaction network, this reaction (and it's kinetic laws etc) will only be removed if all it's species are removed. If you export the enzyme network, it will be removed if all it's species are removed or all it's genes are removed.</p>
       </div>
       <div id="filter-gene" class="w3-responsive" style="display:none" class="">
+		<p>You may sort the following table by clicking on the header cell.</p>
+        <p>A red gene indicates, that the gene is not used in any reaction anymore. Thus, it will be excluded even if you keep it selected here!</p>
         <table class="w3-table w3-striped sortable notfirst">
            <thead>
              <th>include</th>
@@ -91,13 +99,9 @@
            </thead>
            <tbody id="gene-table"></tbody>
         </table>
-        <p>A red gene indicates, that the gene is not used in the model anymore. Thus, it will be excluded even if you keep it selected here.</p>
       </div>
       <div id="filter-batch" style="display:none" class="">
         <textarea id="batch-filter" rows="20">
-species: []
-reactions: []
-genes: []
         </textarea>
       </div>
     </div>
@@ -108,6 +112,5 @@ genes: []
   token = '{{ csrf_token }}';
   loadNetwork ();
 </script>
-DELETE MY MODEL AND SELECT A NEW ONE
 {% endblock %}
 
