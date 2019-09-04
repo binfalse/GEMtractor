@@ -130,7 +130,12 @@ def export(request):
           
           file_name = file_name + ".sbml"
           file_path = Utils.create_generated_file_web (file_name, request.session.session_key)
-          model = net.export_en_sbml (file_path, request.session[Constants.SESSION_MODEL_ID], request.session[Constants.SESSION_MODEL_NAME])
+          model = net.export_en_sbml (file_path, request.session[Constants.SESSION_MODEL_ID], request.session[Constants.SESSION_MODEL_NAME],
+          request.session[Constants.SESSION_FILTER_SPECIES],
+        request.session[Constants.SESSION_FILTER_REACTION],
+        request.session[Constants.SESSION_FILTER_GENES],
+        form.cleaned_data['remove_reaction_genes_removed'],
+        form.cleaned_data['remove_reaction_missing_species'])
           if os.path.exists(file_path):
             return serve_file (file_path, file_name, "application/xml")
           else:

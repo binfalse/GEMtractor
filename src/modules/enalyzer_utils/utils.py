@@ -18,6 +18,33 @@ class NotYetImplemented (Exception): pass
 class InvalidGeneExpression (Exception): pass
 
 class Utils:
+  @staticmethod
+  def add_model_note (model, filter_species, filter_reactions, filter_genes, remove_reaction_genes_removed, remove_reaction_missing_species):
+    note = model.getNotesString ()
+    print (note)
+    if note is None or len (note) < 1 or "</body>" not in note:
+        note = '<notes><body xmlns="http://www.w3.org/1999/xhtml"></body></notes>'
+    
+    additional_note = "<p>This file was generated at the enalyzer (https://enalyzer.bio.informatik.uni-rostock.de/) using the following settings:</p>"
+    if filter_species is not None and len (filter_species) > 0:
+      additional_note = additional_note + "<p>Filter Species:</p><ul>"
+      for s in filter_species:
+        additional_note = additional_note + "<li>"+s+"</li>"
+      additional_note = additional_note + "</ul>"
+    if filter_reactions is not None and len (filter_reactions) > 0:
+      additional_note = additional_note + "<p>Filter Reactions:</p><ul>"
+      for s in filter_reactions:
+        additional_note = additional_note + "<li>"+s+"</li>"
+      additional_note = additional_note + "</ul>"
+    if filter_genes is not None and len (filter_genes) > 0:
+      additional_note = additional_note + "<p>Filter Genes:</p><ul>"
+      for s in filter_genes:
+        additional_note = additional_note + "<li>"+s+"</li>"
+      additional_note = additional_note + "</ul>"
+    additional_note = additional_note + "<p>Remove reactions who's genes are removed: " +str(remove_reaction_genes_removed)+ "</p>"
+    additional_note = additional_note + "<p>Remove reactions that are missing a species: " +str(remove_reaction_missing_species)+ "</p>"
+    
+    model.setNotes (note.replace ("</body>", additional_note + "</body>"))
   
   @staticmethod
   def _create_dir (d):

@@ -22,7 +22,7 @@ import logging
 import hashlib
 from .network import Network, Reaction, Species
 import math
-from modules.enalyzer_utils.utils import BreakLoops, InvalidGeneExpression
+from modules.enalyzer_utils.utils import BreakLoops, InvalidGeneExpression, Utils
 
 # assumptions:
 # * gene logic is stored per reaction in reaction->notes->html as "<p>GENE_ASSOCIATION: ....</p>"
@@ -148,6 +148,7 @@ class PpinExtractor:
       model.setId (model.getId() + "_enalyzed_ReactionNetwork")
       model.setName ("enalyzed ReactionNetwork of " + name)
       
+      Utils.add_model_note (model, filter_species, filter_reactions, filter_genes, remove_reaction_genes_removed, remove_reaction_missing_species)
       
       
       if filter_species is not None or filter_reactions is not None or filter_genes is not None:

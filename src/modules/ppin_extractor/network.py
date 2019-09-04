@@ -1,6 +1,7 @@
 
 import logging
 from libsbml import *
+from modules.enalyzer_utils.utils import Utils
 
 # TODO: logging
 class Species:
@@ -283,7 +284,7 @@ class Network:
     return n
       
       
-  def export_en_sbml (self, filename, model_id, model_name = None):
+  def export_en_sbml (self, filename, model_id, model_name = None, filter_species = None, filter_reactions = None, filter_genes = None, remove_reaction_genes_removed = True, remove_reaction_missing_species = False):
     sbml = SBMLDocument ()
     model = sbml.createModel ()
     if model is None:
@@ -292,6 +293,9 @@ class Network:
     if model_name is None:
       model_name = model_id
     model.setName ("enalyzed EnzymeNetwork of " + model_name)
+    
+    print ("adding note to en sbml")
+    Utils.add_model_note (model, filter_species, filter_reactions, filter_genes, remove_reaction_genes_removed, remove_reaction_missing_species)
     
     nodemap = {}
     
