@@ -24,6 +24,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = '!6qdx@dba$w9uh(6efjcnm_!gblg9i5_d^r&#8btxo=0na$b&)'
 
 # SECURITY WARNING: don't run with debug turned on in production!
+# TODO
 DEBUG = True
 
 ALLOWED_HOSTS = ['enalyzer-py','localhost']
@@ -132,13 +133,22 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 
 
-if DEBUG:
-    # will output to your console
-    logging.basicConfig(
-        level = logging.DEBUG,
-        format = '%(asctime)s %(levelname)s %(message)s',
-    )
-
+# if DEBUG:
+    # # will output to your console
+    # logging.basicConfig(
+        # level = logging.DEBUG,
+        # format = '%(asctime)s %(levelname)s %(message)s',
+    # )
+# else:
+    # logging.basicConfig(
+        # level = logging.CRITICAL,
+        # format = '%(asctime)s %(levelname)s %(message)s',
+    # )
+# TODO remove and include above
+logging.basicConfig(
+    level = logging.CRITICAL,
+    format = '%(asctime)s %(levelname)s %(message)s',
+)
 
 #import tempfile
 STORAGE = "/tmp/enalyzer-storage/"
@@ -146,4 +156,5 @@ STORAGE_INVALIDATE_DEFAULT = 60*60*5
 STORAGE_INVALIDATE_PUBLIC = 60*60*24
 
 CACHE_BIGG = 60*60*24
-
+CACHE_BIOMODELS = 60*60*24
+CACHE_BIOMODEL_FILE = 60*60*24

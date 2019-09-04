@@ -11,8 +11,11 @@ import json
 import re
 
 class InvalidBiggId (Exception): pass
+class InvalidBiomodelsId (Exception): pass
+class UnableToRetriebeBiomodel (Exception): pass
 class BreakLoops (Exception): pass
 class NotYetImplemented (Exception): pass
+class InvalidGeneExpression (Exception): pass
 
 class Utils:
   
@@ -74,7 +77,7 @@ class Utils:
       urllib.request.urlretrieve ("http://bigg.ucsd.edu/api/v2/models/", f)
     if time.time() - os.path.getmtime(f) > settings.CACHE_BIGG:
       return Utils.get_bigg_models (True)
-    with open(f) as json_data:
+    with open(f, 'r') as json_data:
       return json.load(json_data)
   
   @staticmethod
@@ -95,7 +98,42 @@ class Utils:
     
     urllib.request.urlretrieve ("http://bigg.ucsd.edu/static/models/"+bigg_id+".xml", f)
     return f
+  
+  @staticmethod
+  def get_biomodels (force = False):
+    d = os.path.join (settings.STORAGE, "cache", "biomodels")
+    Utils._create_dir(d)
+    f = os.path.join (d, "models.json")
+    if force or not os.path.isfile (f):
+      urllib.request.urlretrieve ('https://www.ebi.ac.uk/biomodels/search?format=json&query=genome+scale+metabolic+model+modelformat%3A%22SBML%22+NOT+%22nicolas+le%22&numResults=100&sort=id-asc', f)
+    if time.time() - os.path.getmtime(f) > settings.CACHE_BIOMODELS:
+      return Utils.get_biomodels (True)
+    with open(f, 'r') as json_data:
+      return json.load(json_data)
+  
+  @staticmethod
+  def get_biomodel (model_id):
+    if not re.match('^[BM][A-Z0-9_-]+$', model_id):
+      raise InvalidBiomodelsId ("this biomodels id is invalid: " + model_id)
+      
+    d = os.path.join (settings.STORAGE, "cache", "biomodels")
+    Utils._create_dir(d)
+    h = hashlib.sha512 (model_id.encode("utf-8")).hexdigest()
+    f = os.path.join (d, h + ".json")
+    if not os.path.isfile (f) or time.time() - os.path.getmtime(f) > settings.CACHE_BIOMODEL_FILE:
+      urllib.request.urlretrieve ("https://www.ebi.ac.uk/biomodels/"+model_id+"?format=json", f)
     
+    
+    with open(f, 'r') as json_data:
+      model = json.load(json_data)
+      sbmlfile = os.path.join (d, h + ".sbml")
+      if not os.path.isfile (sbmlfile) or time.time() - os.path.getmtime(sbmlfile) > settings.CACHE_BIOMODEL_FILE:
+        # print (type (model["files"]["main"][0]["name"]))
+        filename = model["files"]["main"][0]["name"]
+        # print (filename)
+        urllib.request.urlretrieve ("https://www.ebi.ac.uk/biomodels/model/download/"+model_id+"?filename="+filename, sbmlfile)
+      return sbmlfile
+    raise UnableToRetriebeBiomodel ("could not download biomodel: " + model_id)
   
   @staticmethod
   def get_model_path (model_type, model_id, sessionid):
@@ -103,6 +141,8 @@ class Utils:
       return Utils.get_path_of_uploaded_file (model_id, sessionid)
     if model_type == 'bigg':
       return Utils.get_bigg_model (model_id)
+    if model_type == 'biomodels':
+      return Utils.get_biomodel (model_id)
     
   @staticmethod
   def del_session_key (request, context, key):

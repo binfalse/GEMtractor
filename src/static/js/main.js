@@ -179,6 +179,15 @@ function updateNetwork () {
     storeFilters (s, r, g);
 }
 
+function truncate (str) {
+  length = 40;
+  ending = "..."
+  if (str.length > length) {
+    return str.substring(0, length - ending.length) + ending;
+  }
+  return  str;
+}
+
 function draw_network_table (filter) {
   
   for (var key in networks.original.species) {
@@ -186,7 +195,7 @@ function draw_network_table (filter) {
      const item = networks.original.species[key];
      item.DOM = domIdMapper (item.identifier);
      var checked = filter["filter_species"].includes(key) ? "" : " checked";
-    const row = $("<tr id='"+item.DOM+"'><td class='check'><input type='checkbox'"+checked+"></td><td>"+item.identifier+"</td><td>"+item.name+"</td><td title='occurs in "+item.occurence.join (", ")+"'>"+item.occurence.length+"</td></tr>");
+    const row = $("<tr id='"+item.DOM+"'><td class='check'><input type='checkbox'"+checked+"></td><td><abbr title='"+item.identifier+"'>"+truncate (item.identifier)+"</abbr></td><td><abbr title='"+item.name+"'>"+truncate (item.name)+"</abbr></td><td title='occurs in "+item.occurence.join (", ")+"'>"+item.occurence.length+"</td></tr>");
     $('#species-table').append(row);
   }};
   
@@ -195,7 +204,7 @@ function draw_network_table (filter) {
      const item = networks.original.reactions[key];
      item.DOM = domIdMapper (item.identifier);
      var checked = filter["filter_reactions"].includes(key) ? "" : " checked";
-    const row = $("<tr id='"+item.DOM+"'><td class='check'><input type='checkbox'"+checked+"></td><td>"+item.identifier+"</td><td>"+item.name+"</td><td><small>"+item.consumed.join (" + ") + "</small> <i class='fas fa-arrow-right'></i> <small>" + item.produced.join (" + ") +"</small></td><td><small>"+item.genes.join ("</small> [OR] <small>") +"</small></td></tr>");
+    const row = $("<tr id='"+item.DOM+"'><td class='check'><input type='checkbox'"+checked+"></td><td><abbr title='"+item.identifier+"'>"+truncate (item.identifier)+"</abbr></td><td><abbr title='"+item.name+"'>"+truncate (item.name)+"</abbr></td><td><small>"+item.consumed.join (" + ") + "</small> <i class='fas fa-arrow-right'></i> <small>" + item.produced.join (" + ") +"</small></td><td><small>"+item.genes.join ("</small> [OR] <small>") +"</small></td></tr>");
     $('#reaction-table').append(row);
   }};
   
@@ -288,7 +297,7 @@ function loadNetwork () {
         error: function (jqXHR, textStatus, errorThrown) {
           $("#filtercontainer").hide ();
           $("#loading").hide ();
-          $("#error").show ().text ("Failed to retrieve the network: " + errorThrown);
+          $("#error").show ().text ("Failed to retrieve the network: " + errorThrown + " (" + textStatus + ")");
         }
       });
 }
@@ -363,7 +372,6 @@ function prepareIndex () {
             $("#error").show ().text ("Failed to select BiGG model: " + data.error);
             return;
           }
-          $("#error").hide ();
           window.location = filter_url;
         },
         error: function (jqXHR, textStatus, errorThrown) {
@@ -380,7 +388,6 @@ function prepareIndex () {
           
           //$("#filtercontainer").show ();
           //$("#loading").hide ();
-          $("#error").hide ();
           $("#bigg_loading").hide ();
           $("#choose-bigg table").show ();
           //draw_network_table (data.filter);
@@ -395,5 +402,75 @@ function prepareIndex () {
           $("#error").show ().text ("Failed to obtain BiGG models: " + errorThrown);
         }
       });
+      
+      
+      
+      
+          
+  $.ajax({
+        url: '/api/get_biomodels',
+        dataType: 'json',
+        success: function (data) {
+          
+          if (data.status != 'success') {
+            //$("#filtercontainer").hide ();
+            //$("#loading").hide ();
+            $("#error").show ().text ("Failed to obtain Biomodels: " + data.error);
+            return;
+          }
+          console.log (data);
+          
+          
+          
+  for (var model of data.models) {
+    //console.log (model["id"]);
+     model.DOM = domIdMapper (model.id);
+     
+    const row = $("<tr id='"+model.DOM+"'><td><a class='biomodels_id'>"+model.id+"</a></td><td>"+model.name+"</td></tr>");
+    $('#biomodels-table').append(row);
+  }
+  
+  $('.biomodels_id').click (function () {
+    //console.log ($(this).text ());
+    const modelid = $(this).text ();
+    $(this).html ("<i class='fa fa-spinner w3-spin'></i> loading model")
+  $.ajax({
+        url: '/api/select_biomodel',
+        dataType: 'json',
+    method: "POST",
+    headers: {"X-CSRFToken": token},
+        data: JSON.stringify({
+          biomodels_id: modelid
+          }),
+        success: function (data) {
+          
+          if (data.status != 'success') {
+            //$("#filtercontainer").hide ();
+            //$("#loading").hide ();
+            $("#error").show ().text ("Failed to select Biomodel: " + data.error);
+            return;
+          }
+          window.location = filter_url;
+        },
+        error: function (jqXHR, textStatus, errorThrown) {
+          $("#error").show ().text ("Failed to obtain Biomodel: " + errorThrown);
+        }
+      });
+  });
+          
+          
+          $("#biomodels_loading").hide ();
+          $("#choose-biomodels table").show ();
+  prepareTableSorting ();
+        },
+        error: function (jqXHR, textStatus, errorThrown) {
+          //$("#filtercontainer").hide ();
+          //$("#loading").hide ();
+          $("#biomodels_loading").hide ();
+          $("#choose-biomodels table").hide ();
+          $("#error").show ().text ("Failed to obtain Biomodels: " + errorThrown);
+        }
+      });
+          
 }
 

@@ -29,9 +29,14 @@ form ul.errorlist {
   padding-top: 15px;
   padding-bottom: 15px;
 }
+a.biomodels_id,
 a.bigg_id {
   border-bottom: 1px solid;
 }
+a.biomodels_id:hover,
 a.bigg_id:hover {
  cursor:pointer;
+}
+#filter-tables abbr {
+  text-decoration: none;
 }

@@ -39,7 +39,14 @@ You can either choose a model from a public repository or upload your own model:
         </table>
       </div>
       <div id="choose-biomodels" style="display:none" class="">
-        to be implemented.... curl https://www.ebi.ac.uk/biomodels/search?format=json&query=genome+scale+metabolic+model | python -mjson.tool
+        <div id="biomodels_loading"><i class="fa fa-spinner w3-spin"></i> loading network</div>
+        <table class="w3-table w3-striped sortable" style="display:none">
+           <thead>
+             <th>ID</th>
+             <th>Name</th>
+           </thead>
+           <tbody id="biomodels-table"></tbody>
+        </table>
       </div>
     </div>
   </div>

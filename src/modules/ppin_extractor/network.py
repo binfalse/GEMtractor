@@ -7,7 +7,7 @@ class Species:
   def __init__ (self, name, identifier):
     self.__logger = logging.getLogger('enalyzer.species')
     # TODO: fix
-    self.__logger.setLevel(logging.DEBUG)
+    # self.__logger.setLevel(logging.DEBUG)
     self.name = name
     self.identifier = identifier
     self.genes_for_consumption = []
@@ -27,7 +27,7 @@ class Reaction:
   def __init__(self, identifier, name, reversible = False):
     self.__logger = logging.getLogger('enalyzer.reaction')
     # TODO: fix
-    self.__logger.setLevel(logging.DEBUG)
+    # self.__logger.setLevel(logging.DEBUG)
     self.identifier = identifier
     self.name = name
     self.reversible = reversible
@@ -59,7 +59,7 @@ class Network:
   def __init__ (self):
     self.__logger = logging.getLogger('enalyzer.network')
     # TODO: fix
-    self.__logger.setLevel(logging.ERROR)
+    # self.__logger.setLevel(logging.ERROR)
     self.species = {}
     self.reactions = {}
     self.genenet = {}

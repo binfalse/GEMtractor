@@ -22,7 +22,7 @@ import logging
 import hashlib
 from .network import Network, Reaction, Species
 import math
-from modules.enalyzer_utils.utils import BreakLoops
+from modules.enalyzer_utils.utils import BreakLoops, InvalidGeneExpression
 
 # assumptions:
 # * gene logic is stored per reaction in reaction->notes->html as "<p>GENE_ASSOCIATION: ....</p>"
@@ -37,20 +37,24 @@ class PpinExtractor:
     
     
     def __init__(self):
-        self.__GENE_PATTERN = re.compile(r".*GENE_ASSOCIATION: ([^<]+)<.*", re.DOTALL)
+        self.__GENE_PATTERN = re.compile(r".*GENE_ASSOCIATION: *([^<]+)<.*", re.DOTALL)
         self.__EXPRESSION_PARSER = self.__get_expression_parser ()
         self.__logger = logging.getLogger('PpinExtractor')
         # TODO: fix
-        self.__logger.setLevel(logging.DEBUG)
+        # self.__logger.setLevel(logging.DEBUG)
     
     def __get_expression_parser (self):
-        variables = pp.Word(pp.alphanums, pp.alphanums + "_") 
+        variables = pp.Word(pp.alphanums, pp.alphanums + "_-.") 
         condition = pp.Group(variables)
         return pp.infixNotation(condition,[("and", 2, pp.opAssoc.LEFT, ),("or", 2, pp.opAssoc.LEFT, ),])
 
 
     def _parse_expression (self, expression):
-        return self.__EXPRESSION_PARSER.parseString(expression.lower (), True)
+        # print ("parsing expression: " + expression)
+        try:
+            return self.__EXPRESSION_PARSER.parseString(expression.lower (), True)
+        except pp.ParseException as e:
+            raise InvalidGeneExpression ("cannot parse expression: >>" + expression + "<< -- " + getattr(e, 'message', repr(e)))
 
     def _unfold_complex_expression (self, parseresult):
         #print ("current: " + str(parseresult))
@@ -139,22 +143,6 @@ class PpinExtractor:
         raise IOError ("model seems to be invalid")
       model = sbml.getModel()
       
-      # reaction = model.getReaction ("R_ATPS4r")
-      # self.__logger.debug ("reaction: " + reaction.getName ())
-      # rfbc = reaction.getPlugin ("fbc")
-      # gpa = rfbc.getGeneProductAssociation().getAssociation()
-      # self.__logger.debug ("gpa: " + gpa.toInfix())
-      # self.__logger.debug ("gpa: " + str (gpa.isFbcAnd()))
-      # self.__logger.debug ("gpa: " + str (gpa.isFbcOr()))
-      # liste = gpa.getNumFbcAssociations ()
-      # for n in range (0, gpa.getNumFbcAssociations ()):
-          # self.__logger.debug ("list "+str(n)+": " + str (type(gpa.get(n))))
-          # # self.__logger.debug ("list "+str(n)+": " + str (liste.get(n).isFbcAnd()))
-          # # self.__logger.debug ("list "+str(n)+": " + str (liste.get(n).isFbcOr()))
-          # # self.__logger.debug ("list "+str(n)+": " + str (liste.get(n).isGeneProductRef()))
-      
-      
-      
       if filter_species is not None or filter_reactions is not None or filter_genes is not None:
         try:
           for n in range (model.getNumReactions () - 1, -1, -1):
@@ -239,9 +227,9 @@ class PpinExtractor:
             if gpa is not None:
                 return gpa.getAssociation().toInfix()
             else:
-                self.__logger.critical('no association: ' + reaction.getId ())
+                self.__logger.debug('no association: ' + reaction.getId ())
         else:
-            self.__logger.critical('no fbc: ' + reaction.getId ())
+            self.__logger.debug('no fbc: ' + reaction.getId ())
         
         return self._extract_genes_from_sbml_notes (reaction.getNotesString(), reaction.getId ())
         
@@ -272,11 +260,11 @@ class PpinExtractor:
         # TODO: reversible?
         r = Reaction (reaction.getId (), reaction.getName ())
         genes = self._get_genes (reaction)
-        self.__logger.critical("current genes string: " + genes + " - reaction: " + reaction.getId ())
+        self.__logger.debug("current genes string: " + genes + " - reaction: " + reaction.getId ())
         current_genes = self._unfold_complex_expression(self._parse_expression(self._get_genes (reaction)))
       
         if len(current_genes) < 1:
-          self.__logger.critical("did not find genes in reaction " + reaction.getId ())
+          self.__logger.debug("did not find genes in reaction " + reaction.getId ())
           raise NotImplementedError ("did not find genes in reaction " + reaction.getId ())
     
         for g in current_genes:
@@ -295,107 +283,5 @@ class PpinExtractor:
         network.add_reaction (r)
         
       return network
-    
-    # def extract_ppin_from_sbml (self, sbml_document, cutoff):
-        # model = document.getModel()
-        
-        # # create a list of 
-        # species = {}
-        # for n in range(0, model.getNumSpecies()):
-            # s = model.getSpecies (n)
-            # species[s.getId ()] = {
-                # "def": s,
-                # "occ": 0,
-                # "genes_for_consumption": [],
-                # "genes_for_production": []
-                # }
 
-        # self.__logger.debug("found " + str (len (species)) + " species")
-        
-        # genes = []
-
-        # for n in range(0, model.getNumReactions()):
-            # reaction = model.getReaction(n)
-            # current_genes = self._unfold_complex_expression(self._parse_expression(self._extract_genes_from_sbml_notes (reaction.getNotesString(), reaction.getId ())))
-            
-            # if len(current_genes) < 1:
-                # self.__logger.critical("did not find genes in reaction " + reaction.getId ())
-                # raise NotImplementedError ("did not find genes in reaction " + reaction.getId ())
-            
-            # for g in current_genes:
-                # if g not in genes:
-                    # genes.append(g)
-            
-            # for sn in range(0, reaction.getNumReactants()):
-                # s = reaction.getReactant(sn).getSpecies()
-                # species[s]["occ"] = species[s]["occ"] +1
-                # for g in current_genes:
-                    # if g not in species[s]["genes_for_consumption"]:
-                        # species[s]["genes_for_consumption"].append (g)
-            # for sn in range(0, reaction.getNumProducts()):
-                # s = reaction.getProduct(sn).getSpecies()
-                # species[s]["occ"] = species[s]["occ"] +1
-                # for g in current_genes:
-                    # if g not in species[s]["genes_for_production"]:
-                        # species[s]["genes_for_production"].append (g)
-
-        # self.__logger.debug("found " + str (len (genes)) + " genes")
-        
-        # if cutoff > 0:
-            # sp2 = {}
-            # for s in species:
-                # if species[s]["occ"] < cutoff:
-                    # sp2[s] = species[s]
-            # species = sp2
-                
-        # geneassociation = {}
-
-        # for g in genes:
-            # geneassociation[g] = []
-
-        # for s in species:
-            # for consumption in species[s]["genes_for_consumption"]:
-                # for production in species[s]["genes_for_production"]:
-                    # if consumption not in geneassociation[production]:
-                        # geneassociation[production].append (consumption)
-        
-        # return geneassociation
-    
-    # def export_ppin_dot (self, geneassociation, filename):
-        # nodemap = {}
-        # with open(filename, 'w') as f:
-            # f.write ("digraph ppin {\n")
-            # for gene in geneassociation:
-                # nodemap[gene] = 's' + hashlib.md5(gene).hexdigest()
-                # f.write ("\t" + nodemap[gene] + " [label=\""+gene+"\"];\n")
-            # for gene in geneassociation:
-                # for associated in geneassociation[gene]:
-                    # f.write ("\t" + nodemap[gene] + " -> " + nodemap[associated] + ";\n")
-            # f.write ("}\n")
-    
-    # def export_ppin_graphml (self, geneassociation, filename):
-        # nodemap = {}
-        # with open(filename, 'w') as f:
-            # f.write ("<graphml xmlns=\"http://graphml.graphdrawing.org/xmlns\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd\">\n<graph id=\"G\" edgedefault=\"directed\">\n")
-            # num = 0
-            # for gene in geneassociation:
-                # num += 1
-                # nodemap[gene] = 's' + str (num)
-                # f.write ("\t<node id=\"" + nodemap[gene] + "\"/>\n")
-            # num = 0
-            # for gene in geneassociation:
-                # for associated in geneassociation[gene]:
-                    # num += 1
-                    # f.write ("\t<edge id=\"e" + str(num) + "\" source=\"" + nodemap[gene] + "\" target=\"" + nodemap[associated] + "\"/>\n")
-            # f.write ("</graph>\n</graphml>\n")
-
-
-
-#reader = SBMLReader()
-#document = reader.readSBML("ecoli_core_model.xml")
-
-#ppinext = PpinExtractor ()
-#ppin = ppinext.extract_ppin_from_sbml (document, 8)
-#ppinext.export_ppin_dot (ppin, "output.dot")
-#ppinext.export_ppin_graphml (ppin, "output.graphml")
 

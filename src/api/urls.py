@@ -11,4 +11,6 @@ urlpatterns = [
     path('store_filter', views.store_filter, name='store_filter'),
     path('get_bigg_models', views.get_bigg_models, name='get_bigg_models'),
     path('select_bigg_model', views.select_bigg_model, name='select_bigg_model'),
+    path('get_biomodels', views.get_biomodels, name='get_biomodels'),
+    path('select_biomodel', views.select_biomodel, name='select_biomodel'),
     ]

@@ -6,11 +6,12 @@ import logging
 import json
 import os
 from django.http import JsonResponse, HttpResponse, Http404
-from modules.enalyzer_utils.utils import Utils
+from modules.enalyzer_utils.utils import Utils, InvalidGeneExpression
 from modules.ppin_extractor.ppin_extractor import PpinExtractor
 from modules.enalyzer_utils.constants import Constants
 import time
 import urllib
+import pyparsing as pp
 
 from libsbml import *
 
@@ -72,6 +73,9 @@ def get_network (request):
             })
     except IOError as e:
       return JsonResponse ({"status":"failed","error":getattr(e, 'message', repr(e))})
+    except InvalidGeneExpression as e:
+      __logger.critical("InvalidGeneExpression in model " + request.session[Constants.SESSION_MODEL_ID] + ": " + getattr(e, 'message', repr(e)))
+      return JsonResponse ({"status":"failed","error": "The model uses an invalid gene expression: " + getattr(e, 'message', repr(e))})
     #return JsonResponse ({"nope": "nope"})
   
   # invalid api request
@@ -131,7 +135,43 @@ def select_bigg_model (request):
   
   
   
+def get_biomodels (request):
+  # time.sleep(5)
+  try:
+    models = Utils.get_biomodels ()
+    models["status"] = "success"
+    return JsonResponse (models)
+  except urllib.error.HTTPError  as e:
+      return JsonResponse ({"status":"failed","error":str (getattr(e, 'code', repr(e))) + getattr(e, 'message', repr(e))})
+  except urllib.error.URLError as e:
+    if hasattr(e, 'reason'):
+      return JsonResponse ({"status":"failed","error":str (getattr(e, 'reason', repr(e))) + getattr(e, 'message', repr(e))})
+    elif hasattr(e, 'code'):
+      return JsonResponse ({"status":"failed","error":str (getattr(e, 'code', repr(e))) + getattr(e, 'message', repr(e))})
   
+def select_biomodel (request):
+  if request.method != 'POST':
+    # TODO
+    return redirect('index:index')
+  data=json.loads(request.body)
+  
+  try:
+    Utils.get_biomodel (data["biomodels_id"])
+    request.session[Constants.SESSION_MODEL_ID] = data["biomodels_id"]
+    request.session[Constants.SESSION_MODEL_NAME] = data["biomodels_id"]
+    request.session[Constants.SESSION_MODEL_TYPE] = 'biomodels'
+    Utils.del_session_key (request, {}, Constants.SESSION_FILTER_SPECIES)
+    Utils.del_session_key (request, {}, Constants.SESSION_FILTER_REACTION)
+    Utils.del_session_key (request, {}, Constants.SESSION_FILTER_GENES)
+    return JsonResponse ({"status":"success"})
+
+  except urllib.error.HTTPError  as e:
+      return JsonResponse ({"status":"failed","error":str (getattr(e, 'code', repr(e))) + getattr(e, 'message', repr(e))})
+  except urllib.error.URLError as e:
+    if hasattr(e, 'reason'):
+      return JsonResponse ({"status":"failed","error":str (getattr(e, 'reason', repr(e))) + getattr(e, 'message', repr(e))})
+    elif hasattr(e, 'code'):
+      return JsonResponse ({"status":"failed","error":str (getattr(e, 'code', repr(e))) + getattr(e, 'message', repr(e))})
   
   
 # def download (request):
