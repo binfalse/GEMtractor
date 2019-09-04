@@ -121,6 +121,7 @@ def export(request):
         form.cleaned_data['remove_reaction_missing_species'])
       
       if form.cleaned_data['network_type'] == 'en':
+        file_name = file_name + "-EnzymeNetwork"
         net = ppin.extract_network_from_sbml (sbml)
         net.calc_genenet ()
         if form.cleaned_data['network_format'] == 'sbml':
@@ -162,6 +163,7 @@ def export(request):
           else:
             context['error'] = "invalid format"
       elif form.cleaned_data['network_type'] == 'rn':
+        file_name = file_name + "-ReactionNetwork"
         if form.cleaned_data['network_format'] == 'sbml':
           file_name = file_name + ".sbml"
           file_path = Utils.create_generated_file_web (file_name, request.session.session_key)
