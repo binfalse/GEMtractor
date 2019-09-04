@@ -1,17 +1,10 @@
 {% extends "base.html" %}
+{% block title %}
+hello
+{% endblock %}
 {% block content %}
-{% if 3 < 4 %}
-3 ist kleiner 4
-{% else %}
-anders
-{% endif %}
-{{ test }}
-
-{{ net }}
-
-<form action="{% url 'index:filter' %}" method="post">
-{% csrf_token %}
-<input type="submit" value="Vote">
-</form>
+<h1>hello enalyzer</h1>
+<p>The enalyzer supports you in analyzing enzyme networks.</p>
+<p>The enalyzer supports you in analyzing enzyme networks.</p>
 
 {% endblock %}
