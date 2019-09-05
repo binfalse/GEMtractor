@@ -40,3 +40,9 @@ a.bigg_id:hover {
 #filter-tables abbr {
   text-decoration: none;
 }
+.anchor-heading a {
+    display: block;
+  position: relative;
+  top: -60px;
+    visibility: hidden;
+}
