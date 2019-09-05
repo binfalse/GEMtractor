@@ -164,19 +164,19 @@ class Network:
       with open(filename, 'w') as f:
         f.write (Network.create_gml_prefix ())
         
+        num = 0
         for identifier, species in self.species.items ():
-          nodemap[identifier] = 's' + identifier
+          num += 1
+          nodemap[identifier] = str (num)
           f.write (Network.create_gml_node (nodemap[identifier], "species", "ellipse", identifier))
         
-        num = 0
         for identifier, reaction in self.reactions.items ():
-          rid = 'r' + identifier
+          num += 1
+          rid = str (num)
           f.write (Network.create_gml_node (rid, "reaction", "rectangle", identifier))
           for s in reaction.consumed:
-            num = num + 1
             f.write (Network.create_gml_edge (nodemap[s], rid))
           for s in reaction.produced:
-            num = num + 1
             f.write (Network.create_gml_edge (rid, nodemap[s]))
           
         f.write ("]\n")
@@ -189,12 +189,10 @@ class Network:
         num = 0
         for gene in self.genenet:
           num += 1
-          nodemap[gene] = 'g' + str (num)
+          nodemap[gene] = str (num)
           f.write (Network.create_gml_node (nodemap[gene], "gene", "ellipse", gene))
-        num = 0
         for gene in self.genenet:
             for associated in self.genenet[gene]['links']:
-                num += 1
                 f.write (Network.create_gml_edge (nodemap[gene], nodemap[associated]))
         f.write ("]\n")
       
