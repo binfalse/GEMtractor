@@ -24,6 +24,7 @@ import tempfile
 import urllib.request
 import json
 import re
+from .constants import Constants
 
 class InvalidBiggId (Exception): pass
 class InvalidBiomodelsId (Exception): pass
@@ -36,7 +37,7 @@ class Utils:
   @staticmethod
   def add_model_note (model, filter_species, filter_reactions, filter_genes, remove_reaction_genes_removed, remove_reaction_missing_species):
     note = model.getNotesString ()
-    print (note)
+    # print (note)
     if note is None or len (note) < 1 or "</body>" not in note:
         note = '<notes><body xmlns="http://www.w3.org/1999/xhtml"></body></notes>'
     
@@ -182,11 +183,11 @@ class Utils:
   
   @staticmethod
   def get_model_path (model_type, model_id, sessionid):
-    if model_type == 'upload':
+    if model_type == Constants.SESSION_MODEL_TYPE_UPLOAD:
       return Utils.get_path_of_uploaded_file (model_id, sessionid)
-    if model_type == 'bigg':
+    if model_type == Constants.SESSION_MODEL_TYPE_BIGG:
       return Utils.get_bigg_model (model_id)
-    if model_type == 'biomodels':
+    if model_type == Constants.SESSION_MODEL_TYPE_BIOMODELS:
       return Utils.get_biomodel (model_id)
     
   @staticmethod

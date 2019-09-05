@@ -16,7 +16,7 @@
 
 import logging
 from libsbml import *
-from modules.enalyzer_utils.utils import Utils
+from .utils import Utils
 
 # TODO: logging
 class Species:
@@ -307,7 +307,7 @@ class Network:
       model_name = model_id
     model.setName ("enalyzed EnzymeNetwork of " + model_name)
     
-    print ("adding note to en sbml")
+    # print ("adding note to en sbml")
     Utils.add_model_note (model, filter_species, filter_reactions, filter_genes, remove_reaction_genes_removed, remove_reaction_missing_species)
     
     nodemap = {}

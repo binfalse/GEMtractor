@@ -22,7 +22,7 @@ import logging
 import hashlib
 from .network import Network, Reaction, Species
 import math
-from modules.enalyzer_utils.utils import BreakLoops, InvalidGeneExpression, Utils
+from .utils import BreakLoops, InvalidGeneExpression, Utils
 
 # assumptions:
 # * gene logic is stored per reaction in reaction->notes->html as "<p>GENE_ASSOCIATION: ....</p>"
@@ -50,7 +50,6 @@ class Enalyzer:
 
 
     def _parse_expression (self, expression):
-        # print ("parsing expression: " + expression)
         try:
             return self.__EXPRESSION_PARSER.parseString(expression.lower (), True)
         except pp.ParseException as e:
@@ -186,11 +185,11 @@ class Enalyzer:
             
             if filter_genes is not None:
               genes = self._get_genes (reaction)
-              self.__logger.critical("current genes string: " + genes + " - reaction: " + reaction.getId ())
+              self.__logger.debug("current genes string: " + genes + " - reaction: " + reaction.getId ())
               #self._extract_genes_from_sbml_notes (reaction.getNotesString(), reaction.getId ())
               current_genes = self._unfold_complex_expression(self._parse_expression(genes))
               if len(current_genes) < 1:
-                self.__logger.critical("did not find genes in reaction " + reaction.getId ())
+                self.__logger.info("did not find genes in reaction " + reaction.getId ())
                 raise NotImplementedError ("did not find genes in reaction " + reaction.getId ())
               
               # if len(current_genes) == 1 and current_genes[0] == reaction.getId ():
@@ -206,25 +205,11 @@ class Enalyzer:
               
               if (len (final_genes) != len (current_genes)):
                 self._overwrite_genes_in_sbml_notes (genes, "(" + ("".join (final_genes)) + ")", reaction)
-                #self.__logger.debug ("reaction " + reaction.getId() + " found gene " + g)
-                # if g not in r.genes:
-                  # r.genes.append (g)
             
             if reaction.getNumReactants() + reaction.getNumModifiers() + reaction.getNumProducts() == 0:
               model.removeReaction (n)
         except BreakLoops:
           pass
-      
-      # self.__logger.critical('filter species:')
-      # self.__logger.critical(filter_species)
-      # if filter_species is not None:
-        # self.__logger.critical('filter species!')
-        # for n in range (model.getNumSpecies() - 1, -1, -1):
-          # s = model.getSpecies (n)
-          # self.__logger.critical('remove species? ' +  s.getId ())
-          # if s.getId () in filter_species:
-            # self.__logger.critical('remove species ' +  s.getId ())
-            # self.__logger.critical(model.removeSpecies (s.getId ()))
       
       return sbml
       
@@ -276,7 +261,6 @@ class Enalyzer:
           raise NotImplementedError ("did not find genes in reaction " + reaction.getId ())
     
         for g in current_genes:
-          #self.__logger.debug ("reaction " + reaction.getId() + " found gene " + g)
           if g not in r.genes:
             r.genes.append (g)
             
