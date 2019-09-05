@@ -254,12 +254,11 @@ function updateNetwork () {
  * 
  * truncate -- shrink a string to a max size and append ...
  * @param str the long string
+ * @param length the max length of the string, defaults to 40
  * @return the truncated string
  * 
  */
-function truncate (str) {
-	// let's do 40
-	length = 40;
+function truncate (str, length=40) {
 	ending = "...";
 	if (str.length > length)
 		return str.substring(0, length - ending.length) + ending;
@@ -285,7 +284,7 @@ function fill_network_table (filter) {
 			// is it filtered?
 			var checked = filter["filter_species"].includes(key) ? "" : " checked";
 			// create DOM row
-			const row = $("<tr id='"+item.DOM+"'><td class='check'><input type='checkbox'"+checked+"></td><td><abbr title='"+item.identifier+"'>"+truncate (item.identifier)+"</abbr></td><td><abbr title='"+item.name+"'>"+truncate (item.name)+"</abbr></td><td title='occurs in "+item.occurence.join (", ")+"'>"+item.occurence.length+"</td></tr>");
+			const row = $("<tr id='"+item.DOM+"'><td class='check'><input type='checkbox'"+checked+"></td><td><abbr title='"+item.identifier+"'>"+truncate (item.identifier, 20)+"</abbr></td><td><abbr title='"+item.name+"'>"+truncate (item.name)+"</abbr></td><td title='occurs in "+item.occurence.join (", ")+"'>"+item.occurence.length+"</td></tr>");
 			$('#species-table').append(row);
 		}
 	};
@@ -297,7 +296,7 @@ function fill_network_table (filter) {
 			// is it filtered?
 			var checked = filter["filter_reactions"].includes(key) ? "" : " checked";
 			// create DOM row
-			const row = $("<tr id='"+item.DOM+"'><td class='check'><input type='checkbox'"+checked+"></td><td><abbr title='"+item.identifier+"'>"+truncate (item.identifier)+"</abbr></td><td><abbr title='"+item.name+"'>"+truncate (item.name)+"</abbr></td><td><small>"+item.consumed.join (" + ") + "</small> <i class='fas fa-arrow-right'></i> <small>" + item.produced.join (" + ") +"</small></td><td><small>"+item.genes.join ("</small> [OR] <small>") +"</small></td></tr>");
+			const row = $("<tr id='"+item.DOM+"'><td class='check'><input type='checkbox'"+checked+"></td><td><abbr title='"+item.identifier+"'>"+truncate (item.identifier, 20)+"</abbr></td><td><abbr title='"+item.name+"'>"+truncate (item.name)+"</abbr></td><td><small>"+item.consumed.join (" + ") + "</small> <i class='fas fa-arrow-right'></i> <small>" + item.produced.join (" + ") +"</small></td><td><small>"+item.genes.join ("</small> [OR] <small>") +"</small></td></tr>");
 			$('#reaction-table').append(row);
 		}
 	};

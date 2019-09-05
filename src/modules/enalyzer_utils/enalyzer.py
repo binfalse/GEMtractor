@@ -195,12 +195,8 @@ class Enalyzer:
                     reaction.removeModifier (sn)
             
             if filter_genes is not None:
-              # genes = self._get_genes (reaction)
-              #self._extract_genes_from_sbml_notes (reaction.getNotesString(), reaction.getId ())
               current_genes = self._get_genes (reaction)
               self.__logger.debug("current genes: " + self._implode_genes (current_genes) + " - reaction: " + reaction.getId ())
-              # will already be done in _get_genes:
-              # self._unfold_complex_expression(self._parse_expression(genes))
               
               if len(current_genes) < 1:
                 self.__logger.info("did not find genes in reaction " + reaction.getId ())
@@ -217,13 +213,10 @@ class Enalyzer:
                 model.removeReaction (n)
                 continue
               
+              # should we update the genes in the model?
               if (len (final_genes) != len (current_genes)):
-                # TODO not only in notes but also in FBC package
-                # TODO TODO TODO This doesn't work anymore:
-                # self._overwrite_genes_in_sbml_notes (genes, self._implode_genes (final_genes), reaction)
                 self._set_genes_in_sbml (final_genes, reaction, model)
               
-              print (final_genes)
               self.__reaction_gene_map[reaction.getId ()] = final_genes
             
             if reaction.getNumReactants() + reaction.getNumModifiers() + reaction.getNumProducts() == 0:
@@ -303,10 +296,7 @@ class Enalyzer:
         reaction = model.getReaction(n)
         # TODO: reversible?
         r = Reaction (reaction.getId (), reaction.getName ())
-        # genes = self._get_genes (reaction)
         current_genes = self._get_genes (reaction)
-        print (current_genes)
-        #self._unfold_complex_expression(self._parse_expression(self._get_genes (reaction)))
         self.__logger.debug("current genes: " + self._implode_genes (current_genes) + " - reaction: " + reaction.getId ())
       
         if len(current_genes) < 1:

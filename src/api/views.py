@@ -90,9 +90,11 @@ def get_network (request):
       if Constants.SESSION_FILTER_GENES in request.session:
           filter_genes = request.session[Constants.SESSION_FILTER_GENES]
       __logger.info ("sending response")
+      net = network.serialize()
+      __logger.info ("serialised the network")
       return JsonResponse ({
             "status":"success",
-            "network":network.serialize(),
+            "network":net,
             "filter": {
             Constants.SESSION_FILTER_SPECIES: filter_species,
             Constants.SESSION_FILTER_REACTION: filter_reaction,

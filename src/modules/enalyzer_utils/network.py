@@ -61,9 +61,9 @@ class Reaction:
     self.produced.append (species.identifier)
       
   def serialize (self):
-    self.__logger.info ("consumed: " + str (len (self.consumed)))
-    self.__logger.info ("produced: " + str (len (self.produced)))
-    self.__logger.info ("genes:    " + str (len (self.genes)))
+    # self.__logger.info ("consumed: " + str (len (self.consumed)))
+    # self.__logger.info ("produced: " + str (len (self.produced)))
+    # self.__logger.info ("genes:    " + str (len (self.genes)))
     return {
       "identifier" : self.identifier,
       "name" : self.name,
@@ -93,7 +93,7 @@ class Network:
     return self.species[identifier]
 
   def serialize (self):
-    self.__logger.info ("serialising the network")
+    self.__logger.debug ("serialising the network")
     json = {
       "species": {},
       "reactions": {},
@@ -105,10 +105,10 @@ class Network:
         json["genenet"][gene]['links'].append (associated)
     
     for identifier, species in self.species.items ():
-      self.__logger.info ("serialising species " + identifier)
+      self.__logger.debug ("serialising species " + identifier)
       json["species"][identifier] = species.serialize ()
     for identifier, reaction in self.reactions.items ():
-      self.__logger.info ("serialising reaction " + identifier)
+      self.__logger.debug ("serialising reaction " + identifier)
       json["reactions"][identifier] = reaction.serialize ()
     
     return json
