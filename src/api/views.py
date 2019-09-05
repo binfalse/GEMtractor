@@ -41,6 +41,38 @@ def upload (request):
   return redirect('index:index')
 
 
+def get_session_data (request):
+  if request.session.session_key is None:
+    return JsonResponse ({
+            "status":"success",
+            "data": {}
+          })
+  files = []
+  if Constants.SESSION_MODEL_TYPE in request.session and request.session[Constants.SESSION_MODEL_TYPE] == Constants.SESSION_MODEL_TYPE_UPLOAD:
+    files.append (request.session[Constants.SESSION_MODEL_ID] + " (" + Utils.human_readable_bytes (os.path.getsize(Utils.get_model_path (request.session[Constants.SESSION_MODEL_TYPE], request.session[Constants.SESSION_MODEL_ID], request.session.session_key))) + ")")
+  s = {}
+  for key, value in request.session.items ():
+    s[key] = value
+  return JsonResponse ({
+          "status":"success",
+          "data": {
+            "session": s,
+            "files": files
+          }
+        })
+
+def clear_data (request):
+  Utils.del_session_key (request, None, Constants.SESSION_HAS_SESSION)
+  Utils.del_session_key (request, None, Constants.SESSION_MODEL_ID)
+  Utils.del_session_key (request, None, Constants.SESSION_MODEL_NAME)
+  Utils.del_session_key (request, None, Constants.SESSION_MODEL_TYPE)
+  Utils.del_session_key (request, None, Constants.SESSION_FILTER_SPECIES)
+  Utils.del_session_key (request, None, Constants.SESSION_FILTER_REACTION)
+  Utils.del_session_key (request, None, Constants.SESSION_FILTER_GENES)
+  return JsonResponse ({
+          "status":"success"
+        })
+
 def get_network (request):
   __logger = logging.getLogger('get_network')
   if request.method == 'POST':
@@ -119,7 +151,7 @@ def select_bigg_model (request):
     Utils.get_bigg_model (data["bigg_id"])
     request.session[Constants.SESSION_MODEL_ID] = data["bigg_id"]
     request.session[Constants.SESSION_MODEL_NAME] = data["bigg_id"]
-    request.session[Constants.SESSION_MODEL_TYPE] = 'bigg'
+    request.session[Constants.SESSION_MODEL_TYPE] = Constants.SESSION_MODEL_TYPE_BIGG
     Utils.del_session_key (request, {}, Constants.SESSION_FILTER_SPECIES)
     Utils.del_session_key (request, {}, Constants.SESSION_FILTER_REACTION)
     Utils.del_session_key (request, {}, Constants.SESSION_FILTER_GENES)
@@ -159,7 +191,7 @@ def select_biomodel (request):
     Utils.get_biomodel (data["biomodels_id"])
     request.session[Constants.SESSION_MODEL_ID] = data["biomodels_id"]
     request.session[Constants.SESSION_MODEL_NAME] = data["biomodels_id"]
-    request.session[Constants.SESSION_MODEL_TYPE] = 'biomodels'
+    request.session[Constants.SESSION_MODEL_TYPE] = Constants.SESSION_MODEL_TYPE_BIOMODELS
     Utils.del_session_key (request, {}, Constants.SESSION_FILTER_SPECIES)
     Utils.del_session_key (request, {}, Constants.SESSION_FILTER_REACTION)
     Utils.del_session_key (request, {}, Constants.SESSION_FILTER_GENES)

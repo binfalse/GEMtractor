@@ -473,7 +473,7 @@ function select_biomodel (modelid) {
 				// successfully downloaded something, but was the request also successfull?
 				if (data.status != 'success') {
 					$("#error").show ().text ("Failed to select Biomodel: " + data.error);
-				$("#specific-biomodel-loading").hide ();
+					$("#specific-biomodel-loading").hide ();
 					return;
 				}
 				// all right, let's move on to filtering
@@ -607,3 +607,49 @@ function prepareIndex () {
     });
 }
 
+
+/**
+ * 
+ * prepareImprint -- prepare the imprint page
+ * 
+ * including download of bigg models and biomodels, binding click events to buttons, etc
+ * 
+ */
+function prepareImprint () {
+	
+	// get session information
+	$.ajax({
+        url: '/api/get_session_data',
+        dataType: 'json',
+        success: function (data) {
+			if (data.status != 'success') {
+				$("#sessionlist").append ("<li>Error retrieving session information: "+data.error+"</li>");
+				return;
+			}
+			for (var key in data.data.session) {
+				if (data.data.session.hasOwnProperty(key)) {
+					$("#sessionlist").append ("<li>" + key + ": " + data.data.session[key] + "</li>");
+				}
+			}
+			for (var i in data.data.files) {
+				$("#fileslist").append ("<li>" + data.data.files[i] + "</li>");
+			}
+		},
+        error: function (jqXHR, textStatus, errorThrown) {
+			$("#sessionlist").append ("<li>Error retrieving session information: "+errorThrown+"</li>");
+        }
+	});
+	
+	$("#clear-session").click (function () {
+		$.ajax({
+			url: '/api/clear_data',
+			dataType: 'json',
+			success: function (data) {
+				location.reload(); 
+			},
+			error: function (jqXHR, textStatus, errorThrown) {
+				alert ("Error clearing data: "+errorThrown);
+			}
+		});
+	});
+}

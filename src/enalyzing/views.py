@@ -47,7 +47,7 @@ def serve_file (file_path, file_name, file_type):
 def index(request):
   
   if request.session.session_key is None:
-    request.session['has_session'] = True
+    request.session[Constants.SESSION_HAS_SESSION] = Constants.SESSION_HAS_SESSION_VALUE
   #if 'model' in request.session:
   #  return filterModel (request)
   
@@ -61,7 +61,7 @@ def index(request):
     
     request.session[Constants.SESSION_MODEL_ID] = os.path.basename(filename)
     request.session[Constants.SESSION_MODEL_NAME] = model.name
-    request.session[Constants.SESSION_MODEL_TYPE] = 'upload'
+    request.session[Constants.SESSION_MODEL_TYPE] = Constants.SESSION_MODEL_TYPE_UPLOAD
     
     return redirect('enalyzing:filter')
     # filterModel (request)

@@ -48,9 +48,57 @@ Web: <a href="https://www.sbi.uni-rostock.de">sbi.uni-rostock.de</a>
 	However, we explicitly encourage reusage, reproduction, and and reutilisation under the terms of the <a href="https://www.gnu.org/licenses/gpl-3.0.html">GNU General Public License</a> (code) or the <a href="http://creativecommons.org/licenses/by-sa/4.0/">Creative Commons Attribution-ShareAlike 4.0 International License</a> (text and media).
 </p>
 
-<div class="w3-padding w3-card w3-flat-clouds w3-margin anchor-heading">
+<div class="w3-padding w3-card w3-flat-clouds w3-margin">
+<div class="anchor-heading">
   <a name="privacy" id="privacy"> </a>
 	<h2>Privacy Policy</h2>
 </div>
-
+<p>
+	One of our main priorities is the privacy of our visitors.
+	This Privacy Policy document contains types of information that is collected and recorded by this portal and how we use it.<br>
+	If you have additional questions or require more information about our Privacy Policy, do not hesitate to contact us using one of the methods provided above.
+</p>
+<h4>Log Files</h4>
+<p>
+	We follow a standard procedure of using log files, solely for administration purposes.
+	These files log visitors when they visit websites.
+	The information collected by log files include internet protocol (IP) addresses, browser type, Internet Service Provider (ISP), date and time stamp, referring/exit pages for every page access.
+	These are not linked to any information.
+	Log files are deleted within seven days, unless they are required for conservation of evidence.
+</p>
+<h4>Cookies, Sessions, and stored Data about You</h4>
+<p>
+	We use session cookies to store information about your uploads and settings.
+	Your current session stores the following information:
+	<ul id="sessionlist"></ul>
+	In addition, we store the following files that you uploaded:
+	<ul id="fileslist"></ul>
+	Your data will be deleted after one month of not using it anymore.
+	Uploaded files may be deleted at any time (eg. when rebuilding the website or if we need the storage space).
+	So do not treat this as a storage and always have a local backup of your data.<br>
+	<strong>You can delete all your data by clearing your session:</strong> <button class="w3-button w3-flat-wet-asphalt" id="clear-session">Clear my Data now!</button>
+</p>
+<h4>Rights according to the General Data Protection Regulation</h4>
+<p>
+	According to the regulations of the DSGVO and the Austrian Data Protection Act (DSG) you have the following rights:
+	<ul>
+		<li>Right to correction</li>
+		<li>Right to cancellation ("Right to be forgotten")</li>
+		<li>Right to restriction of processing</li>
+		<li>Right to a notification - Obligation to notify in connection with the correction or deletion of personal data or limitation of processing</li>
+		<li>Right to data portability</li>
+		<li>Right of objection</li>
+		<li>Right not to be subjected to a decision based solely on automated processing &mdash; including profiling</li>
+	</ul>
+	Feel free to contact use at any time to claim these rights.
+	If you believe that the processing of your data violates data protection law or your data protection claims have otherwise been violated in any way, you can complain to the data protection authority.
+</p>
+<h4></h4>
+<p>
+</p>
+</div>
+<script>
+  token = '{{ csrf_token }}';
+  prepareImprint ();
+</script>
 {% endblock %}

@@ -180,7 +180,16 @@ class Utils:
       del request.session[key]
     except KeyError:
       pass
-    try:
-      del context[key]
-    except KeyError:
-      pass
+    if context is not None:
+      try:
+        del context[key]
+      except KeyError:
+        pass
+    
+  @staticmethod
+  def human_readable_bytes (byt):
+    for count in ['Bytes', 'KB', 'MB', 'GB', 'TB']:
+      if byt > -1024.0 and byt < 1024.0:
+        return "%3.1f %s" % (byt, count)
+      byt /= 1024.
+    return "%3.1f %s" % (byt, 'PB')
