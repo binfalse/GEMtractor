@@ -37,9 +37,11 @@ class Enalyzer:
     
     
     def __init__(self):
-        self.__GENE_PATTERN = re.compile(r".*GENE_ASSOCIATION: *([^<]+)<.*", re.DOTALL)
+        self.__GENE_ASSOCIATION_PATTERN = re.compile(r".*GENE_ASSOCIATION: *([^ <][^<]*)<.*", re.DOTALL)
+        self.__GENE_LIST_PATTERN = re.compile(r".*GENE_LIST: *([^ <][^<]*)<.*", re.DOTALL)
         self.__EXPRESSION_PARSER = self.__get_expression_parser ()
         self.__logger = logging.getLogger('enalyzer-class')
+        self.__reaction_gene_map = {}
         # TODO: fix
         # self.__logger.setLevel(logging.DEBUG)
     
@@ -108,20 +110,22 @@ class Enalyzer:
 
 
     def _extract_genes_from_sbml_notes (self, annotation, default):
-        m = re.match (self.__GENE_PATTERN, annotation)
+        m = re.match (self.__GENE_ASSOCIATION_PATTERN, annotation)
         if m:
             return m.group (1)
         return default
     
-    def _overwrite_genes_in_sbml_notes (self, original_genes, new_genes, reaction):
-        m = re.match (self.__GENE_PATTERN, reaction.getNotesString())
+    def _overwrite_genes_in_sbml_notes (self, new_genes, reaction):
+        m = re.match (self.__GENE_ASSOCIATION_PATTERN, reaction.getNotesString())
         if m:
-          reaction.setNotes (reaction.getNotesString().replace (original_genes, new_genes))
+          reaction.setNotes (reaction.getNotesString().replace (m.group (1), new_genes))
         else:
-          # TODO
-          raise IOError ("not yet implemented")
-          # return
-          
+          self.__logger.debug('no gene notes to update: ' + reaction.getId ())
+        
+        # TODO
+        # also update the GENE_LIST using __GENE_LIST_PATTERN
+        # but for this we need the list of genes here (not only the logic expression)
+        
       
     
     def get_sbml (self, sbml_file, filter_species = None, filter_reactions = None, filter_genes = None, remove_reaction_genes_removed = True, remove_reaction_missing_species = False):
@@ -140,7 +144,10 @@ class Enalyzer:
       self.__logger.debug("reading sbml file " + sbml_file)
       sbml = SBMLReader().readSBML(sbml_file)
       if sbml.getNumErrors() > 0:
-        raise IOError ("model seems to be invalid")
+        e = []
+        for i in range (0, sbml.getNumErrors()):
+          e.append (sbml.getError(i).getMessage())
+        raise IOError ("model seems to be invalid: " + str (e))
       model = sbml.getModel()
       name = model.getName ()
       if name is None:
@@ -188,10 +195,13 @@ class Enalyzer:
                     reaction.removeModifier (sn)
             
             if filter_genes is not None:
-              genes = self._get_genes (reaction)
-              self.__logger.debug("current genes string: " + genes + " - reaction: " + reaction.getId ())
+              # genes = self._get_genes (reaction)
               #self._extract_genes_from_sbml_notes (reaction.getNotesString(), reaction.getId ())
-              current_genes = self._unfold_complex_expression(self._parse_expression(genes))
+              current_genes = self._get_genes (reaction)
+              self.__logger.debug("current genes: " + self._implode_genes (current_genes) + " - reaction: " + reaction.getId ())
+              # will already be done in _get_genes:
+              # self._unfold_complex_expression(self._parse_expression(genes))
+              
               if len(current_genes) < 1:
                 self.__logger.info("did not find genes in reaction " + reaction.getId ())
                 raise NotImplementedError ("did not find genes in reaction " + reaction.getId ())
@@ -209,7 +219,12 @@ class Enalyzer:
               
               if (len (final_genes) != len (current_genes)):
                 # TODO not only in notes but also in FBC package
-                self._overwrite_genes_in_sbml_notes (genes, "(" + (") or (".join (final_genes)) + ")", reaction)
+                # TODO TODO TODO This doesn't work anymore:
+                # self._overwrite_genes_in_sbml_notes (genes, self._implode_genes (final_genes), reaction)
+                self._set_genes_in_sbml (final_genes, reaction, model)
+              
+              print (final_genes)
+              self.__reaction_gene_map[reaction.getId ()] = final_genes
             
             if reaction.getNumReactants() + reaction.getNumModifiers() + reaction.getNumProducts() == 0:
               model.removeReaction (n)
@@ -217,19 +232,44 @@ class Enalyzer:
           pass
       
       return sbml
-      
-    def _get_genes (self, reaction):
-        rfbc = reaction.getPlugin ("fbc")
-        if rfbc is not None:
-            gpa = rfbc.getGeneProductAssociation()
-            if gpa is not None:
-                return gpa.getAssociation().toInfix()
-            else:
-                self.__logger.debug('no association: ' + reaction.getId ())
+    
+    def _set_genes_in_sbml (self, genes, reaction, model):
+      rfbc = reaction.getPlugin ("fbc")
+      if rfbc is not None:
+        gpa = rfbc.getGeneProductAssociation()
+        if gpa is not None:
+          g = self._implode_genes (genes)
+          gpa.setAssociation(FbcAssociation_parseFbcInfixAssociation (g, model.getPlugin ("fbc")))
         else:
-            self.__logger.debug('no fbc: ' + reaction.getId ())
-        
-        return self._extract_genes_from_sbml_notes (reaction.getNotesString(), reaction.getId ())
+          self.__logger.debug('no fbc to update: ' + reaction.getId ())
+      
+      self._overwrite_genes_in_sbml_notes (self._implode_genes (genes), reaction)
+      
+    
+    def _implode_genes (self, genes):
+      """ implode a list of genes to a proper logical expression """
+      return "(" + (") or (".join (genes)) + ")"
+    
+    
+    def _get_genes (self, reaction):
+      
+      if reaction.getId () in self.__reaction_gene_map:
+        return self.__reaction_gene_map[reaction.getId ()]
+      
+      return self._unfold_complex_expression(self._parse_expression(self.__find_genes (reaction)))
+    
+    def __find_genes (self, reaction):
+      rfbc = reaction.getPlugin ("fbc")
+      if rfbc is not None:
+          gpa = rfbc.getGeneProductAssociation()
+          if gpa is not None:
+              return gpa.getAssociation().toInfix()
+          else:
+              self.__logger.debug('no association: ' + reaction.getId ())
+      else:
+          self.__logger.debug('no fbc: ' + reaction.getId ())
+      
+      return self._extract_genes_from_sbml_notes (reaction.getNotesString(), reaction.getId ())
         
         
     
@@ -263,9 +303,11 @@ class Enalyzer:
         reaction = model.getReaction(n)
         # TODO: reversible?
         r = Reaction (reaction.getId (), reaction.getName ())
-        genes = self._get_genes (reaction)
-        self.__logger.debug("current genes string: " + genes + " - reaction: " + reaction.getId ())
-        current_genes = self._unfold_complex_expression(self._parse_expression(self._get_genes (reaction)))
+        # genes = self._get_genes (reaction)
+        current_genes = self._get_genes (reaction)
+        print (current_genes)
+        #self._unfold_complex_expression(self._parse_expression(self._get_genes (reaction)))
+        self.__logger.debug("current genes: " + self._implode_genes (current_genes) + " - reaction: " + reaction.getId ())
       
         if len(current_genes) < 1:
           self.__logger.debug("did not find genes in reaction " + reaction.getId ())
