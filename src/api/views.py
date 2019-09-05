@@ -75,8 +75,11 @@ def get_network (request):
     ppin = Enalyzer ()
     # __logger.critical(f)
     try:
+      __logger.info ("getting sbml")
       network = ppin.extract_network_from_sbml (ppin.get_sbml (Utils.get_model_path (request.session[Constants.SESSION_MODEL_TYPE], request.session[Constants.SESSION_MODEL_ID], request.session.session_key)))
+      __logger.info ("got sbml")
       network.calc_genenet ()
+      __logger.info ("got genenet")
       filter_species = []
       filter_reaction = []
       filter_genes = []
@@ -85,7 +88,8 @@ def get_network (request):
       if Constants.SESSION_FILTER_REACTION in request.session:
         filter_reaction = request.session[Constants.SESSION_FILTER_REACTION]
       if Constants.SESSION_FILTER_GENES in request.session:
-          fiter_genes = request.session[Constants.SESSION_FILTER_GENES]
+          filter_genes = request.session[Constants.SESSION_FILTER_GENES]
+      __logger.info ("sending response")
       return JsonResponse ({
             "status":"success",
             "network":network.serialize(),
@@ -117,7 +121,12 @@ def store_filter (request):
   request.session[Constants.SESSION_FILTER_REACTION] = data["reaction"]
   request.session[Constants.SESSION_FILTER_GENES] = data["genes"]
   __logger.critical(data)
-  return JsonResponse ({"status":"success"})
+  return JsonResponse ({"status":"success",
+            "filter": {
+            Constants.SESSION_FILTER_SPECIES: request.session[Constants.SESSION_FILTER_SPECIES],
+            Constants.SESSION_FILTER_REACTION: request.session[Constants.SESSION_FILTER_REACTION],
+            Constants.SESSION_FILTER_GENES: request.session[Constants.SESSION_FILTER_GENES],
+            }})
   
 def get_bigg_models (request):
   # time.sleep(5)

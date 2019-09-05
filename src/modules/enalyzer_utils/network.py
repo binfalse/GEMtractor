@@ -61,6 +61,9 @@ class Reaction:
     self.produced.append (species.identifier)
       
   def serialize (self):
+    self.__logger.info ("consumed: " + str (len (self.consumed)))
+    self.__logger.info ("produced: " + str (len (self.produced)))
+    self.__logger.info ("genes:    " + str (len (self.genes)))
     return {
       "identifier" : self.identifier,
       "name" : self.name,
@@ -90,29 +93,41 @@ class Network:
     return self.species[identifier]
 
   def serialize (self):
+    self.__logger.info ("serialising the network")
     json = {
       "species": {},
       "reactions": {},
       "genenet": self.genenet}
     
+    for gene in self.genenet:
+      json["genenet"][gene]['links'] = []
+      for associated in self.genenet[gene]['links']:
+        json["genenet"][gene]['links'].append (associated)
+    
     for identifier, species in self.species.items ():
+      self.__logger.info ("serialising species " + identifier)
       json["species"][identifier] = species.serialize ()
     for identifier, reaction in self.reactions.items ():
+      self.__logger.info ("serialising reaction " + identifier)
       json["reactions"][identifier] = reaction.serialize ()
     
     return json
 
 
   def calc_genenet (self):
-    
+    self.__logger.info ("calc gene net")
     self.genenet = {}
     
+    num = 0
     for identifier, reaction in self.reactions.items ():
-      self.__logger.debug ("calc gene net for reaction " + reaction.identifier)
+      num += 1
+      if num % 100 == 0:
+        self.__logger.info ("calc gene associations for reaction " + str (num))
+      self.__logger.debug ("calc gene associations for reaction " + reaction.identifier)
       for gene in reaction.genes:
         self.__logger.debug ("processing gene " + gene)
         if gene not in self.genenet:
-          self.genenet[gene] = {"links": [], "reactions": [identifier]}
+          self.genenet[gene] = {"links": set (), "reactions": [identifier]}
         else:
           self.genenet[gene]["reactions"].append (identifier)
         
@@ -129,11 +144,13 @@ class Network:
           if reaction.reversible and gene not in s.genes_for_consumption:
             s.genes_for_consumption.append (gene)
     
+    self.__logger.info ("got gene associations")
     for identifier, species in self.species.items ():
       for consumption in species.genes_for_consumption:
         for production in species.genes_for_production:
-          if consumption not in self.genenet[production]["links"]:
-            self.genenet[production]["links"].append (consumption)
+          # if consumption not in self.genenet[production]["links"]:
+          self.genenet[production]["links"].add (consumption)
+    self.__logger.info ("got gene net")
     
     
   def export_rn_dot (self, filename):

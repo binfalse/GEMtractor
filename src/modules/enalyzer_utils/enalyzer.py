@@ -91,7 +91,7 @@ class Enalyzer:
                         tmp = []
                         for a in term_combination:
                             for b in newterms:
-                                tmp.append ("("+str(a)+" and "+str (b)+")")
+                                tmp.append (str(a)+" and "+str (b))
                         term_combination = tmp
                     else:
                         # just add them to the list as alternatives
@@ -137,6 +137,7 @@ class Enalyzer:
       remove_reaction_genes_removed: should we remove a reaction if all it's genes were removed?
       remove_reaction_missing_species: remove a reaction if one of the participating genes was removed?
       """
+      self.__logger.debug("reading sbml file " + sbml_file)
       sbml = SBMLReader().readSBML(sbml_file)
       if sbml.getNumErrors() > 0:
         raise IOError ("model seems to be invalid")
@@ -146,12 +147,15 @@ class Enalyzer:
           name = model.getId()
       model.setId (model.getId() + "_enalyzed_ReactionNetwork")
       model.setName ("enalyzed ReactionNetwork of " + name)
+      self.__logger.info("got proper sbml model")
       
+      self.__logger.debug("append a note")
       Utils.add_model_note (model, filter_species, filter_reactions, filter_genes, remove_reaction_genes_removed, remove_reaction_missing_species)
       
       
       if filter_species is not None or filter_reactions is not None or filter_genes is not None:
         try:
+          self.__logger.debug("filtering things")
           for n in range (model.getNumReactions () - 1, -1, -1):
             reaction = model.getReaction (n)
             if filter_reactions is not None and reaction.getId () in filter_reactions:
@@ -204,7 +208,8 @@ class Enalyzer:
                 continue
               
               if (len (final_genes) != len (current_genes)):
-                self._overwrite_genes_in_sbml_notes (genes, "(" + ("".join (final_genes)) + ")", reaction)
+                # TODO not only in notes but also in FBC package
+                self._overwrite_genes_in_sbml_notes (genes, "(" + (") or (".join (final_genes)) + ")", reaction)
             
             if reaction.getNumReactants() + reaction.getNumModifiers() + reaction.getNumProducts() == 0:
               model.removeReaction (n)
@@ -239,6 +244,7 @@ class Enalyzer:
       if sbml.getNumErrors() > 0:
         raise IOError ("model seems to be invalid")
       model = sbml.getModel()
+      self.__logger.info ("extracting network from " + model.getId ())
       
       network = Network ()
       species = {}
@@ -247,8 +253,13 @@ class Enalyzer:
         s = model.getSpecies (n)
         species[s.getId ()] = Species (s.getName (), s.getId ())
         network.add_species (species[s.getId ()])
-        
+      
+      # TODO remove debugging
+      max_genes = 0
+      max_genes_id = 0
       for n in range (0, model.getNumReactions()):
+        if n % 100 == 0:
+          self.__logger.info ("processing reaction " + str (n))
         reaction = model.getReaction(n)
         # TODO: reversible?
         r = Reaction (reaction.getId (), reaction.getName ())
@@ -274,6 +285,14 @@ class Enalyzer:
         
         network.add_reaction (r)
         
+        # TODO remove debugging
+        if max_genes < len (current_genes):
+          print (reaction.getId () + " -- " + str (len (current_genes)))
+          max_genes = len (current_genes)
+          max_genes_id = reaction.getId ()
+      
+        
+      self.__logger.info ("extracted network")
       return network
 
 

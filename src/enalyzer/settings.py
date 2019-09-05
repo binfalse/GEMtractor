@@ -145,7 +145,7 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
     # )
 # TODO remove and include above
 logging.basicConfig(
-    level = logging.CRITICAL,
+    level = logging.INFO,
     format = '%(asctime)s %(levelname)s %(message)s',
 )
 
