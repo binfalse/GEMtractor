@@ -6,7 +6,7 @@ import os
 from modules.enalyzer_utils.utils import Utils, NotYetImplemented
 from django.urls import reverse
 from django.http import HttpResponseRedirect, HttpResponse, Http404
-from modules.ppin_extractor.ppin_extractor import PpinExtractor
+from modules.enalyzer_utils.enalyzer import Enalyzer
 from modules.enalyzer_utils.constants import Constants
 from .forms import ExportForm, TYPE, FORMAT
 from libsbml import *
@@ -112,7 +112,7 @@ def export(request):
     if (form.is_valid()):
       file_name = request.session[Constants.SESSION_MODEL_NAME] + "-enalyzed"
       
-      ppin = PpinExtractor ()
+      ppin = Enalyzer ()
       sbml = ppin.get_sbml (Utils.get_model_path (request.session[Constants.SESSION_MODEL_TYPE], request.session[Constants.SESSION_MODEL_ID], request.session.session_key),
         request.session[Constants.SESSION_FILTER_SPECIES],
         request.session[Constants.SESSION_FILTER_REACTION],

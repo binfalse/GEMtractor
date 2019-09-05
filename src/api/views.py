@@ -7,7 +7,7 @@ import json
 import os
 from django.http import JsonResponse, HttpResponse, Http404
 from modules.enalyzer_utils.utils import Utils, InvalidGeneExpression, InvalidBiomodelsId, UnableToRetrieveBiomodel
-from modules.ppin_extractor.ppin_extractor import PpinExtractor
+from modules.enalyzer_utils.enalyzer import Enalyzer
 from modules.enalyzer_utils.constants import Constants
 import time
 import urllib
@@ -15,30 +15,6 @@ import pyparsing as pp
 
 from libsbml import *
 
-# Create your views here.
-def upload (request):
-  # if request.method == 'POST' and request.FILES['custom-model']:
-    # model = request.FILES['custom-model']
-    
-    
-    # filename = Utils.get_upload_path (model.name)
-    # with open(filename, 'wb+') as destination:
-      # for chunk in model.chunks():
-        # destination.write(chunk)
-        
-    # ppin = PpinExtractor ()
-    # network = ppin.extract_network_from_sbml (filename)
-    # if network:
-      # request.session['model_id'] = os.path.basename(filename)
-      # request.session['model_name'] = model.name
-      # request.session['model_type'] = 'upload'
-      # return JsonResponse ({"upload": "success", "model_id": request.session['model_id'], "network": network})
-    # else:
-      # os.remove (filename)
-      # error = "error"
-      # return JsonResponse ({"upload": "failed", "msg": "file is not valid: " + error})
-    
-  return redirect('index:index')
 
 
 def get_session_data (request):
@@ -80,7 +56,7 @@ def get_network (request):
     return redirect('index:index')
   
   if Constants.SESSION_MODEL_ID in request.session:
-    ppin = PpinExtractor ()
+    ppin = Enalyzer ()
     # __logger.critical(f)
     try:
       network = ppin.extract_network_from_sbml (ppin.get_sbml (Utils.get_model_path (request.session[Constants.SESSION_MODEL_TYPE], request.session[Constants.SESSION_MODEL_ID], request.session.session_key)))
@@ -210,28 +186,6 @@ def select_biomodel (request):
       return JsonResponse ({"status":"failed","error":str (getattr(e, 'code', repr(e))) + getattr(e, 'message', repr(e))})
   
   
-# def download (request):
-  # __logger = logging.getLogger('download')
-  # if request.method != 'POST':
-    # # TODO
-    # return redirect('index:index')
-  
-  # data=json.loads(request.body)
-  # __logger.critical(data)
-  # ppin = PpinExtractor ()
-  # sbml = ppin.get_sbml (Utils.get_path_of_uploaded_file (request.session[Constants.SESSION_MODEL_ID]),
-    # request.session[Constants.SESSION_FILTER_SPECIES],
-    # request.session[Constants.SESSION_FILTER_REACTION],
-    # request.session[Constants.SESSION_FILTER_GENES])
-  # file_path = "/tmp/filtered_sbml.sbml"
-  # SBMLWriter().writeSBML (sbml, file_path)
-  # if os.path.exists(file_path):
-        # with open(file_path, 'rb') as fh:
-          # response = HttpResponse(fh.read(), content_type="application/xml")
-          # response['Content-Disposition'] = 'attachment; filename=' + os.path.basename(file_path)
-          # return response
-  # raise Http404
-  # # return JsonResponse ({"status":"success"})
   
 
 

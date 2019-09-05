@@ -5,7 +5,6 @@ from . import views
 
 app_name = 'api'
 urlpatterns = [
-    path('upload', views.upload, name='upload'),
     path('status', views.status, name='status'),
     path('get_network', views.get_network, name='get_network'),
     path('store_filter', views.store_filter, name='store_filter'),

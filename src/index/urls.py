@@ -7,5 +7,5 @@ app_name = 'index'
 urlpatterns = [
     path('', views.index, name='index'),
     path('imprint', views.imprint, name='imprint'),
-    path('filter', views.filter, name='filter'),
+    path('learn', views.learn, name='learn'),
     ]

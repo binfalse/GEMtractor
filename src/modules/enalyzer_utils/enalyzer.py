@@ -31,7 +31,7 @@ from modules.enalyzer_utils.utils import BreakLoops, InvalidGeneExpression, Util
 # * you know that ((a and b) and c) is the same as (a and (b and c)) etc... we don't care about the ordering, if you care you need to post process the results
 # * there is no list of modifiers
 
-class PpinExtractor:
+class Enalyzer:
     """class to extract protein-protein-interaction-networks from chemical reaction networks"""
 
     
@@ -39,7 +39,7 @@ class PpinExtractor:
     def __init__(self):
         self.__GENE_PATTERN = re.compile(r".*GENE_ASSOCIATION: *([^<]+)<.*", re.DOTALL)
         self.__EXPRESSION_PARSER = self.__get_expression_parser ()
-        self.__logger = logging.getLogger('PpinExtractor')
+        self.__logger = logging.getLogger('enalyzer-class')
         # TODO: fix
         # self.__logger.setLevel(logging.DEBUG)
     
