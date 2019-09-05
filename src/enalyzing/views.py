@@ -78,6 +78,9 @@ def index(request):
     request.session[Constants.SESSION_MODEL_ID] = os.path.basename(filename)
     request.session[Constants.SESSION_MODEL_NAME] = model.name
     request.session[Constants.SESSION_MODEL_TYPE] = Constants.SESSION_MODEL_TYPE_UPLOAD
+    Utils.del_session_key (request, None, Constants.SESSION_FILTER_SPECIES)
+    Utils.del_session_key (request, None, Constants.SESSION_FILTER_REACTION)
+    Utils.del_session_key (request, None, Constants.SESSION_FILTER_GENES)
     
     return redirect('enalyzing:filter')
     # filterModel (request)
