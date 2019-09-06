@@ -14,22 +14,16 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-from django.shortcuts import render, redirect
-from django.http import HttpResponse
+from django.shortcuts import redirect
 from django.views.decorators.csrf import csrf_exempt
-from django.core import serializers
 import logging
 import json
 import os
-from django.http import JsonResponse, HttpResponse, Http404
+from django.http import JsonResponse
 from modules.enalyzer_utils.utils import Utils, InvalidGeneExpression, InvalidBiomodelsId, UnableToRetrieveBiomodel
 from modules.enalyzer_utils.enalyzer import Enalyzer
 from modules.enalyzer_utils.constants import Constants
-import time
 import urllib
-import pyparsing as pp
-
-from libsbml import *
 
 
 __logger = logging.getLogger('api')

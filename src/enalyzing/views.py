@@ -15,16 +15,12 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 from django.shortcuts import render, redirect
-from django.core.files.storage import FileSystemStorage
-from django.conf import settings
-import tempfile
 import os
-from modules.enalyzer_utils.utils import Utils, NotYetImplemented
-from django.urls import reverse
-from django.http import HttpResponseRedirect, HttpResponse, Http404
+from modules.enalyzer_utils.utils import Utils
+from django.http import HttpResponse
 from modules.enalyzer_utils.enalyzer import Enalyzer
 from modules.enalyzer_utils.constants import Constants
-from .forms import ExportForm, TYPE, FORMAT
+from .forms import ExportForm
 from libsbml import *
 
 def __prepare_context (request):
@@ -149,12 +145,12 @@ def export(request):
           
           file_name = file_name + ".sbml"
           file_path = Utils.create_generated_file_web (request.session.session_key)
-          model = net.export_en_sbml (file_path, request.session[Constants.SESSION_MODEL_ID], request.session[Constants.SESSION_MODEL_NAME],
-          request.session[Constants.SESSION_FILTER_SPECIES],
-        request.session[Constants.SESSION_FILTER_REACTION],
-        request.session[Constants.SESSION_FILTER_GENES],
-        form.cleaned_data['remove_reaction_genes_removed'],
-        form.cleaned_data['remove_reaction_missing_species'])
+          net.export_en_sbml (file_path, request.session[Constants.SESSION_MODEL_ID], request.session[Constants.SESSION_MODEL_NAME],
+              request.session[Constants.SESSION_FILTER_SPECIES],
+              request.session[Constants.SESSION_FILTER_REACTION],
+              request.session[Constants.SESSION_FILTER_GENES],
+              form.cleaned_data['remove_reaction_genes_removed'],
+              form.cleaned_data['remove_reaction_missing_species'])
           if os.path.exists(file_path):
             return serve_file (file_path, file_name, "application/xml")
           else:
