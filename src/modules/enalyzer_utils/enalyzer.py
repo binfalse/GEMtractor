@@ -17,9 +17,7 @@
 from libsbml import *
 import re
 import pyparsing as pp
-import sys
 import logging
-import hashlib
 from .network import Network, Reaction, Species
 import math
 from .utils import BreakLoops, InvalidGeneExpression, Utils
@@ -77,7 +75,7 @@ class Enalyzer:
                 if parseresult[1] == "and":
                     logic = True
                 elif parseresult[1] == "or":
-                    logig = False
+                    logic = False
                 else:
                     self.__logger.critical('neither and nor or -> do not understand: ' + str(parseresult[1]))
                     raise NotImplementedError ('neither and nor or -> do not understand: ' + str(parseresult[1]))
@@ -289,7 +287,6 @@ class Enalyzer:
       
       # TODO remove debugging
       max_genes = 0
-      max_genes_id = 0
       for n in range (0, model.getNumReactions()):
         if n % 100 == 0:
           self.__logger.info ("processing reaction " + str (n))
@@ -321,7 +318,6 @@ class Enalyzer:
         if max_genes < len (current_genes):
           print (reaction.getId () + " -- " + str (len (current_genes)))
           max_genes = len (current_genes)
-          max_genes_id = reaction.getId ()
       
         
       self.__logger.info ("extracted network")
