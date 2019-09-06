@@ -239,7 +239,23 @@ class Enalyzer:
       
     
     def _implode_genes (self, genes):
-      """ implode a list of genes to a proper logical expression """
+      """
+      implode a list of genes to a proper logical expression
+
+      basically joins the list with or, making sure every item is enclosed in brackets
+       
+       
+      Parameters:
+      -----------
+      genes: array
+        the list of optional genes
+      
+      Returns
+      -------
+      string
+        the logical expression (genes joined using 'or')
+       
+      """
       return "(" + (") or (".join (genes)) + ")"
     
     

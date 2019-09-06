@@ -191,6 +191,24 @@ class Utils:
     
   @staticmethod
   def human_readable_bytes (byt):
+    """
+    convert a size in bytes to a human readable string
+    
+    Parameters:
+    -----------
+    byt: int
+      the byte size
+    
+    Returns
+    -------
+    string
+      the human readable  size (such as 1 MB or 2.7 TB)
+    """
+    if byt == 1:
+      return "1 Byte"
+    if byt < 1024:
+      return str (byt) + " Bytes"
+    
     for count in ['Bytes', 'KB', 'MB', 'GB', 'TB']:
       if byt > -1024.0 and byt < 1024.0:
         return "%3.1f %s" % (byt, count)
