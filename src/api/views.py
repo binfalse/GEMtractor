@@ -32,6 +32,7 @@ import pyparsing as pp
 from libsbml import *
 
 
+__logger = logging.getLogger('api')
 
 def get_session_data (request):
   if request.session.session_key is None:
@@ -66,7 +67,6 @@ def clear_data (request):
         })
 
 def get_network (request):
-  __logger = logging.getLogger('get_network')
   if request.method == 'POST':
     # TODO
     return redirect('index:index')
@@ -102,9 +102,10 @@ def get_network (request):
             }
             })
     except IOError as e:
+      __logger.error ("error retrieving network: " + getattr(e, 'message', repr(e)))
       return JsonResponse ({"status":"failed","error":getattr(e, 'message', repr(e))})
     except InvalidGeneExpression as e:
-      __logger.critical("InvalidGeneExpression in model " + request.session[Constants.SESSION_MODEL_ID] + ": " + getattr(e, 'message', repr(e)))
+      __logger.error("InvalidGeneExpression in model " + request.session[Constants.SESSION_MODEL_ID] + ": " + getattr(e, 'message', repr(e)))
       return JsonResponse ({"status":"failed","error": "The model uses an invalid gene expression: " + getattr(e, 'message', repr(e))})
     #return JsonResponse ({"nope": "nope"})
   
@@ -113,7 +114,6 @@ def get_network (request):
   
   
 def store_filter (request):
-  __logger = logging.getLogger('store_filter')
   if request.method != 'POST':
     # TODO
     return redirect('index:index')
@@ -137,11 +137,14 @@ def get_bigg_models (request):
     models["status"] = "success"
     return JsonResponse (models)
   except urllib.error.HTTPError  as e:
+      __logger.error ("error getting bigg models: " + getattr(e, 'message', repr(e)))
       return JsonResponse ({"status":"failed","error":str (getattr(e, 'code', repr(e))) + getattr(e, 'message', repr(e))})
   except urllib.error.URLError as e:
     if hasattr(e, 'reason'):
+      __logger.error ("error getting bigg models: " + str (getattr(e, 'reason', repr(e))) + getattr(e, 'message', repr(e)))
       return JsonResponse ({"status":"failed","error":str (getattr(e, 'reason', repr(e))) + getattr(e, 'message', repr(e))})
     elif hasattr(e, 'code'):
+      __logger.error ("error getting bigg models: " + str (getattr(e, 'code', repr(e))) + getattr(e, 'message', repr(e)))
       return JsonResponse ({"status":"failed","error":str (getattr(e, 'code', repr(e))) + getattr(e, 'message', repr(e))})
   
 def select_bigg_model (request):
@@ -161,11 +164,14 @@ def select_bigg_model (request):
     return JsonResponse ({"status":"success"})
 
   except urllib.error.HTTPError  as e:
+      __logger.error ("error getting bigg model: " + data["bigg_id"] + " -- " + getattr(e, 'message', repr(e)))
       return JsonResponse ({"status":"failed","error":str (getattr(e, 'code', repr(e))) + getattr(e, 'message', repr(e))})
   except urllib.error.URLError as e:
     if hasattr(e, 'reason'):
+      __logger.error ("error getting bigg model: " + data["bigg_id"] + " -- " + str (getattr(e, 'reason', repr(e))) + getattr(e, 'message', repr(e)))
       return JsonResponse ({"status":"failed","error":str (getattr(e, 'reason', repr(e))) + getattr(e, 'message', repr(e))})
     elif hasattr(e, 'code'):
+      __logger.error ("error getting bigg model: " + data["bigg_id"] + " -- " + str (getattr(e, 'code', repr(e))) + getattr(e, 'message', repr(e)))
       return JsonResponse ({"status":"failed","error":str (getattr(e, 'code', repr(e))) + getattr(e, 'message', repr(e))})
   
   
@@ -177,11 +183,14 @@ def get_biomodels (request):
     models["status"] = "success"
     return JsonResponse (models)
   except urllib.error.HTTPError  as e:
+      __logger.error ("error getting biomodels models: " + getattr(e, 'message', repr(e)))
       return JsonResponse ({"status":"failed","error":str (getattr(e, 'code', repr(e))) + getattr(e, 'message', repr(e))})
   except urllib.error.URLError as e:
     if hasattr(e, 'reason'):
+      __logger.error ("error getting biomodels models: " + str (getattr(e, 'reason', repr(e))) + getattr(e, 'message', repr(e)))
       return JsonResponse ({"status":"failed","error":str (getattr(e, 'reason', repr(e))) + getattr(e, 'message', repr(e))})
     elif hasattr(e, 'code'):
+      __logger.error ("error getting biomodels models: " + str (getattr(e, 'code', repr(e))) + getattr(e, 'message', repr(e)))
       return JsonResponse ({"status":"failed","error":str (getattr(e, 'code', repr(e))) + getattr(e, 'message', repr(e))})
   
 def select_biomodel (request):
@@ -201,15 +210,20 @@ def select_biomodel (request):
     return JsonResponse ({"status":"success"})
 
   except UnableToRetrieveBiomodel  as e:
+      __logger.error ("error getting biomodels model: "  + data["biomodels_id"] + " -- "+ getattr(e, 'message', repr(e)))
       return JsonResponse ({"status":"failed","error":getattr(e, 'message', repr(e))})
   except InvalidBiomodelsId  as e:
+      __logger.error ("error getting biomodels model: "  + data["biomodels_id"] + " -- " + getattr(e, 'message', repr(e)))
       return JsonResponse ({"status":"failed","error":getattr(e, 'message', repr(e))})
   except urllib.error.HTTPError  as e:
+      __logger.error ("error getting biomodels model: "  + data["biomodels_id"] + " -- " + getattr(e, 'message', repr(e)))
       return JsonResponse ({"status":"failed","error": "Does such a model exist? Can't download from Biomodels: " + str (getattr(e, 'code', repr(e))) + getattr(e, 'message', repr(e))})
   except urllib.error.URLError as e:
     if hasattr(e, 'reason'):
+      __logger.error ("error getting biomodels model: "  + data["biomodels_id"] + " -- " + str (getattr(e, 'reason', repr(e))) + getattr(e, 'message', repr(e)))
       return JsonResponse ({"status":"failed","error":str (getattr(e, 'reason', repr(e))) + getattr(e, 'message', repr(e))})
     elif hasattr(e, 'code'):
+      __logger.error ("error getting biomodels model: "  + data["biomodels_id"] + " -- " + str (getattr(e, 'code', repr(e))) + getattr(e, 'message', repr(e)))
       return JsonResponse ({"status":"failed","error":str (getattr(e, 'code', repr(e))) + getattr(e, 'message', repr(e))})
   
   

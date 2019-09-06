@@ -25,6 +25,7 @@ import urllib.request
 import json
 import re
 from .constants import Constants
+import logging
 
 class InvalidBiggId (Exception): pass
 class InvalidBiomodelsId (Exception): pass
@@ -34,6 +35,10 @@ class NotYetImplemented (Exception): pass
 class InvalidGeneExpression (Exception): pass
 
 class Utils:
+  
+  __logger = logging.getLogger('enalyzer-class')
+  
+  
   @staticmethod
   def add_model_note (model, filter_species, filter_reactions, filter_genes, remove_reaction_genes_removed, remove_reaction_missing_species):
     note = model.getNotesString ()
@@ -117,6 +122,7 @@ class Utils:
     Utils._create_dir(d)
     f = os.path.join (d, "models.json")
     if force or not os.path.isfile (f):
+      Utils.__logger.info('need to (re)download the list of models from BiGG')
       urllib.request.urlretrieve ("http://bigg.ucsd.edu/api/v2/models/", f)
     if time.time() - os.path.getmtime(f) > settings.CACHE_BIGG:
       return Utils.get_bigg_models (True)
@@ -136,10 +142,10 @@ class Utils:
     Utils._create_dir(d)
     h = hashlib.sha512 (bigg_id.encode("utf-8")).hexdigest()
     f = os.path.join (d, h)
-    if os.path.isfile (f):
-      return f
+    if not os.path.isfile (f):
+      Utils.__logger.info('need to (re)download the model from BiGG: ' + bigg_id)
+      urllib.request.urlretrieve ("http://bigg.ucsd.edu/static/models/"+bigg_id+".xml", f)
     
-    urllib.request.urlretrieve ("http://bigg.ucsd.edu/static/models/"+bigg_id+".xml", f)
     return f
   
   @staticmethod
@@ -148,6 +154,7 @@ class Utils:
     Utils._create_dir(d)
     f = os.path.join (d, "models.json")
     if force or not os.path.isfile (f):
+      Utils.__logger.info('need to (re)download the list of models from biomodels')
       urllib.request.urlretrieve ('https://www.ebi.ac.uk/biomodels/search?format=json&query=genome+scale+metabolic+model+modelformat%3A%22SBML%22+NOT+%22nicolas+le%22&numResults=100&sort=id-asc', f)
     if time.time() - os.path.getmtime(f) > settings.CACHE_BIOMODELS:
       return Utils.get_biomodels (True)
@@ -164,6 +171,7 @@ class Utils:
     h = hashlib.sha512 (model_id.encode("utf-8")).hexdigest()
     f = os.path.join (d, h + ".json")
     if not os.path.isfile (f) or time.time() - os.path.getmtime(f) > settings.CACHE_BIOMODEL_FILE:
+      Utils.__logger.info('need to (re)download the model information from biomodels: ' + model_id)
       urllib.request.urlretrieve ("https://www.ebi.ac.uk/biomodels/"+model_id+"?format=json", f)
     
     
@@ -172,13 +180,15 @@ class Utils:
         model = json.load(json_data)
         sbmlfile = os.path.join (d, h + ".sbml")
         if not os.path.isfile (sbmlfile) or time.time() - os.path.getmtime(sbmlfile) > settings.CACHE_BIOMODEL_FILE:
-          # print (type (model["files"]["main"][0]["name"]))
+          Utils.__logger.info('need to (re)download the model from biomodels: ' + model_id)
           filename = model["files"]["main"][0]["name"]
-          # print (filename)
           urllib.request.urlretrieve ("https://www.ebi.ac.uk/biomodels/model/download/"+model_id+"?filename="+filename, sbmlfile)
         return sbmlfile
     except JSONDecodeError as e:
+      Utils.__logger.critical('error retrieving biomodel '+model_id+': ' + getattr(e, 'message', repr(e)))
       raise UnableToRetrieveBiomodel ("could not read biomodel: " + model_id + " -- json response is invalid")
+    
+    Utils.__logger.critical('was not able to download biomodel '+model_id+' -- expexted file does not exist')
     raise UnableToRetrieveBiomodel ("could not download biomodel: " + model_id)
   
   @staticmethod
