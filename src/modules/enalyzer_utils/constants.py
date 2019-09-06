@@ -14,6 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
+
 class Constants:
   SESSION_MODEL_ID             = "model_id"
   SESSION_MODEL_NAME           = "model_name"
@@ -27,3 +28,8 @@ class Constants:
   SESSION_MODEL_TYPE_BIGG      = "bigg"
   SESSION_MODEL_TYPE_BIOMODELS = "biomodels"
   SESSION_HAS_SESSION_VALUE    = "yes"
+  
+  STORAGE_UPLOAD_DIR           = "UPLOADED"
+  STORAGE_BIGG_DIR             = "BIGG"
+  STORAGE_BIOMODELS_DIR        = "BIOMODELS"
+  STORAGE_GENERATED_DIR        = "GENERATED"

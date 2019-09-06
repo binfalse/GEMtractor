@@ -70,7 +70,7 @@ def index(request):
   if request.method == 'POST' and 'custom-model' in request.FILES and request.FILES['custom-model']:
     model = request.FILES['custom-model']
     
-    filename = Utils.get_upload_path (model.name, request.session.session_key)
+    filename = Utils.get_upload_path (request.session.session_key)
     with open(filename, 'wb+') as destination:
       for chunk in model.chunks():
         destination.write(chunk)
@@ -148,7 +148,7 @@ def export(request):
           
           
           file_name = file_name + ".sbml"
-          file_path = Utils.create_generated_file_web (file_name, request.session.session_key)
+          file_path = Utils.create_generated_file_web (request.session.session_key)
           model = net.export_en_sbml (file_path, request.session[Constants.SESSION_MODEL_ID], request.session[Constants.SESSION_MODEL_NAME],
           request.session[Constants.SESSION_FILTER_SPECIES],
         request.session[Constants.SESSION_FILTER_REACTION],
@@ -162,7 +162,7 @@ def export(request):
         else:
           if form.cleaned_data['network_format'] == 'dot':
             file_name = file_name + ".dot"
-            file_path = Utils.create_generated_file_web (file_name, request.session.session_key)
+            file_path = Utils.create_generated_file_web (request.session.session_key)
             net.export_en_dot (file_path)
             if os.path.exists(file_path):
               return serve_file (file_path, file_name, "application/dot")
@@ -170,7 +170,7 @@ def export(request):
               context['error'] = "error generating file"
           elif form.cleaned_data['network_format'] == 'graphml':
             file_name = file_name + ".graphml"
-            file_path = Utils.create_generated_file_web (file_name, request.session.session_key)
+            file_path = Utils.create_generated_file_web (request.session.session_key)
             net.export_en_graphml (file_path)
             if os.path.exists(file_path):
               return serve_file (file_path, file_name, "application/xml")
@@ -178,7 +178,7 @@ def export(request):
               context['error'] = "error generating file"
           elif form.cleaned_data['network_format'] == 'gml':
             file_name = file_name + ".gml"
-            file_path = Utils.create_generated_file_web (file_name, request.session.session_key)
+            file_path = Utils.create_generated_file_web (request.session.session_key)
             net.export_en_gml (file_path)
             if os.path.exists(file_path):
               return serve_file (file_path, file_name, "application/gml")
@@ -190,7 +190,7 @@ def export(request):
         file_name = file_name + "-ReactionNetwork"
         if form.cleaned_data['network_format'] == 'sbml':
           file_name = file_name + ".sbml"
-          file_path = Utils.create_generated_file_web (file_name, request.session.session_key)
+          file_path = Utils.create_generated_file_web (request.session.session_key)
           SBMLWriter().writeSBML (sbml, file_path)
           if os.path.exists(file_path):
             return serve_file (file_path, file_name, "application/xml")
@@ -200,7 +200,7 @@ def export(request):
           net = ppin.extract_network_from_sbml (sbml)
           if form.cleaned_data['network_format'] == 'dot':
             file_name = file_name + ".dot"
-            file_path = Utils.create_generated_file_web (file_name, request.session.session_key)
+            file_path = Utils.create_generated_file_web (request.session.session_key)
             net.export_rn_dot (file_path)
             if os.path.exists(file_path):
               return serve_file (file_path, file_name, "application/dot")
@@ -208,7 +208,7 @@ def export(request):
               context['error'] = "error generating file"
           elif form.cleaned_data['network_format'] == 'graphml':
             file_name = file_name + ".graphml"
-            file_path = Utils.create_generated_file_web (file_name, request.session.session_key)
+            file_path = Utils.create_generated_file_web (request.session.session_key)
             net.export_rn_graphml (file_path)
             if os.path.exists(file_path):
               return serve_file (file_path, file_name, "application/xml")
@@ -216,7 +216,7 @@ def export(request):
               context['error'] = "error generating file"
           elif form.cleaned_data['network_format'] == 'gml':
             file_name = file_name + ".gml"
-            file_path = Utils.create_generated_file_web (file_name, request.session.session_key)
+            file_path = Utils.create_generated_file_web (request.session.session_key)
             net.export_rn_gml (file_path)
             if os.path.exists(file_path):
               return serve_file (file_path, file_name, "application/gml")

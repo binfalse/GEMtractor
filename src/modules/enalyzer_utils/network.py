@@ -22,8 +22,6 @@ from .utils import Utils
 class Species:
   def __init__ (self, name, identifier):
     self.__logger = logging.getLogger('enalyzer.species')
-    # TODO: fix
-    # self.__logger.setLevel(logging.DEBUG)
     self.name = name
     self.identifier = identifier
     self.genes_for_consumption = []
@@ -41,9 +39,6 @@ class Species:
 class Reaction:
 
   def __init__(self, identifier, name, reversible = False):
-    self.__logger = logging.getLogger('enalyzer.reaction')
-    # TODO: fix
-    # self.__logger.setLevel(logging.DEBUG)
     self.identifier = identifier
     self.name = name
     self.reversible = reversible
@@ -61,9 +56,6 @@ class Reaction:
     self.produced.append (species.identifier)
       
   def serialize (self):
-    # self.__logger.info ("consumed: " + str (len (self.consumed)))
-    # self.__logger.info ("produced: " + str (len (self.produced)))
-    # self.__logger.info ("genes:    " + str (len (self.genes)))
     return {
       "identifier" : self.identifier,
       "name" : self.name,
@@ -77,8 +69,6 @@ class Network:
 
   def __init__ (self):
     self.__logger = logging.getLogger('enalyzer.network')
-    # TODO: fix
-    # self.__logger.setLevel(logging.ERROR)
     self.species = {}
     self.reactions = {}
     self.genenet = {}
@@ -195,6 +185,7 @@ class Network:
       nodemap = {}
       with open(filename, 'w') as f:
         f.write (Network.create_gml_prefix ())
+        #TODO comment incl time and version?
         
         num = 0
         for identifier, species in self.species.items ():
@@ -218,6 +209,7 @@ class Network:
       nodemap = {}
       with open(filename, 'w') as f:
         f.write (Network.create_gml_prefix ())
+        #TODO comment incl time and version?
         num = 0
         for gene in self.genenet:
           num += 1
@@ -254,6 +246,7 @@ class Network:
       nodemap = {}
       with open(filename, 'w') as f:
         f.write (Network.create_graphml_prefix ())
+        #TODO comment incl time and version?
         
         for identifier, species in self.species.items ():
           nodemap[identifier] = 's' + identifier
@@ -277,6 +270,7 @@ class Network:
       nodemap = {}
       with open(filename, 'w') as f:
         f.write (Network.create_graphml_prefix ())
+        #TODO comment incl time and version?
         num = 0
         for gene in self.genenet:
           num += 1
@@ -317,6 +311,7 @@ class Network:
   def export_en_sbml (self, filename, model_id, model_name = None, filter_species = None, filter_reactions = None, filter_genes = None, remove_reaction_genes_removed = True, remove_reaction_missing_species = False):
     sbml = SBMLDocument ()
     model = sbml.createModel ()
+    #TODO dc modified?
     if model is None:
       return False
     model.setId (model_id + "_enalyzed_EnzymeNetwork")

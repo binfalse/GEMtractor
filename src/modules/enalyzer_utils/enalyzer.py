@@ -160,6 +160,7 @@ class Enalyzer:
       
       if filter_species is not None or filter_reactions is not None or filter_genes is not None:
         try:
+          #TODO dc modified?
           self.__logger.debug("filtering things")
           for n in range (model.getNumReactions () - 1, -1, -1):
             reaction = model.getReaction (n)

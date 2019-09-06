@@ -17,10 +17,8 @@
 from django.conf import settings
 import hashlib
 import time
-import random
 import os
 import errno
-import tempfile
 import urllib.request
 import json
 import re
@@ -41,6 +39,7 @@ class Utils:
   
   @staticmethod
   def add_model_note (model, filter_species, filter_reactions, filter_genes, remove_reaction_genes_removed, remove_reaction_missing_species):
+    # TODO can we do better? eg. annotate with proper structure?
     note = model.getNotesString ()
     # print (note)
     if note is None or len (note) < 1 or "</body>" not in note:
@@ -74,42 +73,20 @@ class Utils:
     except OSError as e:
       if e.errno != errno.EEXIST:
         raise
-  
-  @staticmethod
-  def get_path_of_generated_file_web (filename, sessionid):
-    d = os.path.join (settings.STORAGE, "generated", "web", sessionid)
-    Utils._create_dir(d)
-    return os.path.join (d, filename)
     
   
   @staticmethod
-  def create_generated_file_web (filename, sessionid):
-    d = os.path.join (settings.STORAGE, "generated", "web", sessionid)
+  def create_generated_file_web (sessionid):
+    d = os.path.join (settings.STORAGE, Constants.STORAGE_GENERATED_DIR)
     Utils._create_dir(d)
-    
-    # tmp = hashlib.sha512 ((filename + str (time.time() + random.random())).encode("utf-8")).hexdigest ()
-    # while os.path.exists(os.path.join (d, tmp)):
-      # tmp = hashlib.sha512 ((filename + str (time.time() + random.random())).encode("utf-8")).hexdigest ()
-    
-    # return os.path.join (d, tmp)
-    return os.path.join (d, filename)
+    return os.path.join (d, sessionid)
     
   
   @staticmethod
-  def get_path_of_uploaded_file (filename, sessionid):
-    d = os.path.join (settings.STORAGE, "upload", sessionid)
+  def get_upload_path (sessionid):
+    d = os.path.join (settings.STORAGE, Constants.STORAGE_UPLOAD_DIR)
     Utils._create_dir(d)
-    return os.path.join (d, filename)
-  
-  @staticmethod
-  def get_upload_path (filename, sessionid):
-    d = os.path.join (settings.STORAGE, "upload", sessionid)
-    Utils._create_dir(d)
-    # tmp = hashlib.sha512 ((filename + str (time.time() + random.random())).encode("utf-8")).hexdigest ()
-    # while os.path.exists(os.path.join (d, tmp)):
-      # tmp = hashlib.sha512 ((filename + str (time.time() + random.random())).encode("utf-8")).hexdigest ()
-    
-    return os.path.join (d, filename)
+    return os.path.join (d, sessionid)
     
   
   @staticmethod
@@ -194,7 +171,7 @@ class Utils:
   @staticmethod
   def get_model_path (model_type, model_id, sessionid):
     if model_type == Constants.SESSION_MODEL_TYPE_UPLOAD:
-      return Utils.get_path_of_uploaded_file (model_id, sessionid)
+      return Utils.get_upload_path (sessionid)
     if model_type == Constants.SESSION_MODEL_TYPE_BIGG:
       return Utils.get_bigg_model (model_id)
     if model_type == Constants.SESSION_MODEL_TYPE_BIOMODELS:
