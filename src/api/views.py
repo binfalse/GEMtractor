@@ -112,10 +112,21 @@ def store_filter (request):
     # TODO
     return redirect('index:index')
   
+  if not Constants.SESSION_FILTER_SPECIES in request.session:
+    request.session[Constants.SESSION_FILTER_SPECIES] = []
+  if not Constants.SESSION_FILTER_REACTION in request.session:
+    request.session[Constants.SESSION_FILTER_REACTION] = []
+  if not Constants.SESSION_FILTER_GENES in request.session:
+    request.session[Constants.SESSION_FILTER_GENES] = []
+    
   data=json.loads(request.body)
-  request.session[Constants.SESSION_FILTER_SPECIES] = data["species"]
-  request.session[Constants.SESSION_FILTER_REACTION] = data["reaction"]
-  request.session[Constants.SESSION_FILTER_GENES] = data["genes"]
+  
+  if "species" in data:
+    request.session[Constants.SESSION_FILTER_SPECIES] = data["species"]
+  if "reaction" in data:
+    request.session[Constants.SESSION_FILTER_REACTION] = data["reaction"]
+  if "genes" in data:
+    request.session[Constants.SESSION_FILTER_GENES] = data["genes"]
   __logger.critical(data)
   return JsonResponse ({"status":"success",
             "filter": {

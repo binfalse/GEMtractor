@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sbml xmlns="http://www.sbml.org/sbml/level3/version1/core" level="3" version="1" fbc:required="false"  xmlns:fbc="http://www.sbml.org/sbml/level3/version1/fbc/version2">
+  <model id="modelid" fbc:strict="true">
+    <fbc:listOfGeneProducts xmlns:fbc="http://www.sbml.org/sbml/level3/version1/fbc/version2">
+        <fbc:geneProduct fbc:id="x" fbc:label="x" metaid="x"/>
+        <fbc:geneProduct fbc:id="y" fbc:label="y" metaid="y"/>
+        <fbc:geneProduct fbc:id="z" fbc:label="z" metaid="z"/>
+    </fbc:listOfGeneProducts>
+    <listOfCompartments>
+      <compartment id="c" constant="true" name="Cytoplasm"/>
+    </listOfCompartments>
+    <listOfSpecies>
+      <species id="a" compartment="c" boundaryCondition="false" constant="false" hasOnlySubstanceUnits="false" />
+      <species id="b" compartment="c" boundaryCondition="false" constant="false" hasOnlySubstanceUnits="false" />
+      <species id="c" compartment="c" boundaryCondition="false" constant="false" hasOnlySubstanceUnits="false" />
+    </listOfSpecies>
+    <listOfReactions>
+      <reaction id="r1" reversible="true" fast="false">
+        <notes>
+          <html xmlns="http://www.w3.org/1999/xhtml"><p>GENE_ASSOCIATION: (a or (b and c) or d or (f and g and k) or (k and a) or x)</p><p>GENE_LIST: b0351 b1241</p><p>SUBSYSTEM: Pyruvate Metabolism</p></html>
+        </notes>
+        <listOfReactants>
+          <speciesReference constant="true" species="a"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference constant="true" species="b"/>
+        </listOfProducts>
+      </reaction>
+      <reaction id="r2" reversible="false" fast="false">
+        <notes>
+          <html xmlns="http://www.w3.org/1999/xhtml"><p>GENE_ASSOCIATION: (a or (b and c) or d or (f and g and k) or (k and a))</p><p>GENE_LIST: b0351 b1241</p><p>SUBSYSTEM: Pyruvate Metabolism</p></html>
+        </notes>
+        <fbc:geneProductAssociation xmlns:fbc="http://www.sbml.org/sbml/level3/version1/fbc/version2">
+          <fbc:or sboTerm="SBO:0000174">
+            <fbc:geneProductRef fbc:geneProduct="x" />
+            <fbc:geneProductRef fbc:geneProduct="y" />
+          </fbc:or>
+        </fbc:geneProductAssociation>
+        <listOfReactants>
+          <speciesReference constant="true" species="b"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference constant="true" species="c"/>
+        </listOfProducts>
+      </reaction>
+      <reaction id="r3" reversible="false" fast="false">
+        <fbc:geneProductAssociation xmlns:fbc="http://www.sbml.org/sbml/level3/version1/fbc/version2">
+          <fbc:or sboTerm="SBO:0000174">
+            <fbc:geneProductRef fbc:geneProduct="x" />
+            <fbc:geneProductRef fbc:geneProduct="y" />
+          </fbc:or>
+        </fbc:geneProductAssociation>
+        <listOfProducts>
+          <speciesReference constant="true" species="c"/>
+        </listOfProducts>
+      </reaction>
+    </listOfReactions>
+  </model>
+</sbml>
