@@ -14,5 +14,5 @@ class ApiTest(TestCase):
   def test_status_post (self):
     response = self.client.post('/api/status', json.dumps({'request': 'something'}),content_type="application/json")
     self.assertEqual(response.status_code, 200)
-    # j = json.load (response.content.decode())
-    self.assertEqual("",response.json()["answer"])
+    #TODO
+    self.assertEqual("abc",response.json()["answer"])

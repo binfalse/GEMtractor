@@ -27,7 +27,7 @@ SECRET_KEY = '!6qdx@dba$w9uh(6efjcnm_!gblg9i5_d^r&#8btxo=0na$b&)'
 # TODO
 DEBUG = True
 
-ALLOWED_HOSTS = ['enalyzer-py','localhost']
+ALLOWED_HOSTS = ['enalyzer-py','localhost','127.0.0.1']
 
 
 # Application definition
@@ -167,3 +167,6 @@ STORAGE_INVALIDATE_PUBLIC = 60*60*24
 CACHE_BIGG = 60*60*24
 CACHE_BIOMODELS = 60*60*24
 CACHE_BIOMODEL_FILE = 60*60*24
+
+URLS_BIGG_REPO = "http://bigg.ucsd.edu/api/v2/models/"
+

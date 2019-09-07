@@ -24,8 +24,8 @@ class Species:
     self.__logger = logging.getLogger('enalyzer.species')
     self.name = name
     self.identifier = identifier
-    self.genes_for_consumption = []
-    self.genes_for_production = []
+    self.genes_for_consumption = set ()
+    self.genes_for_production = set ()
     self.occurence = []
     
   def serialize (self):
@@ -78,21 +78,20 @@ class Network:
 
   def add_reaction (self, reaction):
     self.reactions[reaction.identifier] = reaction
-    
-  def get_species (self, identifier):
-    return self.species[identifier]
 
   def serialize (self):
     self.__logger.debug ("serialising the network")
     json = {
       "species": {},
       "reactions": {},
-      "genenet": self.genenet}
+      "genenet": {}}
     
     for gene in self.genenet:
-      json["genenet"][gene]['links'] = []
-      for associated in self.genenet[gene]['links']:
-        json["genenet"][gene]['links'].append (associated)
+      json["genenet"][gene] = {"links": [], "reactions": []}
+      for associated in self.genenet[gene]["links"]:
+        json["genenet"][gene]["links"].append (associated)
+      for reaction in self.genenet[gene]["reactions"]:
+        json["genenet"][gene]["reactions"].append (reaction)
     
     for identifier, species in self.species.items ():
       self.__logger.debug ("serialising species " + identifier)
@@ -100,7 +99,6 @@ class Network:
     for identifier, reaction in self.reactions.items ():
       self.__logger.debug ("serialising reaction " + identifier)
       json["reactions"][identifier] = reaction.serialize ()
-    
     return json
 
 
@@ -123,22 +121,23 @@ class Network:
         
         for species in reaction.consumed:
           s = self.species[species]
-          if gene not in s.genes_for_consumption:
-            s.genes_for_consumption.append (gene)
-          if reaction.reversible and gene not in s.genes_for_production:
-            s.genes_for_production.append (gene)
+          #if gene not in s.genes_for_consumption:
+          s.genes_for_consumption.add (gene)
+          if reaction.reversible:
+            # and gene not in s.genes_for_production:
+            s.genes_for_production.add (gene)
         for species in reaction.produced:
           s = self.species[species]
-          if gene not in s.genes_for_production:
-            s.genes_for_production.append (gene)
-          if reaction.reversible and gene not in s.genes_for_consumption:
-            s.genes_for_consumption.append (gene)
+          # if gene not in s.genes_for_production:
+          s.genes_for_production.add (gene)
+          if reaction.reversible:
+            # and gene not in s.genes_for_consumption:
+            s.genes_for_consumption.add (gene)
     
     self.__logger.info ("got gene associations")
     for identifier, species in self.species.items ():
       for consumption in species.genes_for_consumption:
         for production in species.genes_for_production:
-          # if consumption not in self.genenet[production]["links"]:
           self.genenet[production]["links"].add (consumption)
     self.__logger.info ("got gene net")
     
@@ -324,12 +323,20 @@ class Network:
     
     nodemap = {}
     
+    compartment = model.createCompartment()
+    compartment.setId('compartment')
+    compartment.setConstant(True)
+    
     num = 0
     for gene in self.genenet:
       num += 1
       g = model.createSpecies ()
       g.setId ('g' + str (num))
       g.setName (gene)
+      g.setCompartment(compartment.getId())
+      g.setHasOnlySubstanceUnits(False)
+      g.setBoundaryCondition(False)
+      g.setConstant(False)
       nodemap[gene] = g
       # TODO: add other information if available
     
@@ -339,6 +346,8 @@ class Network:
         num += 1
         r= model.createReaction ()
         r.setId ('r' + str (num))
+        r.setFast(False)
+        r.setReversible(False)
         r.addReactant (nodemap[gene])
         r.addProduct (nodemap[associated])
     

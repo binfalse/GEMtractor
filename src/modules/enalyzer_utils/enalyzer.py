@@ -34,14 +34,20 @@ class Enalyzer:
 
     
     
-    def __init__(self):
-        self.__GENE_ASSOCIATION_PATTERN = re.compile(r".*GENE_ASSOCIATION: *([^ <][^<]*)<.*", re.DOTALL)
-        self.__GENE_LIST_PATTERN = re.compile(r".*GENE_LIST: *([^ <][^<]*)<.*", re.DOTALL)
-        self.__EXPRESSION_PARSER = self.__get_expression_parser ()
-        self.__logger = logging.getLogger('enalyzer-class')
-        self.__reaction_gene_map = {}
-        # TODO: fix
-        # self.__logger.setLevel(logging.DEBUG)
+    def __init__(self, sbml_file):
+      """ Get a new enalyzer for an sbml model
+      
+      Parameters:
+      -----------
+      
+      sbml_file: path to the SBML file
+      """
+      self.__GENE_ASSOCIATION_PATTERN = re.compile(r".*GENE_ASSOCIATION:([^<]+) *<.*", re.DOTALL)
+      self.__GENE_LIST_PATTERN = re.compile(r".*GENE_LIST: *([^ <][^<]*)<.*", re.DOTALL)
+      self.__EXPRESSION_PARSER = self.__get_expression_parser ()
+      self.__logger = logging.getLogger('enalyzer-class')
+      self.__reaction_gene_map = {}
+      self.__sbml_file = sbml_file
     
     def __get_expression_parser (self):
         variables = pp.Word(pp.alphanums + "_-.") 
@@ -62,7 +68,7 @@ class Enalyzer:
             if len(parseresult) == 1:
                 return self._unfold_complex_expression (parseresult[0])
             
-            if len(parseresult) > 2 and len(parseresult) % 2 == 1:
+            if len(parseresult) > 1 and len(parseresult) % 2 == 1:
                 # this is a chain of ANDs/ORs
                 # make sure it's only ANDs or only ORs
                 for i in range (0, math.floor (len(parseresult) / 2) - 1):
@@ -110,7 +116,7 @@ class Enalyzer:
     def _extract_genes_from_sbml_notes (self, annotation, default):
         m = re.match (self.__GENE_ASSOCIATION_PATTERN, annotation)
         if m:
-            return m.group (1)
+            return m.group (1).strip()
         return default
     
     def _overwrite_genes_in_sbml_notes (self, new_genes, reaction):
@@ -126,21 +132,22 @@ class Enalyzer:
         
       
     
-    def get_sbml (self, sbml_file, filter_species = None, filter_reactions = None, filter_genes = None, remove_reaction_genes_removed = True, remove_reaction_missing_species = False):
+    def get_sbml (self, filter_species = None, filter_reactions = None, filter_genes = None, remove_reaction_genes_removed = True, remove_reaction_missing_species = False):
       """ Get a filtered SBML document from a file
+      
+      do not use the same enalyzer object for two different SBML files!!
       
       Parameters:
       -----------
       
-      sbml_file: path to the SBML file
       filter_species:
       filter_reactions:
       filter_genes:
       remove_reaction_genes_removed: should we remove a reaction if all it's genes were removed?
       remove_reaction_missing_species: remove a reaction if one of the participating genes was removed?
       """
-      self.__logger.debug("reading sbml file " + sbml_file)
-      sbml = SBMLReader().readSBML(sbml_file)
+      self.__logger.debug("reading sbml file " + self.__sbml_file)
+      sbml = SBMLReader().readSBML(self.__sbml_file)
       if sbml.getNumErrors() > 0:
         e = []
         for i in range (0, sbml.getNumErrors()):

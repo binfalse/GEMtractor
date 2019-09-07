@@ -127,8 +127,8 @@ def export(request):
     if (form.is_valid()):
       file_name = request.session[Constants.SESSION_MODEL_NAME] + "-enalyzed"
       
-      ppin = Enalyzer ()
-      sbml = ppin.get_sbml (Utils.get_model_path (request.session[Constants.SESSION_MODEL_TYPE], request.session[Constants.SESSION_MODEL_ID], request.session.session_key),
+      enalyzer = Enalyzer (Utils.get_model_path (request.session[Constants.SESSION_MODEL_TYPE], request.session[Constants.SESSION_MODEL_ID], request.session.session_key))
+      sbml = enalyzer.get_sbml (
         request.session[Constants.SESSION_FILTER_SPECIES],
         request.session[Constants.SESSION_FILTER_REACTION],
         request.session[Constants.SESSION_FILTER_GENES],
@@ -137,7 +137,7 @@ def export(request):
       
       if form.cleaned_data['network_type'] == 'en':
         file_name = file_name + "-EnzymeNetwork"
-        net = ppin.extract_network_from_sbml (sbml)
+        net = enalyzer.extract_network_from_sbml (sbml)
         net.calc_genenet ()
         if form.cleaned_data['network_format'] == 'sbml':
           context['error'] = "not yet implemented"

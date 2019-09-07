@@ -100,7 +100,7 @@ class Utils:
     f = os.path.join (d, "models.json")
     if force or not os.path.isfile (f):
       Utils.__logger.info('need to (re)download the list of models from BiGG')
-      urllib.request.urlretrieve ("http://bigg.ucsd.edu/api/v2/models/", f)
+      urllib.request.urlretrieve (settings.URLS_BIGG_REPO, f)
     if time.time() - os.path.getmtime(f) > settings.CACHE_BIGG:
       return Utils.get_bigg_models (True)
     with open(f, 'r') as json_data:

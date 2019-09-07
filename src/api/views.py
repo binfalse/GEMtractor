@@ -66,11 +66,11 @@ def get_network (request):
     return redirect('index:index')
   
   if Constants.SESSION_MODEL_ID in request.session:
-    ppin = Enalyzer ()
+    enalyzer = Enalyzer (Utils.get_model_path (request.session[Constants.SESSION_MODEL_TYPE], request.session[Constants.SESSION_MODEL_ID], request.session.session_key))
     # __logger.critical(f)
     try:
       __logger.info ("getting sbml")
-      network = ppin.extract_network_from_sbml (ppin.get_sbml (Utils.get_model_path (request.session[Constants.SESSION_MODEL_TYPE], request.session[Constants.SESSION_MODEL_ID], request.session.session_key)))
+      network = enalyzer.extract_network_from_sbml (enalyzer.get_sbml ())
       __logger.info ("got sbml")
       network.calc_genenet ()
       __logger.info ("got genenet")
@@ -226,6 +226,7 @@ def select_biomodel (request):
 
 @csrf_exempt
 def status (request):
+  # TODO heartbeat
   if request.method != 'POST':
     return redirect('index:index')
   
