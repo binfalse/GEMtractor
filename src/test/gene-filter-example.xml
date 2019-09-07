@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <sbml xmlns="http://www.sbml.org/sbml/level3/version1/core" level="3" version="1" fbc:required="false"  xmlns:fbc="http://www.sbml.org/sbml/level3/version1/fbc/version2">
-  <model id="m" name="m" fbc:strict="true">
+  <model id="modelid" name="modelname" fbc:strict="true">
     <fbc:listOfGeneProducts xmlns:fbc="http://www.sbml.org/sbml/level3/version1/fbc/version2">
         <fbc:geneProduct fbc:id="x" fbc:label="x" metaid="x"/>
         <fbc:geneProduct fbc:id="y" fbc:label="y" metaid="y"/>
@@ -42,6 +42,25 @@
         <listOfProducts>
           <speciesReference constant="true" species="c"/>
         </listOfProducts>
+        <listOfModifiers>
+            <modifierSpeciesReference species="b"/>
+            <modifierSpeciesReference species="a"/>
+        </listOfModifiers>
+      </reaction>
+      <reaction id="r3" reversible="false" fast="false">
+        <fbc:geneProductAssociation xmlns:fbc="http://www.sbml.org/sbml/level3/version1/fbc/version2">
+          <fbc:or sboTerm="SBO:0000174">
+            <fbc:geneProductRef fbc:geneProduct="x" />
+            <fbc:geneProductRef fbc:geneProduct="y" />
+          </fbc:or>
+        </fbc:geneProductAssociation>
+        <listOfProducts>
+          <speciesReference constant="true" species="c"/>
+        </listOfProducts>
+        <listOfModifiers>
+            <modifierSpeciesReference species="b"/>
+            <modifierSpeciesReference species="a"/>
+        </listOfModifiers>
       </reaction>
     </listOfReactions>
   </model>

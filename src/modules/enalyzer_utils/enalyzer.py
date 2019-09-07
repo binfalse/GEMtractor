@@ -155,7 +155,7 @@ class Enalyzer:
         raise IOError ("model seems to be invalid: " + str (e))
       model = sbml.getModel()
       name = model.getName ()
-      if name is None:
+      if name is None or len (name) < 1:
           name = model.getId()
       model.setId (model.getId() + "_enalyzed_ReactionNetwork")
       model.setName ("enalyzed ReactionNetwork of " + name)
@@ -215,9 +215,12 @@ class Enalyzer:
                 if g not in filter_genes:
                   final_genes.append (g)
               
-              if (remove_reaction_genes_removed and len (final_genes) < 1):
-                model.removeReaction (n)
-                continue
+              if len (final_genes) < 1:
+                if remove_reaction_genes_removed:
+                  model.removeReaction (n)
+                  continue
+                else:
+                  final_genes = [reaction.getId ()]
               
               # should we update the genes in the model?
               if (len (final_genes) != len (current_genes)):

@@ -8,6 +8,159 @@ from modules.enalyzer_utils.utils import BreakLoops, InvalidGeneExpression, Util
 from xml.dom import minidom
 
 class EnalyzerTests (TestCase):
+  def test_sbml_filter1 (self):
+        f = "test/gene-filter-example.xml"
+        self.assertTrue (os.path.isfile(f), msg="cannot find test file")
+        
+        enalyzer = Enalyzer (f)
+        sbml = enalyzer.get_sbml (filter_species = ["a"], filter_genes = ["y"])
+        self.assertEqual (sbml.getNumErrors(), 0)
+        
+        self.assertTrue ("modelname" in sbml.getModel ().getName ()) 
+        self.assertTrue ("modelid" in sbml.getModel ().getId ())
+        
+        net = enalyzer.extract_network_from_sbml (sbml)
+        self.assertEqual (len (net.species), 3)
+        self.assertEqual (len (net.reactions), 3)
+        self.assertEqual (len (net.genenet), 0)
+        
+        
+        self.assertEqual (len(net.reactions["r1"].consumed), 0)
+        self.assertEqual (len(net.reactions["r1"].produced), 1)
+        self.assertEqual (len(net.reactions["r1"].genes), 6)
+        
+        self.assertEqual (len(net.reactions["r2"].consumed), 1)
+        self.assertEqual (len(net.reactions["r2"].produced), 1)
+        self.assertEqual (len(net.reactions["r2"].genes), 1)
+        
+        
+        
+        
+  def test_sbml_filter3 (self):
+        f = "test/gene-filter-example-3.xml"
+        self.assertTrue (os.path.isfile(f), msg="cannot find test file")
+        
+        enalyzer = Enalyzer (f)
+        sbml = enalyzer.get_sbml (filter_species = ["a"], filter_genes = ["a"])
+        self.assertEqual (sbml.getNumErrors(), 0)
+        
+        self.assertTrue ("modelname" in sbml.getModel ().getName ()) 
+        self.assertTrue ("modelid" in sbml.getModel ().getId ())
+        
+        net = enalyzer.extract_network_from_sbml (sbml)
+        self.assertEqual (len (net.species), 3)
+        self.assertEqual (len (net.reactions), 3)
+        self.assertEqual (len (net.genenet), 0)
+        
+        
+        self.assertEqual (len(net.reactions["r1"].consumed), 0)
+        self.assertEqual (len(net.reactions["r1"].produced), 1)
+        self.assertEqual (len(net.reactions["r1"].genes), 5)
+        
+        self.assertEqual (len(net.reactions["r2"].consumed), 1)
+        self.assertEqual (len(net.reactions["r2"].produced), 1)
+        self.assertEqual (len(net.reactions["r2"].genes), 4)
+        
+        
+        
+  def test_sbml_filter2 (self):
+        f = "test/gene-filter-example-2.xml"
+        self.assertTrue (os.path.isfile(f), msg="cannot find test file")
+        
+        enalyzer = Enalyzer (f)
+        sbml = enalyzer.get_sbml (filter_species = ["a"], filter_genes = ["a"])
+        self.assertEqual (sbml.getNumErrors(), 0)
+        
+        self.assertTrue ("modelid" in sbml.getModel ().getName ()) 
+        self.assertTrue ("modelid" in sbml.getModel ().getId ())
+        
+        net = enalyzer.extract_network_from_sbml (sbml)
+        self.assertEqual (len (net.species), 3)
+        self.assertEqual (len (net.reactions), 3)
+        self.assertEqual (len (net.genenet), 0)
+        
+        
+        self.assertEqual (len(net.reactions["r1"].consumed), 0)
+        self.assertEqual (len(net.reactions["r1"].produced), 1)
+        self.assertEqual (len(net.reactions["r1"].genes), 5)
+        
+        self.assertEqual (len(net.reactions["r2"].consumed), 1)
+        self.assertEqual (len(net.reactions["r2"].produced), 1)
+        self.assertEqual (len(net.reactions["r2"].genes), 2)
+        
+      
+      
+      
+        enalyzer = Enalyzer (f)
+        sbml = enalyzer.get_sbml (filter_species = ["b"], remove_reaction_missing_species = False)
+        self.assertEqual (sbml.getNumErrors(), 0)
+        
+        net = enalyzer.extract_network_from_sbml (sbml)
+        self.assertEqual (len (net.species), 3)
+        self.assertEqual (len (net.reactions), 3)
+        self.assertEqual (len (net.genenet), 0)
+        
+      
+      
+      
+        enalyzer = Enalyzer (f)
+        sbml = enalyzer.get_sbml (filter_species = ["a", "b"])
+        self.assertEqual (sbml.getNumErrors(), 0)
+        
+        net = enalyzer.extract_network_from_sbml (sbml)
+        self.assertEqual (len (net.species), 3)
+        self.assertEqual (len (net.reactions), 2)
+        self.assertEqual (len (net.genenet), 0)
+        
+      
+      
+      
+        enalyzer = Enalyzer (f)
+        sbml = enalyzer.get_sbml (filter_species = ["a", "c"], remove_reaction_missing_species = True)
+        self.assertEqual (sbml.getNumErrors(), 0)
+        
+        net = enalyzer.extract_network_from_sbml (sbml)
+        self.assertEqual (len (net.species), 3)
+        self.assertEqual (len (net.reactions), 2)
+        self.assertEqual (len (net.genenet), 0)
+        
+      
+      
+      
+        enalyzer = Enalyzer (f)
+        sbml = enalyzer.get_sbml (filter_species = ["a", "c"], filter_reactions = ["r3"], remove_reaction_missing_species = True)
+        self.assertEqual (sbml.getNumErrors(), 0)
+        
+        net = enalyzer.extract_network_from_sbml (sbml)
+        self.assertEqual (len (net.species), 3)
+        self.assertEqual (len (net.reactions), 1)
+        self.assertEqual (len (net.genenet), 0)
+        
+      
+        
+        
+        enalyzer = Enalyzer (f)
+        sbml = enalyzer.get_sbml (filter_genes = ["x", "y"])
+        self.assertEqual (sbml.getNumErrors(), 0)
+        
+        net = enalyzer.extract_network_from_sbml (sbml)
+        self.assertEqual (len (net.species), 3)
+        self.assertEqual (len (net.reactions), 1)
+        self.assertEqual (len (net.genenet), 0)
+        
+      
+        
+        
+        enalyzer = Enalyzer (f)
+        sbml = enalyzer.get_sbml (filter_genes = ["x", "y"], remove_reaction_genes_removed = False)
+        self.assertEqual (sbml.getNumErrors(), 0)
+        
+        net = enalyzer.extract_network_from_sbml (sbml)
+        self.assertEqual (len (net.species), 3)
+        self.assertEqual (len (net.reactions), 3)
+        self.assertEqual (len (net.genenet), 0)
+        
+        
   def test_sbml (self):
         f = "test/gene-filter-example.xml"
         self.assertTrue (os.path.isfile(f), msg="cannot find test file")
@@ -18,18 +171,17 @@ class EnalyzerTests (TestCase):
         
         net = enalyzer.extract_network_from_sbml (sbml)
         self.assertEqual (len (net.species), 3)
-        self.assertEqual (len (net.reactions), 2)
+        self.assertEqual (len (net.reactions), 3)
         self.assertEqual (len (net.genenet), 0)
         
         net.calc_genenet ()
         self.assertEqual (len (net.species), 3)
-        self.assertEqual (len (net.reactions), 2)
+        self.assertEqual (len (net.reactions), 3)
         self.assertEqual (len (net.genenet), 7)
         
         self.assertEqual (len(net.species["a"].occurence), 1)
         self.assertEqual (len(net.species["b"].occurence), 2)
-        self.assertEqual (len(net.species["c"].occurence), 1)
-        self.assertEqual (len(net.species["c"].occurence), 1)
+        self.assertEqual (len(net.species["c"].occurence), 2)
         
         self.assertEqual (len(net.reactions["r1"].consumed), 1)
         self.assertEqual (len(net.reactions["r1"].produced), 1)
@@ -44,7 +196,7 @@ class EnalyzerTests (TestCase):
         self.assertEqual (len (net.reactions), len (ns["reactions"]))
         self.assertEqual (len (net.genenet), len (ns["genenet"]))
         self.assertEqual (len (net.species), 3)
-        self.assertEqual (len (net.reactions), 2)
+        self.assertEqual (len (net.reactions), 3)
         self.assertEqual (len (net.genenet), 7)
         
         links_in_rn = 0
