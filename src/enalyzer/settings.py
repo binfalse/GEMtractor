@@ -165,8 +165,15 @@ STORAGE_INVALIDATE_DEFAULT = 60*60*5
 STORAGE_INVALIDATE_PUBLIC = 60*60*24
 
 CACHE_BIGG = 60*60*24
+CACHE_BIGG_MODEL = 60*60*24
 CACHE_BIOMODELS = 60*60*24
-CACHE_BIOMODEL_FILE = 60*60*24
+CACHE_BIOMODELS_MODEL = 60*60*24
 
-URLS_BIGG_REPO = "http://bigg.ucsd.edu/api/v2/models/"
+URLS_BIGG_MODELS = "http://bigg.ucsd.edu/api/v2/models/"
+URLS_BIGG_MODEL = lambda model_id: "http://bigg.ucsd.edu/static/models/"+model_id+".xml"
+URLS_BIOMODELS = "https://www.ebi.ac.uk/biomodels/search?format=json&query=genome+scale+metabolic+model+modelformat%3A%22SBML%22+NOT+%22nicolas+le%22&numResults=100&sort=id-asc"
+URLS_BIOMODEL_INFO = lambda model_id: "https://www.ebi.ac.uk/biomodels/"+model_id+"?format=json"
+URLS_BIOMODEL_SBML = lambda model_id, filename: "https://www.ebi.ac.uk/biomodels/model/download/"+model_id+"?filename="+filename
+
+
 

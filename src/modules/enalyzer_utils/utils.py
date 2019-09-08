@@ -100,28 +100,48 @@ class Utils:
     f = os.path.join (d, "models.json")
     if force or not os.path.isfile (f):
       Utils.__logger.info('need to (re)download the list of models from BiGG')
-      urllib.request.urlretrieve (settings.URLS_BIGG_REPO, f)
+      urllib.request.urlretrieve (settings.URLS_BIGG_MODELS, f)
     if time.time() - os.path.getmtime(f) > settings.CACHE_BIGG:
       return Utils.get_bigg_models (True)
-    with open(f, 'r') as json_data:
-      return json.load(json_data)
+    try:
+      with open(f, 'r') as json_data:
+        return json.load(json_data)
+    except Exception as e:
+      Utils.__logger.critical('error retrieving bigg models list -- json error: ' + getattr(e, 'message', repr(e)))
+      try:
+        os.remove (f)
+      except Exception as e:
+        Utils.__logger.critical('error removing bigg models list: ' + getattr(e, 'message', repr(e)))
+      raise e
+      
+  @staticmethod
+  def _get_bigg_model_base_path (model_id):
+    if not re.match('^[a-zA-Z0-9_-]+$', model_id):
+      raise InvalidBiggId ("this BiGG id is invalid: " + model_id)
+    d = os.path.join (settings.STORAGE, "cache", "bigg")
+    Utils._create_dir(d)
+    h = hashlib.sha512 (model_id.encode("utf-8")).hexdigest()
+    return os.path.join (d, h)
   
   @staticmethod
-  def get_bigg_model (bigg_id):
+  def rm_cached_bigg_model (model_id):
+    try:
+      os.remove (Utils._get_bigg_model_base_path (model_id))
+    except Exception as e:
+      Utils.__logger.critical('error removing cached biomodels sbml file: ' + model_id + ' -- ' + getattr(e, 'message', repr(e)))
+  
+  @staticmethod
+  def get_bigg_model (model_id, force = False):
     """ Retrieve a model from BiGG
     
     may raise HTTPError or URLError (see api/get_bigg_models)
     """
-    if not re.match('^[a-zA-Z0-9_-]+$', bigg_id):
-      raise InvalidBiggId ("this BiGG id is invalid: " + bigg_id)
-    
-    d = os.path.join (settings.STORAGE, "cache", "bigg")
-    Utils._create_dir(d)
-    h = hashlib.sha512 (bigg_id.encode("utf-8")).hexdigest()
-    f = os.path.join (d, h)
-    if not os.path.isfile (f):
-      Utils.__logger.info('need to (re)download the model from BiGG: ' + bigg_id)
-      urllib.request.urlretrieve ("http://bigg.ucsd.edu/static/models/"+bigg_id+".xml", f)
+    f = Utils._get_bigg_model_base_path (model_id)
+    if force or not os.path.isfile (f):
+      Utils.__logger.info('need to (re)download the model from BiGG: ' + model_id)
+      urllib.request.urlretrieve (settings.URLS_BIGG_MODEL (model_id), f)
+    if time.time() - os.path.getmtime(f) > settings.CACHE_BIGG_MODEL:
+      return Utils.get_bigg_model (model_id, True)
     
     return f
   
@@ -132,41 +152,65 @@ class Utils:
     f = os.path.join (d, "models.json")
     if force or not os.path.isfile (f):
       Utils.__logger.info('need to (re)download the list of models from biomodels')
-      urllib.request.urlretrieve ('https://www.ebi.ac.uk/biomodels/search?format=json&query=genome+scale+metabolic+model+modelformat%3A%22SBML%22+NOT+%22nicolas+le%22&numResults=100&sort=id-asc', f)
+      urllib.request.urlretrieve (settings.URLS_BIOMODELS, f)
     if time.time() - os.path.getmtime(f) > settings.CACHE_BIOMODELS:
       return Utils.get_biomodels (True)
-    with open(f, 'r') as json_data:
-      return json.load(json_data)
-  
+    try:
+      with open(f, 'r') as json_data:
+        return json.load(json_data)
+    except Exception as e:
+      Utils.__logger.critical('error retrieving biomodels list -- json error: ' + getattr(e, 'message', repr(e)))
+      try:
+        os.remove (f)
+      except Exception as e:
+        Utils.__logger.critical('error removing biomodels list: ' + getattr(e, 'message', repr(e)))
+      raise e
+      
   @staticmethod
-  def get_biomodel (model_id):
+  def _get_biomodel_base_path (model_id):
     if not re.match('^[BM][A-Z]+[0-9]{10}$', model_id):
       raise InvalidBiomodelsId ("this biomodels id is invalid: " + model_id)
-      
     d = os.path.join (settings.STORAGE, "cache", "biomodels")
     Utils._create_dir(d)
     h = hashlib.sha512 (model_id.encode("utf-8")).hexdigest()
-    f = os.path.join (d, h + ".json")
-    if not os.path.isfile (f) or time.time() - os.path.getmtime(f) > settings.CACHE_BIOMODEL_FILE:
+    return os.path.join (d, h)
+  
+  @staticmethod
+  def rm_cached_biomodel (model_id):
+    try:
+      os.remove (Utils._get_biomodel_base_path (model_id) + ".sbml")
+    except Exception as e:
+      Utils.__logger.critical('error removing cached biomodels sbml file: ' + model_id + ' -- ' + getattr(e, 'message', repr(e)))
+    try:
+      os.remove (Utils._get_biomodel_base_path (model_id) + ".json")
+    except Exception as e:
+      Utils.__logger.critical('error removing cached biomodels json file: ' + model_id + ' -- ' + getattr(e, 'message', repr(e)))
+  
+  @staticmethod
+  def get_biomodel (model_id, force = False):
+    f = Utils._get_biomodel_base_path (model_id) + ".json"
+    if force or not os.path.isfile (f):
       Utils.__logger.info('need to (re)download the model information from biomodels: ' + model_id)
-      urllib.request.urlretrieve ("https://www.ebi.ac.uk/biomodels/"+model_id+"?format=json", f)
+      urllib.request.urlretrieve (settings.URLS_BIOMODEL_INFO (model_id), f)
+    if  time.time() - os.path.getmtime(f) > settings.CACHE_BIOMODELS_MODEL:
+      return Utils.get_biomodel (model_id, True)
     
     
     try:
       with open(f, 'r') as json_data:
         model = json.load(json_data)
-        sbmlfile = os.path.join (d, h + ".sbml")
-        if not os.path.isfile (sbmlfile) or time.time() - os.path.getmtime(sbmlfile) > settings.CACHE_BIOMODEL_FILE:
+        sbmlfile = Utils._get_biomodel_base_path (model_id) + ".sbml"
+        if force or not os.path.isfile (sbmlfile):
           Utils.__logger.info('need to (re)download the model from biomodels: ' + model_id)
           filename = model["files"]["main"][0]["name"]
-          urllib.request.urlretrieve ("https://www.ebi.ac.uk/biomodels/model/download/"+model_id+"?filename="+filename, sbmlfile)
+          urllib.request.urlretrieve (settings.URLS_BIOMODEL_SBML (model_id, filename), sbmlfile)
+        if time.time() - os.path.getmtime(sbmlfile) > settings.CACHE_BIOMODELS_MODEL:
+          return Utils.get_biomodel (model_id, True)
         return sbmlfile
     except JSONDecodeError as e:
       Utils.__logger.critical('error retrieving biomodel '+model_id+': ' + getattr(e, 'message', repr(e)))
+      Utils.rm_cached_biomodel (model_id)
       raise UnableToRetrieveBiomodel ("could not read biomodel: " + model_id + " -- json response is invalid")
-    
-    Utils.__logger.critical('was not able to download biomodel '+model_id+' -- expexted file does not exist')
-    raise UnableToRetrieveBiomodel ("could not download biomodel: " + model_id)
   
   @staticmethod
   def get_model_path (model_type, model_id, sessionid):

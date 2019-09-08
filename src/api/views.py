@@ -20,7 +20,7 @@ import logging
 import json
 import os
 from django.http import JsonResponse
-from modules.enalyzer_utils.utils import Utils, InvalidGeneExpression, InvalidBiomodelsId, UnableToRetrieveBiomodel
+from modules.enalyzer_utils.utils import Utils, InvalidGeneExpression, InvalidBiomodelsId, UnableToRetrieveBiomodel, InvalidBiggId
 from modules.enalyzer_utils.enalyzer import Enalyzer
 from modules.enalyzer_utils.constants import Constants
 import urllib
@@ -119,7 +119,9 @@ def store_filter (request):
   if not Constants.SESSION_FILTER_GENES in request.session:
     request.session[Constants.SESSION_FILTER_GENES] = []
     
-  data=json.loads(request.body)
+  succ, data = parse_json_body (request)
+  if not succ:
+    return JsonResponse ({"status":"failed","error":data})
   
   if "species" in data:
     request.session[Constants.SESSION_FILTER_SPECIES] = data["species"]
@@ -127,7 +129,7 @@ def store_filter (request):
     request.session[Constants.SESSION_FILTER_REACTION] = data["reaction"]
   if "genes" in data:
     request.session[Constants.SESSION_FILTER_GENES] = data["genes"]
-  __logger.critical(data)
+  
   return JsonResponse ({"status":"success",
             "filter": {
             Constants.SESSION_FILTER_SPECIES: request.session[Constants.SESSION_FILTER_SPECIES],
@@ -141,6 +143,9 @@ def get_bigg_models (request):
     models = Utils.get_bigg_models ()
     models["status"] = "success"
     return JsonResponse (models)
+  except json.decoder.JSONDecodeError as e:
+      __logger.error ("error getting bigg models: " + getattr(e, 'message', repr(e)))
+      return JsonResponse ({"status":"failed","error":"is BiGG models down? "+str (getattr(e, 'code', repr(e))) + getattr(e, 'message', repr(e))})
   except urllib.error.HTTPError  as e:
       __logger.error ("error getting bigg models: " + getattr(e, 'message', repr(e)))
       return JsonResponse ({"status":"failed","error":str (getattr(e, 'code', repr(e))) + getattr(e, 'message', repr(e))})
@@ -156,7 +161,10 @@ def select_bigg_model (request):
   if request.method != 'POST':
     # TODO
     return redirect('index:index')
-  data=json.loads(request.body)
+  
+  succ, data = parse_json_body (request, ["bigg_id"])
+  if not succ:
+    return JsonResponse ({"status":"failed","error":data})
   
   try:
     Utils.get_bigg_model (data["bigg_id"])
@@ -168,6 +176,9 @@ def select_bigg_model (request):
     Utils.del_session_key (request, {}, Constants.SESSION_FILTER_GENES)
     return JsonResponse ({"status":"success"})
 
+  except InvalidBiggId  as e:
+      __logger.error ("error getting bigg model: " + data["bigg_id"] + " -- " + getattr(e, 'message', repr(e)))
+      return JsonResponse ({"status":"failed","error":getattr(e, 'message', repr(e))})
   except urllib.error.HTTPError  as e:
       __logger.error ("error getting bigg model: " + data["bigg_id"] + " -- " + getattr(e, 'message', repr(e)))
       return JsonResponse ({"status":"failed","error":str (getattr(e, 'code', repr(e))) + getattr(e, 'message', repr(e))})
@@ -187,6 +198,9 @@ def get_biomodels (request):
     models = Utils.get_biomodels ()
     models["status"] = "success"
     return JsonResponse (models)
+  except json.decoder.JSONDecodeError as e:
+      __logger.error ("error getting biomodels: " + getattr(e, 'message', repr(e)))
+      return JsonResponse ({"status":"failed","error":"is biomodels down? "+str (getattr(e, 'code', repr(e))) + getattr(e, 'message', repr(e))})
   except urllib.error.HTTPError  as e:
       __logger.error ("error getting biomodels models: " + getattr(e, 'message', repr(e)))
       return JsonResponse ({"status":"failed","error":str (getattr(e, 'code', repr(e))) + getattr(e, 'message', repr(e))})
@@ -202,7 +216,10 @@ def select_biomodel (request):
   if request.method != 'POST':
     # TODO
     return redirect('index:index')
-  data=json.loads(request.body)
+  
+  succ, data = parse_json_body (request, ["biomodels_id"])
+  if not succ:
+    return JsonResponse ({"status":"failed","error":data})
   
   try:
     Utils.get_biomodel (data["biomodels_id"])
@@ -231,8 +248,18 @@ def select_biomodel (request):
       __logger.error ("error getting biomodels model: "  + data["biomodels_id"] + " -- " + str (getattr(e, 'code', repr(e))) + getattr(e, 'message', repr(e)))
       return JsonResponse ({"status":"failed","error":str (getattr(e, 'code', repr(e))) + getattr(e, 'message', repr(e))})
   
-  
-  
+
+def parse_json_body (request, expected_keys = []):
+  try:
+    data=json.loads(request.body)
+    
+    for k in expected_keys:
+      if k not in data:
+        return False, "request is missing key: " + k
+    
+    return True, data
+  except json.decoder.JSONDecodeError as e:
+    return False, "request is not proper json"
 
 
 @csrf_exempt
