@@ -45,7 +45,7 @@ class Enalyzer:
       self.__GENE_ASSOCIATION_PATTERN = re.compile(r".*GENE_ASSOCIATION:([^<]+) *<.*", re.DOTALL)
       self.__GENE_LIST_PATTERN = re.compile(r".*GENE_LIST: *([^ <][^<]*)<.*", re.DOTALL)
       self.__EXPRESSION_PARSER = self.__get_expression_parser ()
-      self.__logger = logging.getLogger('enalyzer-class')
+      self.__logger = logging.getLogger(__name__)
       self.__reaction_gene_map = {}
       self.__sbml_file = sbml_file
     

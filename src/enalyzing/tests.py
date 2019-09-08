@@ -8,7 +8,7 @@ from libsbml import SBMLReader
 from modules.enalyzer_utils.utils import Utils, InvalidBiggId, InvalidBiomodelsId
 
 import logging
-# logging.getLogger('tmp').debug("---->>>>> " + str(j))
+# logging.getLogger(__name__).debug("---->>>>> " + str(j))
 
 
 # Create your tests here.
@@ -164,9 +164,6 @@ class EnalyzingTest(TestCase):
           reaction = sbml_rn.getModel ().getReaction (r)
           rnEdges += reaction.getNumReactants ()
           rnEdges += reaction.getNumProducts ()
-        logging.getLogger('tmp').debug("----r>>>>> " + str (rnSpecies))
-        logging.getLogger('tmp').debug("----r>>>>> " + str (rnReactions))
-        logging.getLogger('tmp').debug("----r>>>>> " + str (rnEdges))
         
         form = self._create_export ('en', 'sbml', False, True)
         self.assertTrue (form.is_valid())
@@ -182,9 +179,6 @@ class EnalyzingTest(TestCase):
           reaction = sbml_en.getModel ().getReaction (r)
           enEdges += reaction.getNumReactants ()
           enEdges += reaction.getNumProducts ()
-        logging.getLogger('tmp').debug("----e>>>>> " + str (enSpecies))
-        logging.getLogger('tmp').debug("----e>>>>> " + str (enReactions))
-        logging.getLogger('tmp').debug("----e>>>>> " + str (enEdges))
         
         
         
@@ -254,10 +248,6 @@ class EnalyzingTest(TestCase):
         
         
         
-        # logging.getLogger('tmp').debug("---->>>>> " + str(response.content))
-        
-        
-        
     
   def _create_export (self, network_type, network_format, remove_reaction_genes_removed, remove_reaction_missing_species):
     return ExportForm(data={
@@ -272,7 +262,7 @@ class EnalyzingTest(TestCase):
       xmldoc = minidom.parseString (xml)
       return True
     except:
-      logging.getLogger('tmp').debug("XML BAD")
+      logging.getLogger(__name__).debug("XML BAD")
       return False
   
   def _valid_sbml (self, xml):
@@ -282,7 +272,7 @@ class EnalyzingTest(TestCase):
     sbml = SBMLReader().readSBMLFromString(xml.decode("utf-8"))
     if sbml.getNumErrors() > 0:
       for i in range (0, sbml.getNumErrors()):
-        logging.getLogger('tmp').debug("SBML BAD: " + sbml.getError(i).getMessage())
+        logging.getLogger(__name__).debug("SBML BAD: " + sbml.getError(i).getMessage())
       return False, None
     return True, sbml
   

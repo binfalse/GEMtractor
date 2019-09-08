@@ -21,7 +21,7 @@ from .utils import Utils
 # TODO: logging
 class Species:
   def __init__ (self, name, identifier):
-    self.__logger = logging.getLogger('enalyzer.species')
+    self.__logger = logging.getLogger(__name__)
     self.name = name
     self.identifier = identifier
     self.genes_for_consumption = set ()
@@ -68,7 +68,7 @@ class Reaction:
 class Network:
 
   def __init__ (self):
-    self.__logger = logging.getLogger('enalyzer.network')
+    self.__logger = logging.getLogger(__name__)
     self.species = {}
     self.reactions = {}
     self.genenet = {}

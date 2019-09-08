@@ -21,13 +21,19 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/1.11/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '!6qdx@dba$w9uh(6efjcnm_!gblg9i5_d^r&#8btxo=0na$b&)'
+# SECRET_KEY = '!6qdx@dba$w9uh(6efjcnm_!gblg9i5_d^r&#8btxo=0na$b&)'
+with open('secret_key.txt') as f:
+    SECRET_KEY = f.read().strip()
 
 # SECURITY WARNING: don't run with debug turned on in production!
 # TODO
-DEBUG = True
+DEBUG = False
+if "DEBUG" in os.environ:
+    DEBUG = os.environ['DEBUG']
 
-ALLOWED_HOSTS = ['enalyzer-py','localhost','127.0.0.1']
+ALLOWED_HOSTS = ['localhost','127.0.0.1']
+if "ALLOWED_HOSTS" in os.environ:
+    ALLOWED_HOSTS.append ("ALLOWED_HOSTS")
 
 
 # Application definition
@@ -139,25 +145,29 @@ STATICFILES_DIRS = (
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '{asctime} {name}:{module} [{levelname}]: {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose'
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': os.getenv('DJANGO_LOG_LEVEL', 'WARN'),
+        },
+    },
+}
 
-
-
-# if DEBUG:
-    # # will output to your console
-    # logging.basicConfig(
-        # level = logging.DEBUG,
-        # format = '%(asctime)s %(levelname)s %(message)s',
-    # )
-# else:
-    # logging.basicConfig(
-        # level = logging.CRITICAL,
-        # format = '%(asctime)s %(levelname)s %(message)s',
-    # )
-# TODO remove and include above
-logging.basicConfig(
-    level = logging.INFO,
-    format = '%(asctime)s %(levelname)s %(message)s',
-)
 
 #import tempfile
 STORAGE = "/tmp/enalyzer-storage/"

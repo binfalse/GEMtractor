@@ -26,7 +26,7 @@ from modules.enalyzer_utils.constants import Constants
 import urllib
 
 
-__logger = logging.getLogger('api')
+__logger = logging.getLogger(__name__)
 
 def get_session_data (request):
   if request.session.session_key is None:
@@ -67,7 +67,6 @@ def get_network (request):
   
   if Constants.SESSION_MODEL_ID in request.session:
     enalyzer = Enalyzer (Utils.get_model_path (request.session[Constants.SESSION_MODEL_TYPE], request.session[Constants.SESSION_MODEL_ID], request.session.session_key))
-    # __logger.critical(f)
     try:
       __logger.info ("getting sbml")
       network = enalyzer.extract_network_from_sbml (enalyzer.get_sbml ())
@@ -138,7 +137,6 @@ def store_filter (request):
             }})
   
 def get_bigg_models (request):
-  # time.sleep(5)
   try:
     models = Utils.get_bigg_models ()
     models["status"] = "success"
@@ -193,7 +191,6 @@ def select_bigg_model (request):
   
   
 def get_biomodels (request):
-  # time.sleep(5)
   try:
     models = Utils.get_biomodels ()
     models["status"] = "success"
@@ -268,7 +265,6 @@ def status (request):
   if request.method != 'POST':
     return redirect('index:index')
   
-  __logger = logging.getLogger('status')
   
   __logger.critical(request.body)
   try:

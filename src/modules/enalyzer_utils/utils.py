@@ -34,7 +34,7 @@ class InvalidGeneExpression (Exception): pass
 
 class Utils:
   
-  __logger = logging.getLogger('enalyzer-class')
+  __logger = logging.getLogger(__name__)
   
   
   @staticmethod

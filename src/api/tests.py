@@ -6,7 +6,7 @@ from modules.enalyzer_utils.utils import Utils, InvalidBiggId, InvalidBiomodelsI
 import tempfile
 
 import logging
-# logging.getLogger('tmp').debug("---->>>>> " + str(j))
+# logging.getLogger(__name__).debug("---->>>>> " + str(j))
 
 # Create your tests here.
 class ApiTest(TestCase):
