@@ -60,8 +60,7 @@ def index(request):
   
   if request.session.session_key is None:
     request.session[Constants.SESSION_HAS_SESSION] = Constants.SESSION_HAS_SESSION_VALUE
-  #if 'model' in request.session:
-  #  return filterModel (request)
+    request.session.save()
   
   if request.method == 'POST' and 'custom-model' in request.FILES and request.FILES['custom-model']:
     model = request.FILES['custom-model']
@@ -193,7 +192,7 @@ def export(request):
           else:
             context['error'] = "error generating file"
         else:
-          net = ppin.extract_network_from_sbml (sbml)
+          net = enalyzer.extract_network_from_sbml (sbml)
           if form.cleaned_data['network_format'] == 'dot':
             file_name = file_name + ".dot"
             file_path = Utils.create_generated_file_web (request.session.session_key)
