@@ -70,11 +70,11 @@ Web: <a href="https://www.sbi.uni-rostock.de">sbi.uni-rostock.de</a>
 <p>
 	We use session cookies to store information about your uploads and settings.
 	Your current session stores the following information:
-	<ul id="sessionlist"></ul>
-	In addition, we store the following files that you uploaded:
-	<ul id="fileslist"></ul>
-	Your data will be deleted after one month of not using it anymore.
-	Uploaded files may be deleted at any time (eg. when rebuilding the website or if we need the storage space).
+	<ul id="sessionlist"><li id="sessionlistNone">None</li></ul>
+	In addition, we store the following files that you uploaded: (File names are automatically generated)
+	<ul id="fileslist"><li id="fileslistNone">None</li></ul>
+	Your session data will be deleted after one month of not using it anymore.
+	Uploaded files may be deleted at any time (eg. when rebuilding the website or if we need the storage space), but at least after {{CACHE_UPLOADED}} hours of not using it.
 	So do not treat this as a storage and always have a local backup of your data.<br>
 	<strong>You can delete all your data by clearing your session:</strong> <button class="w3-button w3-flat-wet-asphalt" id="clear-session">Clear my Data now!</button>
 </p>

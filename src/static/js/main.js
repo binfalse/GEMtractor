@@ -368,12 +368,9 @@ function prepareTableSorting () {
 		$( this ).parent ().find ('th').removeClass ("sorted-desc");
 		$( this ).parent ().find ('th').removeClass ("sorted-asc");
 		
-		console.log (asc);
-		
 		var table = $(this).parents('table').eq(0);
 		var rows = table.find('tr:gt(0)').toArray().sort(comparer($(this).index()));
 		
-		console.log (rows);
 		if (asc)
 			$(this).addClass ("sorted-asc").append (" <i class='fas fa-sort-up sortsymbol'></i>");
 		else {
@@ -623,6 +620,20 @@ function prepareIndex () {
         }
     });
 	prepareTableSorting ();
+	
+	
+	
+	$.ajax({
+        url: '/api/status',
+        dataType: 'json',
+        success: function (data) {
+					console.log (data)
+				},
+        error: function (jqXHR, textStatus, errorThrown) {
+					console.log (errorThrown + " -- " + textStatus)
+        }
+    });
+        
 }
 
 
@@ -646,11 +657,13 @@ function prepareImprint () {
 					}
 					for (var key in data.data.session) {
 						if (data.data.session.hasOwnProperty(key)) {
-							$("#sessionlist").append ("<li>" + key + ": " + data.data.session[key] + "</li>");
+							$("#sessionlist").append ("<li><strong>" + key + ":</strong> " + data.data.session[key] + "</li>");
+							$("#sessionlistNone").remove ();
 						}
 					}
 					for (var i in data.data.files) {
 						$("#fileslist").append ("<li>" + data.data.files[i] + "</li>");
+						$("#fileslistNone").remove ();
 					}
 				},
         error: function (jqXHR, textStatus, errorThrown) {

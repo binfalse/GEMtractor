@@ -193,10 +193,11 @@ STORAGE = "/tmp/enalyzer-storage/"
 STORAGE_INVALIDATE_DEFAULT = 60*60*5
 STORAGE_INVALIDATE_PUBLIC = 60*60*24
 
+CACHE_UPLOADED = 1.5*60*60
 CACHE_BIGG = 60*60*24
-CACHE_BIGG_MODEL = 60*60*24
+CACHE_BIGG_MODEL = 7*60*60*24
 CACHE_BIOMODELS = 60*60*24
-CACHE_BIOMODELS_MODEL = 60*60*24
+CACHE_BIOMODELS_MODEL = 7*60*60*24
 
 URLS_BIGG_MODELS = "http://bigg.ucsd.edu/api/v2/models/"
 URLS_BIGG_MODEL = lambda model_id: "http://bigg.ucsd.edu/static/models/"+model_id+".xml"
@@ -204,5 +205,5 @@ URLS_BIOMODELS = "https://www.ebi.ac.uk/biomodels/search?format=json&query=genom
 URLS_BIOMODEL_INFO = lambda model_id: "https://www.ebi.ac.uk/biomodels/"+model_id+"?format=json"
 URLS_BIOMODEL_SBML = lambda model_id, filename: "https://www.ebi.ac.uk/biomodels/model/download/"+model_id+"?filename="+filename
 
-MODEL_MAX_ENTITIES_FILTER = 10000
+MAX_ENTITIES_FILTER = os.getenv('MAX_ENTITIES_FILTER', 10000)
 
