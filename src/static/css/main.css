@@ -64,3 +64,12 @@ a.bigg_id:hover {
   top: -60px;
     visibility: hidden;
 }
+
+
+.fa-sort {
+  color: #6c8095;
+}
+.sorted-desc .fa-sort,
+.sorted-asc .fa-sort {
+  display: none
+}

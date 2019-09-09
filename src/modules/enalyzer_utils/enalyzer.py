@@ -343,7 +343,7 @@ class Enalyzer:
         
         # TODO remove debugging
         if max_genes < len (current_genes):
-          print (reaction.getId () + " -- " + str (len (current_genes)))
+          # ~ print (reaction.getId () + " -- " + str (len (current_genes)))
           max_genes = len (current_genes)
       
         

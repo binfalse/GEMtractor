@@ -363,15 +363,18 @@ function comparer(index) {
 function prepareTableSorting () {
 	// do it for all .sortable tables
 	$('.sortable th').click(function(){
-		$('.sortable th .sortsymbol').remove ();
+		console.log ("test");
+		$( this ).parent ().find('.sortsymbol').remove ();
 		var asc = !$( this ).hasClass ("sorted-asc");
-		$('.sortable th').removeClass ("sorted-desc");
-		$('.sortable th').removeClass ("sorted-asc");
+		$( this ).parent ().find ('th').removeClass ("sorted-desc");
+		$( this ).parent ().find ('th').removeClass ("sorted-asc");
 		
+		console.log (asc);
 		
 		var table = $(this).parents('table').eq(0);
 		var rows = table.find('tr:gt(0)').toArray().sort(comparer($(this).index()));
 		
+		console.log (rows);
 		if (asc)
 			$(this).addClass ("sorted-asc").append (" <i class='fas fa-sort-up sortsymbol'></i>");
 		else {
@@ -520,55 +523,54 @@ function prepareIndex () {
         url: '/api/get_bigg_models',
         dataType: 'json',
         success: function (data) {
-			// successfully downloaded something, but was the request also successfull?
-			if (data.status != 'success') {
-				$("#error").show ().text ("Failed to obtain BiGG models: " + data.error);
-				return;
-			}
-			
-			// if it was successful: build the table
-			for (var model of data.results) {
-				model.DOM = domIdMapper (model.bigg_id);
-				const row = $("<tr id='"+model.DOM+"'><td><a class='bigg_id'>"+model.bigg_id+"</a></td><td>"+model.organism+"</td><td>"+model.metabolite_count+"</td><td>"+model.reaction_count+"</td><td>"+model.gene_count+"</td></tr>");
-				$('#bigg-table').append(row);
-			};
-			
-			// add click events to model ids
-			$('.bigg_id').click (function () {
-				const modelid = $(this).text ();
-				$(this).html ("<i class='fa fa-spinner w3-spin'></i> loading model");
-				
-				// select the model
-				$.ajax({
-					url: '/api/select_bigg_model',
-					dataType: 'json',
-					method: "POST",
-					headers: {"X-CSRFToken": token},
-					data: JSON.stringify({
-						bigg_id: modelid
-					}),
-					success: function (data) {
-						// successfully downloaded something, but was the request also successfull?
-						if (data.status != 'success') {
-							$("#error").show ().text ("Failed to select BiGG model: " + data.error);
-							return;
-						}
-						// all right, let's move on to filtering
-						window.location = filter_url;
-					},
-					error: function (jqXHR, textStatus, errorThrown) {
-						$("#error").show ().text ("Failed to obtain BiGG models: " + errorThrown);
+					// successfully downloaded something, but was the request also successfull?
+					if (data.status != 'success') {
+						$("#error").show ().text ("Failed to obtain BiGG models: " + data.error);
+						return;
 					}
-				});
-			});
-			$("#bigg_loading").hide ();
-			$("#choose-bigg table").show ();
-			prepareTableSorting ();
+					
+					// if it was successful: build the table
+					for (var model of data.results) {
+						model.DOM = domIdMapper (model.bigg_id);
+						const row = $("<tr id='"+model.DOM+"'><td><a class='bigg_id'>"+model.bigg_id+"</a></td><td>"+model.organism+"</td><td>"+model.metabolite_count+"</td><td>"+model.reaction_count+"</td><td>"+model.gene_count+"</td></tr>");
+						$('#bigg-table').append(row);
+					};
+					
+					// add click events to model ids
+					$('.bigg_id').click (function () {
+						const modelid = $(this).text ();
+						$(this).html ("<i class='fa fa-spinner w3-spin'></i> loading model");
+						
+						// select the model
+						$.ajax({
+							url: '/api/select_bigg_model',
+							dataType: 'json',
+							method: "POST",
+							headers: {"X-CSRFToken": token},
+							data: JSON.stringify({
+								bigg_id: modelid
+							}),
+							success: function (data) {
+								// successfully downloaded something, but was the request also successfull?
+								if (data.status != 'success') {
+									$("#error").show ().text ("Failed to select BiGG model: " + data.error);
+									return;
+								}
+								// all right, let's move on to filtering
+								window.location = filter_url;
+							},
+							error: function (jqXHR, textStatus, errorThrown) {
+								$("#error").show ().text ("Failed to obtain BiGG models: " + errorThrown);
+							}
+						});
+					});
+					$("#bigg_loading").hide ();
+					$("#choose-bigg table").show ();
         },
         error: function (jqXHR, textStatus, errorThrown) {
-			$("#bigg_loading").hide ();
-			$("#choose-bigg table").hide ();
-			$("#error").show ().text ("Failed to obtain BiGG models: " + errorThrown);
+					$("#bigg_loading").hide ();
+					$("#choose-bigg table").hide ();
+					$("#error").show ().text ("Failed to obtain BiGG models: " + errorThrown);
         }
     });
       
@@ -591,30 +593,29 @@ function prepareIndex () {
         url: '/api/get_biomodels',
         dataType: 'json',
         success: function (data) {
-			if (data.status != 'success') {
-				$("#error").show ().text ("Failed to obtain Biomodels: " + data.error);
-				return;
-			}
+					if (data.status != 'success') {
+						$("#error").show ().text ("Failed to obtain Biomodels: " + data.error);
+						return;
+					}
+					
+					// if it was successful: build the table
+					for (var model of data.models) {
+						model.DOM = domIdMapper (model.id);
+						const row = $("<tr id='"+model.DOM+"'><td><a class='biomodels_id'>"+model.id+"</a></td><td>"+model.name+"</td></tr>");
+						$('#biomodels-table').append(row);
+					}
 			
-			// if it was successful: build the table
-			for (var model of data.models) {
-				model.DOM = domIdMapper (model.id);
-				const row = $("<tr id='"+model.DOM+"'><td><a class='biomodels_id'>"+model.id+"</a></td><td>"+model.name+"</td></tr>");
-				$('#biomodels-table').append(row);
-			}
-  
-			// add click events to model ids
-			$('.biomodels_id').click (function () {
-				const modelid = $(this).text ();
-				$(this).html ("<i class='fa fa-spinner w3-spin'></i> loading model");
-				// select the model
-				select_biomodel (modelid);
-			});
-          
-          
-			$("#biomodels_loading").hide ();
-			$("#choose-biomodels table").show ();
-			prepareTableSorting ();
+					// add click events to model ids
+					$('.biomodels_id').click (function () {
+						const modelid = $(this).text ();
+						$(this).html ("<i class='fa fa-spinner w3-spin'></i> loading model");
+						// select the model
+						select_biomodel (modelid);
+					});
+							
+							
+					$("#biomodels_loading").hide ();
+					$("#choose-biomodels table").show ();
         },
         error: function (jqXHR, textStatus, errorThrown) {
           $("#biomodels_loading").hide ();
@@ -622,6 +623,7 @@ function prepareIndex () {
           $("#error").show ().text ("Failed to obtain Biomodels: " + errorThrown);
         }
     });
+	prepareTableSorting ();
 }
 
 
@@ -639,21 +641,21 @@ function prepareImprint () {
         url: '/api/get_session_data',
         dataType: 'json',
         success: function (data) {
-			if (data.status != 'success') {
-				$("#sessionlist").append ("<li>Error retrieving session information: "+data.error+"</li>");
-				return;
-			}
-			for (var key in data.data.session) {
-				if (data.data.session.hasOwnProperty(key)) {
-					$("#sessionlist").append ("<li>" + key + ": " + data.data.session[key] + "</li>");
-				}
-			}
-			for (var i in data.data.files) {
-				$("#fileslist").append ("<li>" + data.data.files[i] + "</li>");
-			}
-		},
+					if (data.status != 'success') {
+						$("#sessionlist").append ("<li>Error retrieving session information: "+data.error+"</li>");
+						return;
+					}
+					for (var key in data.data.session) {
+						if (data.data.session.hasOwnProperty(key)) {
+							$("#sessionlist").append ("<li>" + key + ": " + data.data.session[key] + "</li>");
+						}
+					}
+					for (var i in data.data.files) {
+						$("#fileslist").append ("<li>" + data.data.files[i] + "</li>");
+					}
+				},
         error: function (jqXHR, textStatus, errorThrown) {
-			$("#sessionlist").append ("<li>Error retrieving session information: "+errorThrown+"</li>");
+					$("#sessionlist").append ("<li>Error retrieving session information: "+errorThrown+"</li>");
         }
 	});
 	

@@ -67,10 +67,10 @@
         <p>A red row indicates, that the corresponding species does not participate in any reaction anymore, so you may want to exclude it as well? If uncheck a species, it will not be removed from the entire model, but it will be removed from all reactions (it may still be used in other entities, such as functions or triggers). However, there may be ghost species afterwards, not participating in any reaction.</p>
         <table class="w3-table w3-striped sortable notfirst">
            <thead>
-             <th>include</th>
-             <th>ID</th>
-             <th>Name</th>
-             <th>Occurences</th>
+             <th>include <i class='fas fa-sort'></i></th>
+             <th>ID <i class='fas fa-sort'></i></th>
+             <th>Name <i class='fas fa-sort'></i></th>
+             <th>Occurences <i class='fas fa-sort'></i></th>
            </thead>
            <tbody id="species-table"></tbody>
         </table>
@@ -80,11 +80,11 @@
         <p>A red row indicates, that your filter would keep the reaction in the model, but some (or all) of it's species and/or all associated genes were removed. So the reaction may be wrong afterwards, and you may want to exclude the reaction as well? If you export the <em>reaction network</em> and you removed all it's species, the reaction will be removed as well. If you export the <em>enzyme network,</em> the reaction will be removed if all it's species are removed or all it's genes are removed.</p>
         <table class="w3-table w3-striped sortable notfirst">
            <thead>
-             <th>include</th>
-             <th>ID</th>
-             <th>Name</th>
-             <th>In <i class="fas fa-arrow-right"></i> Out</th>
-             <th>Genes</th>
+             <th>include <i class='fas fa-sort'></i></th>
+             <th>ID <i class='fas fa-sort'></i></th>
+             <th>Name <i class='fas fa-sort'></i></th>
+             <th>In <i class="fas fa-arrow-right"></i> Out <i class='fas fa-sort'></i></th>
+             <th>Genes <i class='fas fa-sort'></i></th>
            </thead>
            <tbody id="reaction-table"></tbody>
         </table>
@@ -94,8 +94,8 @@
         <p>A red gene indicates, that the gene is not used in any reaction anymore. Thus, it will be excluded even if you keep it selected here!</p>
         <table class="w3-table w3-striped sortable notfirst">
            <thead>
-             <th>include</th>
-             <th>ID</th>
+             <th>include <i class='fas fa-sort'></i></th>
+             <th>ID <i class='fas fa-sort'></i></th>
            </thead>
            <tbody id="gene-table"></tbody>
         </table>
