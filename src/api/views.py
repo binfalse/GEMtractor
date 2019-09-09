@@ -50,6 +50,8 @@ def get_session_data (request):
         })
 
 def clear_data (request):
+  if Constants.SESSION_MODEL_TYPE in request.session and request.session[Constants.SESSION_MODEL_TYPE] == Constants.SESSION_MODEL_TYPE_UPLOAD:
+    os.remove (Utils.get_model_path (request.session[Constants.SESSION_MODEL_TYPE], request.session[Constants.SESSION_MODEL_ID], request.session.session_key))
   Utils.del_session_key (request, None, Constants.SESSION_HAS_SESSION)
   Utils.del_session_key (request, None, Constants.SESSION_MODEL_ID)
   Utils.del_session_key (request, None, Constants.SESSION_MODEL_NAME)
@@ -71,8 +73,8 @@ def get_network (request):
     try:
       __logger.info ("getting sbml")
       network = enalyzer.extract_network_from_sbml (enalyzer.get_sbml ())
-      if len (network.species) + len (network.reactions) > settings.MODEL_MAX_ENTITIES_FILTER:
-        raise TooBigForBrowser ("This model is probably too big for your browser... It contains "+str (len (network.species))+" species, "+str (len (network.reactions))+" reactions. We won't load it for filtering, as you're browser is very likely to die when trying to process that amount of data.. Max is currently set to "+settings.MODEL_MAX_ENTITIES_FILTER+". Please export it w/o filtering or use the API instead.")
+      if len (network.species) + len (network.reactions) > settings.MAX_ENTITIES_FILTER:
+        raise TooBigForBrowser ("This model is probably too big for your browser... It contains "+str (len (network.species))+" species, "+str (len (network.reactions))+" reactions. We won't load it for filtering, as you're browser is very likely to die when trying to process that amount of data.. Max is currently set to "+settings.MAX_ENTITIES_FILTER+". Please export it w/o filtering or use the API instead.")
       __logger.info ("got sbml")
       network.calc_genenet ()
       __logger.info ("got genenet")
@@ -86,8 +88,8 @@ def get_network (request):
       if Constants.SESSION_FILTER_GENES in request.session:
           filter_genes = request.session[Constants.SESSION_FILTER_GENES]
       __logger.info ("sending response")
-      if len (network.species) + len (network.reactions) + len (network.genenet) > settings.MODEL_MAX_ENTITIES_FILTER:
-        raise TooBigForBrowser ("This model is probably too big for your browser... It contains "+str (len (network.species))+" species, "+str (len (network.reactions))+" reactions, "+str (len (network.genenet))+" gene combinations. We won't load it for filtering, as you're browser is very likely to die when trying to process that amount of data.. Max is currently set to "+settings.MODEL_MAX_ENTITIES_FILTER+". Please export it w/o filtering or use the API instead.")
+      if len (network.species) + len (network.reactions) + len (network.genenet) > settings.MAX_ENTITIES_FILTER:
+        raise TooBigForBrowser ("This model is probably too big for your browser... It contains "+str (len (network.species))+" species, "+str (len (network.reactions))+" reactions, "+str (len (network.genenet))+" gene combinations. We won't load it for filtering, as you're browser is very likely to die when trying to process that amount of data.. Max is currently set to "+settings.MAX_ENTITIES_FILTER+". Please export it w/o filtering or use the API instead.")
       net = network.serialize()
       __logger.info ("serialised the network")
       return JsonResponse ({
@@ -270,18 +272,17 @@ def parse_json_body (request, expected_keys = []):
 @csrf_exempt
 def status (request):
   # TODO heartbeat
-  if request.method != 'POST':
-    return redirect('index:index')
   
-  
-  __logger.critical(request.body)
-  try:
-    data=json.loads(request.body)
-    data["answer"] = "abc"
-    return JsonResponse (data)
-    #return HttpResponse(serializers.serialize('json', data), content_type='application/json')
-  except Exception as e:
-    __logger.critical(e)
-    return JsonResponse ({"nope": "nope"})
-    #return HttpResponse(serializers.serialize('json', {"nope": "nope"}), content_type='application/json')
+  Utils.cleanup ()
+  return JsonResponse ({"status": "success"})
+  # ~ __logger.critical(request.body)
+  # ~ try:
+    # ~ data=json.loads(request.body)
+    # ~ data["answer"] = "abc"
+    # ~ return JsonResponse (data)
+    # ~ #return HttpResponse(serializers.serialize('json', data), content_type='application/json')
+  # ~ except Exception as e:
+    # ~ __logger.critical(e)
+    # ~ return JsonResponse ({"nope": "nope"})
+    # ~ #return HttpResponse(serializers.serialize('json', {"nope": "nope"}), content_type='application/json')
   

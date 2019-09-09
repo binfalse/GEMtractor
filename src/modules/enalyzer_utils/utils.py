@@ -39,6 +39,26 @@ class Utils:
   
   
   @staticmethod
+  def __cleanup (rootDir, max_age):
+    for dirName, subdirList, fileList in os.walk(rootDir):
+      for fname in fileList:
+        if  time.time() - os.path.getmtime(os.path.join (dirName, fname)) > settings.CACHE_BIOMODELS_MODEL:
+          try:
+            Utils.__logger.info('deleting old file: ' + os.path.join (dirName, fname))
+            os.remove (os.path.join (dirName, fname))
+          except Exception as e:
+            Utils.__logger.critical('error deleting old file: ' + os.path.join (dirName, fname) + " -- error: " + getattr(e, 'message', repr(e)))
+            
+  
+  @staticmethod
+  def cleanup ():
+    Utils.__cleanup (os.path.join (settings.STORAGE, "cache", "biomodels"), settings.CACHE_BIOMODELS_MODEL)
+    Utils.__cleanup (os.path.join (settings.STORAGE, "cache", "bigg"), settings.CACHE_BIGG_MODEL)
+    Utils.__cleanup (os.path.join (settings.STORAGE, Constants.STORAGE_GENERATED_DIR), settings.CACHE_GENERATED)
+    Utils.__cleanup (os.path.join (settings.STORAGE, Constants.STORAGE_UPLOAD_DIR), settings.CACHE_UPLOADED)
+  
+  
+  @staticmethod
   def add_model_note (model, filter_species, filter_reactions, filter_genes, remove_reaction_genes_removed, remove_reaction_missing_species):
     # TODO can we do better? eg. annotate with proper structure?
     note = model.getNotesString ()
