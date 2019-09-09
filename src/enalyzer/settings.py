@@ -204,5 +204,5 @@ URLS_BIOMODELS = "https://www.ebi.ac.uk/biomodels/search?format=json&query=genom
 URLS_BIOMODEL_INFO = lambda model_id: "https://www.ebi.ac.uk/biomodels/"+model_id+"?format=json"
 URLS_BIOMODEL_SBML = lambda model_id, filename: "https://www.ebi.ac.uk/biomodels/model/download/"+model_id+"?filename="+filename
 
-
+MODEL_MAX_ENTITIES_FILTER = 10000
 

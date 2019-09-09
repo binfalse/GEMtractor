@@ -71,8 +71,8 @@ def get_network (request):
     try:
       __logger.info ("getting sbml")
       network = enalyzer.extract_network_from_sbml (enalyzer.get_sbml ())
-      if len (network.species) + len (network.reactions) > 10000:
-        raise TooBigForBrowser ("This model is probably too big for your browser... It contains "+str (len (network.species))+" species, "+str (len (network.reactions))+" reactions. We won't load it for filtering, as you're browser is very likely to die when trying to process that amount of data.. Please export it directly or try the API instead.")
+      if len (network.species) + len (network.reactions) > settings.MODEL_MAX_ENTITIES_FILTER:
+        raise TooBigForBrowser ("This model is probably too big for your browser... It contains "+str (len (network.species))+" species, "+str (len (network.reactions))+" reactions. We won't load it for filtering, as you're browser is very likely to die when trying to process that amount of data.. Max is currently set to "+settings.MODEL_MAX_ENTITIES_FILTER+". Please export it w/o filtering or use the API instead.")
       __logger.info ("got sbml")
       network.calc_genenet ()
       __logger.info ("got genenet")
@@ -86,8 +86,8 @@ def get_network (request):
       if Constants.SESSION_FILTER_GENES in request.session:
           filter_genes = request.session[Constants.SESSION_FILTER_GENES]
       __logger.info ("sending response")
-      if len (network.species) + len (network.reactions) + len (network.genenet) > 10000:
-        raise TooBigForBrowser ("This model is probably too big for your browser... It contains "+str (len (network.species))+" species, "+str (len (network.reactions))+" reactions, "+str (len (network.genenet))+" gene combinations. We won't load it for filtering, as you're browser is very likely to die when trying to process that amount of data.. Please export it directly or try the API instead.")
+      if len (network.species) + len (network.reactions) + len (network.genenet) > settings.MODEL_MAX_ENTITIES_FILTER:
+        raise TooBigForBrowser ("This model is probably too big for your browser... It contains "+str (len (network.species))+" species, "+str (len (network.reactions))+" reactions, "+str (len (network.genenet))+" gene combinations. We won't load it for filtering, as you're browser is very likely to die when trying to process that amount of data.. Max is currently set to "+settings.MODEL_MAX_ENTITIES_FILTER+". Please export it w/o filtering or use the API instead.")
       net = network.serialize()
       __logger.info ("serialised the network")
       return JsonResponse ({
