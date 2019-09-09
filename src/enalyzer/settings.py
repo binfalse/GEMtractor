@@ -27,13 +27,11 @@ with open('secret_key.txt') as f:
 
 # SECURITY WARNING: don't run with debug turned on in production!
 # TODO
-DEBUG = False
-if "DEBUG" in os.environ:
-    DEBUG = os.environ['DEBUG']
+DEBUG = os.getenv('DJANGO_DEBUG', True)
 
 ALLOWED_HOSTS = ['localhost','127.0.0.1']
-if "ALLOWED_HOSTS" in os.environ:
-    ALLOWED_HOSTS.append ("ALLOWED_HOSTS")
+if "DJANGO_ALLOWED_HOSTS" in os.environ:
+    ALLOWED_HOSTS.append (os.environ["DJANGO_ALLOWED_HOSTS"])
 
 
 # Application definition
@@ -144,6 +142,10 @@ STATICFILES_DIRS = (
 )
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
+# allow for models up to 30mb
+DATA_UPLOAD_MAX_MEMORY_SIZE=30*1024*1024
+
+
 
 LOGGING = {
     'version': 1,
@@ -156,6 +158,7 @@ LOGGING = {
     },
     'handlers': {
         'console': {
+            'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
             'class': 'logging.StreamHandler',
             'formatter': 'verbose'
         },
@@ -163,7 +166,23 @@ LOGGING = {
     'loggers': {
         'django': {
             'handlers': ['console'],
-            'level': os.getenv('DJANGO_LOG_LEVEL', 'WARN'),
+            'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
+        },
+        'api': {
+            'handlers': ['console'],
+            'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
+        },
+        'enalyzing': {
+            'handlers': ['console'],
+            'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
+        },
+        'index': {
+            'handlers': ['console'],
+            'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
+        },
+        'modules.enalyzer_utils': {
+            'handlers': ['console'],
+            'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
         },
     },
 }

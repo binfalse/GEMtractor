@@ -363,7 +363,6 @@ function comparer(index) {
 function prepareTableSorting () {
 	// do it for all .sortable tables
 	$('.sortable th').click(function(){
-		console.log ("test");
 		$( this ).parent ().find('.sortsymbol').remove ();
 		var asc = !$( this ).hasClass ("sorted-asc");
 		$( this ).parent ().find ('th').removeClass ("sorted-desc");

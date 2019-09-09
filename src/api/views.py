@@ -17,15 +17,16 @@
 from django.shortcuts import redirect
 from django.views.decorators.csrf import csrf_exempt
 import logging
+from django.conf import settings
 import json
 import os
 from django.http import JsonResponse
-from modules.enalyzer_utils.utils import Utils, InvalidGeneExpression, InvalidBiomodelsId, UnableToRetrieveBiomodel, InvalidBiggId
+from modules.enalyzer_utils.utils import Utils, InvalidGeneExpression, InvalidBiomodelsId, UnableToRetrieveBiomodel, InvalidBiggId, TooBigForBrowser
 from modules.enalyzer_utils.enalyzer import Enalyzer
 from modules.enalyzer_utils.constants import Constants
 import urllib
 
-
+logging.config.dictConfig(settings.LOGGING)
 __logger = logging.getLogger(__name__)
 
 def get_session_data (request):
@@ -70,6 +71,8 @@ def get_network (request):
     try:
       __logger.info ("getting sbml")
       network = enalyzer.extract_network_from_sbml (enalyzer.get_sbml ())
+      if len (network.species) + len (network.reactions) > 10000:
+        raise TooBigForBrowser ("This model is probably too big for your browser... It contains "+str (len (network.species))+" species, "+str (len (network.reactions))+" reactions. We won't load it for filtering, as you're browser is very likely to die when trying to process that amount of data.. Please export it directly or try the API instead.")
       __logger.info ("got sbml")
       network.calc_genenet ()
       __logger.info ("got genenet")
@@ -83,6 +86,8 @@ def get_network (request):
       if Constants.SESSION_FILTER_GENES in request.session:
           filter_genes = request.session[Constants.SESSION_FILTER_GENES]
       __logger.info ("sending response")
+      if len (network.species) + len (network.reactions) + len (network.genenet) > 10000:
+        raise TooBigForBrowser ("This model is probably too big for your browser... It contains "+str (len (network.species))+" species, "+str (len (network.reactions))+" reactions, "+str (len (network.genenet))+" gene combinations. We won't load it for filtering, as you're browser is very likely to die when trying to process that amount of data.. Please export it directly or try the API instead.")
       net = network.serialize()
       __logger.info ("serialised the network")
       return JsonResponse ({
@@ -94,6 +99,9 @@ def get_network (request):
             Constants.SESSION_FILTER_GENES: filter_genes,
             }
             })
+    except TooBigForBrowser as e:
+      __logger.error ("error retrieving network: " + getattr(e, 'message', repr(e)))
+      return JsonResponse ({"status":"failed","error":getattr(e, 'message', repr(e))})
     except IOError as e:
       __logger.error ("error retrieving network: " + getattr(e, 'message', repr(e)))
       return JsonResponse ({"status":"failed","error":getattr(e, 'message', repr(e))})

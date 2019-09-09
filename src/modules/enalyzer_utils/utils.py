@@ -31,6 +31,7 @@ class UnableToRetrieveBiomodel (Exception): pass
 class BreakLoops (Exception): pass
 class NotYetImplemented (Exception): pass
 class InvalidGeneExpression (Exception): pass
+class TooBigForBrowser (Exception): pass
 
 class Utils:
   
