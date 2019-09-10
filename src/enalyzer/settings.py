@@ -188,21 +188,31 @@ LOGGING = {
 }
 
 
-#import tempfile
+# where to store uploaded/downloaded/generated stuff?
 STORAGE = os.getenv('STORAGE_DIR', "/tmp/enalyzer-storage/")
 
-KEEP_UPLOADED = 1.5*60*60
-KEEP_GENERATED = 10*60
-CACHE_BIGG = 60*60*24
-CACHE_BIGG_MODEL = 7*60*60*24
-CACHE_BIOMODELS = 60*60*24
-CACHE_BIOMODELS_MODEL = 5*60*60*24
+# how long to keep uploaded files
+KEEP_UPLOADED = os.getenv('KEEP_UPLOADED', 1.5*60*60)
+# how long to keep generated files (there are basically just for immediate download)
+KEEP_GENERATED = os.getenv('KEEP_GENERATED', 10*60)
 
+# how long to keep the bigg model list (that is the list of available models from bigg)
+CACHE_BIGG = os.getenv('CACHE_BIGG', 60*60*24)
+# how long to keep a single cached model obtained from bigg
+CACHE_BIGG_MODEL = os.getenv('CACHE_BIGG_MODEL', 7*60*60*24)
+
+# how long to keep the biomodel's search result
+CACHE_BIOMODELS = os.getenv('CACHE_BIOMODELS', 60*60*24)
+# how long to keep a single cached model from biomodels
+CACHE_BIOMODELS_MODEL = os.getenv('CACHE_BIOMODELS_MODEL', 5*60*60*24)
+
+# urls for model retrieval
 URLS_BIGG_MODELS = "http://bigg.ucsd.edu/api/v2/models/"
 URLS_BIGG_MODEL = lambda model_id: "http://bigg.ucsd.edu/static/models/"+model_id+".xml"
 URLS_BIOMODELS = "https://www.ebi.ac.uk/biomodels/search?format=json&query=genome+scale+metabolic+model+modelformat%3A%22SBML%22+NOT+%22nicolas+le%22&numResults=100&sort=id-asc"
 URLS_BIOMODEL_INFO = lambda model_id: "https://www.ebi.ac.uk/biomodels/"+model_id+"?format=json"
 URLS_BIOMODEL_SBML = lambda model_id, filename: "https://www.ebi.ac.uk/biomodels/model/download/"+model_id+"?filename="+filename
 
+# what's the max number of entities to allow in the browser
 MAX_ENTITIES_FILTER = os.getenv('MAX_ENTITIES_FILTER', 10000)
 
