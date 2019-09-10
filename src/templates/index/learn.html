@@ -28,6 +28,7 @@ learn
     <li><a href="#no-gene-name">What if no gene is associated to a reaction?</a></li>
     <li><a href="#currency-metabolites">How can i discard currency metabolites (such as H, H2O or ATP)?</a></li>
     <li><a href="#which-biomodels">How did the enalyzer select the models from Biomodels?</a></li>
+    <li><a href="#which-bigg">How did the enalyzer select the models from BiGG?</a></li>
     <li><a href="#stored-data">Which data does the enalyzer store on the server?</a></li>
     <li><a href="#export-options">What do these export options mean?</a></li>
     <li><a href="#cookies">Why am I always redirected back to model selection?</a></li>
@@ -159,6 +160,17 @@ learn
 		</div>
 		<p>subset of the search for "genome scale metabolic model" (with approximately 7000 results!)</p>
 		<p>however, you can choose basically any model from biomodels by pasting the model id in the input field</p>
+		<p>some models do not work, as the gene associations prior to SBML level 3 was just encoding in free text, which is error-prone and often went wrong</p>
+	</div>
+	
+	<div class="w3-padding w3-card w3-flat-clouds w3-margin">
+		<div class=" anchor-heading">
+			<a name="which-bigg" id="which-bigg"></a>
+			<h3>How did the enalyzer select the models from BiGG?</h3>
+		</div>
+		<p>
+		  The table at the model-selection tab basically lists all available models from <a href="http://bigg.ucsd.edu/models">BiGG Models</a>.
+		</p>
 	</div>
 	
 	<div class="w3-padding w3-card w3-flat-clouds w3-margin">
