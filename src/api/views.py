@@ -27,6 +27,7 @@ from modules.enalyzer_utils.constants import Constants
 import urllib
 import tempfile
 from libsbml import SBMLWriter
+from enalyzing.forms import ExportForm
 
 logging.config.dictConfig(settings.LOGGING)
 __logger = logging.getLogger(__name__)
@@ -116,19 +117,21 @@ def get_network (request):
   
   # invalid api request
   return redirect('index:index')
-  
-  
-def store_filter (request):
-  if request.method != 'POST':
-    # TODO
-    return redirect('index:index')
-  
+
+def prepare_filter (request):
   if not Constants.SESSION_FILTER_SPECIES in request.session:
     request.session[Constants.SESSION_FILTER_SPECIES] = []
   if not Constants.SESSION_FILTER_REACTION in request.session:
     request.session[Constants.SESSION_FILTER_REACTION] = []
   if not Constants.SESSION_FILTER_GENES in request.session:
     request.session[Constants.SESSION_FILTER_GENES] = []
+  
+def store_filter (request):
+  if request.method != 'POST':
+    # TODO
+    return redirect('index:index')
+  
+  prepare_filter (request)
     
   succ, data = parse_json_body (request)
   if not succ:
@@ -270,7 +273,118 @@ def parse_json_body (request, expected_keys = []):
   except json.decoder.JSONDecodeError as e:
     return False, "request is not proper json"
 
+def serve_file (request, file_name, file_type):
+  file_path = Utils.create_generated_file_web (request.session.session_key)
+  if not os.path.exists(file_path):
+    return HttpResponseBadRequest("file does not exist")
+  
+  return Utils.serve_file (file_path, file_name, file_type)
 
+def export (request):
+  
+  if request.session.session_key is None or Constants.SESSION_MODEL_NAME not in request.session:
+    return HttpResponseBadRequest("no such session")
+    
+  
+  prepare_filter (request)
+  
+  form = ExportForm(request.POST)
+  if (form.is_valid()):
+    file_name = request.session[Constants.SESSION_MODEL_NAME] + "-enalyzed"
+    
+    enalyzer = Enalyzer (Utils.get_model_path (request.session[Constants.SESSION_MODEL_TYPE], request.session[Constants.SESSION_MODEL_ID], request.session.session_key))
+    sbml = enalyzer.get_sbml (
+      request.session[Constants.SESSION_FILTER_SPECIES],
+      request.session[Constants.SESSION_FILTER_REACTION],
+      request.session[Constants.SESSION_FILTER_GENES],
+      form.cleaned_data['remove_reaction_genes_removed'],
+      form.cleaned_data['remove_reaction_missing_species'])
+    
+    if form.cleaned_data['network_type'] == 'en':
+      file_name = file_name + "-EnzymeNetwork"
+      net = enalyzer.extract_network_from_sbml (sbml)
+      net.calc_genenet ()
+      if form.cleaned_data['network_format'] == 'sbml':
+        file_name = file_name + ".sbml"
+        file_path = Utils.create_generated_file_web (request.session.session_key)
+        net.export_en_sbml (file_path, request.session[Constants.SESSION_MODEL_ID], request.session[Constants.SESSION_MODEL_NAME],
+            request.session[Constants.SESSION_FILTER_SPECIES],
+            request.session[Constants.SESSION_FILTER_REACTION],
+            request.session[Constants.SESSION_FILTER_GENES],
+            form.cleaned_data['remove_reaction_genes_removed'],
+            form.cleaned_data['remove_reaction_missing_species'])
+        if os.path.exists(file_path):
+          return JsonResponse ({"status":"success", "name": file_name, "mime": "application/xml"})
+        else:
+          return JsonResponse ({"status":"failed","error":"error generating SBML file"})
+      else:
+        if form.cleaned_data['network_format'] == 'dot':
+          file_name = file_name + ".dot"
+          file_path = Utils.create_generated_file_web (request.session.session_key)
+          net.export_en_dot (file_path)
+          if os.path.exists(file_path):
+            return JsonResponse ({"status":"success", "name": file_name, "mime": "application/dot"})
+          else:
+            return JsonResponse ({"status":"failed","error":"error generating file"})
+        elif form.cleaned_data['network_format'] == 'graphml':
+          file_name = file_name + ".graphml"
+          file_path = Utils.create_generated_file_web (request.session.session_key)
+          net.export_en_graphml (file_path)
+          if os.path.exists(file_path):
+            return JsonResponse ({"status":"success", "name": file_name, "mime": "application/xml"})
+          else:
+            return JsonResponse ({"status":"failed","error":"error generating file"})
+        elif form.cleaned_data['network_format'] == 'gml':
+          file_name = file_name + ".gml"
+          file_path = Utils.create_generated_file_web (request.session.session_key)
+          net.export_en_gml (file_path)
+          if os.path.exists(file_path):
+            return JsonResponse ({"status":"success", "name": file_name, "mime": "application/gml"})
+          else:
+            return JsonResponse ({"status":"failed","error":"error generating file"})
+        else:
+          return JsonResponse ({"status":"failed","error":"invalid format"})
+    elif form.cleaned_data['network_type'] == 'rn':
+      file_name = file_name + "-ReactionNetwork"
+      if form.cleaned_data['network_format'] == 'sbml':
+        file_name = file_name + ".sbml"
+        file_path = Utils.create_generated_file_web (request.session.session_key)
+        SBMLWriter().writeSBML (sbml, file_path)
+        if os.path.exists(file_path):
+          return JsonResponse ({"status":"success", "name": file_name, "mime": "application/xml"})
+        else:
+          return JsonResponse ({"status":"failed","error":"error generating file"})
+      else:
+        net = enalyzer.extract_network_from_sbml (sbml)
+        if form.cleaned_data['network_format'] == 'dot':
+          file_name = file_name + ".dot"
+          file_path = Utils.create_generated_file_web (request.session.session_key)
+          net.export_rn_dot (file_path)
+          if os.path.exists(file_path):
+            return JsonResponse ({"status":"success", "name": file_name, "mime": "application/dot"})
+          else:
+            return JsonResponse ({"status":"failed","error":"error generating file"})
+        elif form.cleaned_data['network_format'] == 'graphml':
+          file_name = file_name + ".graphml"
+          file_path = Utils.create_generated_file_web (request.session.session_key)
+          net.export_rn_graphml (file_path)
+          if os.path.exists(file_path):
+            return JsonResponse ({"status":"success", "name": file_name, "mime": "application/xml"})
+          else:
+            return JsonResponse ({"status":"failed","error":"error generating file"})
+        elif form.cleaned_data['network_format'] == 'gml':
+          file_name = file_name + ".gml"
+          file_path = Utils.create_generated_file_web (request.session.session_key)
+          net.export_rn_gml (file_path)
+          if os.path.exists(file_path):
+            return JsonResponse ({"status":"success", "name": file_name, "mime": "application/gml"})
+          else:
+            return JsonResponse ({"status":"failed","error":"error generating file"})
+        else:
+          return JsonResponse ({"status":"failed","error":"invalid format"})
+    else:
+      return JsonResponse ({"status":"failed","error":"invalid network type"})
+  return JsonResponse ({"status":"failed","error":"submitted data is invalid"})
 
 @csrf_exempt
 def execute (request):

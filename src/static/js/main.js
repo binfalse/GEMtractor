@@ -459,8 +459,29 @@ function prepareExport () {
 	
 	// trigger the logic
 	$("#" + network_type_id).change ();
+  
+  $("#export_form").submit (function (event){
+    event.preventDefault();
+    $("#download-error").text ("");
+    var datastring = $("#export_form").serialize();
+    $("#download-button").prop("disabled",true);
+    $.ajax({
+      type: "POST",
+      data: datastring,
+      url: "/api/export",
+      dataType: "json",
+      success: function(data) {
+        $("#download-button").prop("disabled",false);
+        window.location = '/api/serve/' + data["name"] + "/" + data["mime"];
+      },
+      error: function (jqXHR, textStatus, errorThrown) {
+        $("#download-error").text ("error generating file: " + errorThrown + " -- " + textStatus);
+        $("#download-button").prop("disabled",false);
+      }
+    });
+    
+  })
 }
-
 
 /**
  * 

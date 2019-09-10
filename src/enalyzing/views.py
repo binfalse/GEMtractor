@@ -17,7 +17,7 @@
 from django.shortcuts import render, redirect
 import os
 from modules.enalyzer_utils.utils import Utils
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from modules.enalyzer_utils.enalyzer import Enalyzer
 from modules.enalyzer_utils.constants import Constants
 from .forms import ExportForm
@@ -117,109 +117,6 @@ def export(request):
   
   context = __prepare_context (request)
   
-  
-  if request.method == 'POST':
-    form = ExportForm(request.POST)
-    if (form.is_valid()):
-      file_name = request.session[Constants.SESSION_MODEL_NAME] + "-enalyzed"
-      
-      enalyzer = Enalyzer (Utils.get_model_path (request.session[Constants.SESSION_MODEL_TYPE], request.session[Constants.SESSION_MODEL_ID], request.session.session_key))
-      sbml = enalyzer.get_sbml (
-        request.session[Constants.SESSION_FILTER_SPECIES],
-        request.session[Constants.SESSION_FILTER_REACTION],
-        request.session[Constants.SESSION_FILTER_GENES],
-        form.cleaned_data['remove_reaction_genes_removed'],
-        form.cleaned_data['remove_reaction_missing_species'])
-      
-      if form.cleaned_data['network_type'] == 'en':
-        file_name = file_name + "-EnzymeNetwork"
-        net = enalyzer.extract_network_from_sbml (sbml)
-        net.calc_genenet ()
-        if form.cleaned_data['network_format'] == 'sbml':
-          context['error'] = "not yet implemented"
-          
-          
-          file_name = file_name + ".sbml"
-          file_path = Utils.create_generated_file_web (request.session.session_key)
-          net.export_en_sbml (file_path, request.session[Constants.SESSION_MODEL_ID], request.session[Constants.SESSION_MODEL_NAME],
-              request.session[Constants.SESSION_FILTER_SPECIES],
-              request.session[Constants.SESSION_FILTER_REACTION],
-              request.session[Constants.SESSION_FILTER_GENES],
-              form.cleaned_data['remove_reaction_genes_removed'],
-              form.cleaned_data['remove_reaction_missing_species'])
-          if os.path.exists(file_path):
-            return Utils.serve_file (file_path, file_name, "application/xml")
-          else:
-            context['error'] = "error generating SBML file"
-        else:
-          if form.cleaned_data['network_format'] == 'dot':
-            file_name = file_name + ".dot"
-            file_path = Utils.create_generated_file_web (request.session.session_key)
-            net.export_en_dot (file_path)
-            if os.path.exists(file_path):
-              return Utils.serve_file (file_path, file_name, "application/dot")
-            else:
-              context['error'] = "error generating file"
-          elif form.cleaned_data['network_format'] == 'graphml':
-            file_name = file_name + ".graphml"
-            file_path = Utils.create_generated_file_web (request.session.session_key)
-            net.export_en_graphml (file_path)
-            if os.path.exists(file_path):
-              return Utils.serve_file (file_path, file_name, "application/xml")
-            else:
-              context['error'] = "error generating file"
-          elif form.cleaned_data['network_format'] == 'gml':
-            file_name = file_name + ".gml"
-            file_path = Utils.create_generated_file_web (request.session.session_key)
-            net.export_en_gml (file_path)
-            if os.path.exists(file_path):
-              return Utils.serve_file (file_path, file_name, "application/gml")
-            else:
-              context['error'] = "error generating file"
-          else:
-            context['error'] = "invalid format"
-      elif form.cleaned_data['network_type'] == 'rn':
-        file_name = file_name + "-ReactionNetwork"
-        if form.cleaned_data['network_format'] == 'sbml':
-          file_name = file_name + ".sbml"
-          file_path = Utils.create_generated_file_web (request.session.session_key)
-          SBMLWriter().writeSBML (sbml, file_path)
-          if os.path.exists(file_path):
-            return Utils.serve_file (file_path, file_name, "application/xml")
-          else:
-            context['error'] = "error generating file"
-        else:
-          net = enalyzer.extract_network_from_sbml (sbml)
-          if form.cleaned_data['network_format'] == 'dot':
-            file_name = file_name + ".dot"
-            file_path = Utils.create_generated_file_web (request.session.session_key)
-            net.export_rn_dot (file_path)
-            if os.path.exists(file_path):
-              return Utils.serve_file (file_path, file_name, "application/dot")
-            else:
-              context['error'] = "error generating file"
-          elif form.cleaned_data['network_format'] == 'graphml':
-            file_name = file_name + ".graphml"
-            file_path = Utils.create_generated_file_web (request.session.session_key)
-            net.export_rn_graphml (file_path)
-            if os.path.exists(file_path):
-              return Utils.serve_file (file_path, file_name, "application/xml")
-            else:
-              context['error'] = "error generating file"
-          elif form.cleaned_data['network_format'] == 'gml':
-            file_name = file_name + ".gml"
-            file_path = Utils.create_generated_file_web (request.session.session_key)
-            net.export_rn_gml (file_path)
-            if os.path.exists(file_path):
-              return Utils.serve_file (file_path, file_name, "application/gml")
-            else:
-              context['error'] = "error generating file"
-          else:
-            context['error'] = "invalid format"
-      else:
-        context['error'] = "this is not a valid network type"
-  else:
-    form = ExportForm(initial={'network_type':'en','remove_reaction_genes_removed': True, 'remove_reaction_missing_species': False,'network_format': 'sbml'})
-  context['form'] = form
+  context['form'] = ExportForm(initial={'network_type':'en','remove_reaction_genes_removed': True, 'remove_reaction_missing_species': False,'network_format': 'sbml'})
   return render(request, 'enalyzing/export.html', context)
   
