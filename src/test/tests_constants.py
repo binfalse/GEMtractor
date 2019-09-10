@@ -1,8 +1,6 @@
 
 from modules.enalyzer_utils.constants import Constants
 from django.test import TestCase
-import os
-import tempfile
 
 class ConstantsTests (TestCase):
   def test_constants (self):

@@ -1,8 +1,6 @@
 
-from modules.enalyzer_utils.network import Network, Species, Reaction
+from modules.enalyzer_utils.network import Species, Reaction
 from django.test import TestCase
-import os
-import tempfile
 
 # there are also many tests in EnalyzerTests
 

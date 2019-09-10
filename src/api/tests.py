@@ -1,8 +1,6 @@
 from django.test import TestCase, Client
 from modules.enalyzer_utils.constants import Constants
 import json
-from django.conf import settings
-from modules.enalyzer_utils.utils import Utils, InvalidBiggId, InvalidBiomodelsId
 import tempfile
 from libsbml import SBMLReader
 from xml.dom import minidom
@@ -298,7 +296,7 @@ class ApiTest(TestCase):
   def test_api (self):
     response = self.client.get('/api/execute')
     self.assertEqual(response.status_code, 302)
-    self.assertEqual("/", response["location"])
+    self.assertEqual("/learn#api", response["location"])
 
     
     with open("test/gene-filter-example.xml") as f:
@@ -556,7 +554,7 @@ class ApiTest(TestCase):
   
   def _valid_xml (self, xml):
     try:
-      xmldoc = minidom.parseString (xml)
+      minidom.parseString (xml)
       return True
     except Exception as e:
       logging.getLogger(__name__).info("XML BAD: " + str (e))

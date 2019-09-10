@@ -15,7 +15,7 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import logging
-from libsbml import *
+from libsbml import SBMLDocument, SBMLWriter
 from .utils import Utils
 
 # TODO: logging

@@ -229,7 +229,7 @@ class Utils:
         if time.time() - os.path.getmtime(sbmlfile) > settings.CACHE_BIOMODELS_MODEL:
           return Utils.get_biomodel (model_id, True)
         return sbmlfile
-    except JSONDecodeError as e:
+    except json.decoder.JSONDecodeError as e:
       Utils.__logger.critical('error retrieving biomodel '+model_id+': ' + getattr(e, 'message', repr(e)))
       Utils.rm_cached_biomodel (model_id)
       raise UnableToRetrieveBiomodel ("could not read biomodel: " + model_id + " -- json response is invalid")

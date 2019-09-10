@@ -2,7 +2,7 @@
 from django.test import TestCase
 from django.conf import settings
 
-import logging
+# ~ import logging
 # logging.getLogger(__name__).debug("---->>>>> " + str(j))
 
 

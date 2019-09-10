@@ -5,7 +5,7 @@ import os
 import json
 from xml.dom import minidom
 from libsbml import SBMLReader
-from modules.enalyzer_utils.utils import Utils, InvalidBiggId, InvalidBiomodelsId
+from modules.enalyzer_utils.utils import Utils
 
 import logging
 # logging.getLogger(__name__).debug("---->>>>> " + str(j))
@@ -152,8 +152,12 @@ class EnalyzingTest(TestCase):
         
         form = self._create_export ('rn', 'sbml', False, True)
         self.assertTrue (form.is_valid())
-        response = self.client.post('/enalyzing/export', form.cleaned_data)
+        response = self.client.post('/api/export', form.cleaned_data)
         self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertTrue(len(data["name"]) > 0)
+        self.assertTrue(len(data["mime"]) > 0)
+        response = self.client.post('/api/serve/' + data["name"] + "/" + data["mime"])
         valid, sbml_rn = self._valid_sbml (response.content)
         self.assertTrue (valid, msg="invalid SBML of rn")
         
@@ -167,8 +171,12 @@ class EnalyzingTest(TestCase):
         
         form = self._create_export ('en', 'sbml', False, True)
         self.assertTrue (form.is_valid())
-        response = self.client.post('/enalyzing/export', form.cleaned_data)
+        response = self.client.post('/api/export', form.cleaned_data)
         self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertTrue(len(data["name"]) > 0)
+        self.assertTrue(len(data["mime"]) > 0)
+        response = self.client.post('/api/serve/' + data["name"] + "/" + data["mime"])
         valid, sbml_en = self._valid_sbml (response.content)
         self.assertTrue (valid, msg="invalid SBML of en")
         
@@ -184,8 +192,12 @@ class EnalyzingTest(TestCase):
         
         form = self._create_export ('rn', 'graphml', False, True)
         self.assertTrue (form.is_valid())
-        response = self.client.post('/enalyzing/export', form.cleaned_data)
+        response = self.client.post('/api/export', form.cleaned_data)
         self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertTrue(len(data["name"]) > 0)
+        self.assertTrue(len(data["mime"]) > 0)
+        response = self.client.post('/api/serve/' + data["name"] + "/" + data["mime"])
         self.assertTrue (self._valid_xml (response.content))
         c = response.content.decode("utf-8")
         self.assertEqual (c.count ("<node "), rnSpecies + rnReactions)
@@ -197,8 +209,12 @@ class EnalyzingTest(TestCase):
         
         form = self._create_export ('en', 'graphml', False, True)
         self.assertTrue (form.is_valid())
-        response = self.client.post('/enalyzing/export', form.cleaned_data)
+        response = self.client.post('/api/export', form.cleaned_data)
         self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertTrue(len(data["name"]) > 0)
+        self.assertTrue(len(data["mime"]) > 0)
+        response = self.client.post('/api/serve/' + data["name"] + "/" + data["mime"])
         self.assertTrue (self._valid_xml (response.content))
         c = response.content.decode("utf-8")
         self.assertEqual (c.count ("<node "), enSpecies)
@@ -209,8 +225,12 @@ class EnalyzingTest(TestCase):
         
         form = self._create_export ('rn', 'gml', False, True)
         self.assertTrue (form.is_valid())
-        response = self.client.post('/enalyzing/export', form.cleaned_data)
+        response = self.client.post('/api/export', form.cleaned_data)
         self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertTrue(len(data["name"]) > 0)
+        self.assertTrue(len(data["mime"]) > 0)
+        response = self.client.post('/api/serve/' + data["name"] + "/" + data["mime"])
         c = response.content.decode("utf-8")
         self.assertEqual (c.count ("node ["), rnSpecies + rnReactions)
         self.assertEqual (c.count ("edge ["), rnEdges)
@@ -219,8 +239,12 @@ class EnalyzingTest(TestCase):
         
         form = self._create_export ('en', 'gml', False, True)
         self.assertTrue (form.is_valid())
-        response = self.client.post('/enalyzing/export', form.cleaned_data)
+        response = self.client.post('/api/export', form.cleaned_data)
         self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertTrue(len(data["name"]) > 0)
+        self.assertTrue(len(data["mime"]) > 0)
+        response = self.client.post('/api/serve/' + data["name"] + "/" + data["mime"])
         c = response.content.decode("utf-8")
         self.assertEqual (c.count ("node ["), enSpecies)
         self.assertEqual (c.count ("edge ["), enReactions)
@@ -229,8 +253,12 @@ class EnalyzingTest(TestCase):
         
         form = self._create_export ('rn', 'dot', False, True)
         self.assertTrue (form.is_valid())
-        response = self.client.post('/enalyzing/export', form.cleaned_data)
+        response = self.client.post('/api/export', form.cleaned_data)
         self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertTrue(len(data["name"]) > 0)
+        self.assertTrue(len(data["mime"]) > 0)
+        response = self.client.post('/api/serve/' + data["name"] + "/" + data["mime"])
         c = response.content.decode("utf-8")
         self.assertEqual (c.count ("label="), rnSpecies + rnReactions)
         self.assertEqual (c.count (" -> "), rnEdges)
@@ -239,8 +267,12 @@ class EnalyzingTest(TestCase):
         
         form = self._create_export ('en', 'dot', False, True)
         self.assertTrue (form.is_valid())
-        response = self.client.post('/enalyzing/export', form.cleaned_data)
+        response = self.client.post('/api/export', form.cleaned_data)
         self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertTrue(len(data["name"]) > 0)
+        self.assertTrue(len(data["mime"]) > 0)
+        response = self.client.post('/api/serve/' + data["name"] + "/" + data["mime"])
         c = response.content.decode("utf-8")
         self.assertEqual (c.count ("label="), enSpecies)
         self.assertEqual (c.count (" -> "), enReactions)
@@ -259,10 +291,10 @@ class EnalyzingTest(TestCase):
   
   def _valid_xml (self, xml):
     try:
-      xmldoc = minidom.parseString (xml)
+      minidom.parseString (xml)
       return True
     except:
-      logging.getLogger(__name__).debug("XML BAD")
+      logging.getLogger(__name__).info("XML BAD")
       return False
   
   def _valid_sbml (self, xml):
@@ -272,7 +304,7 @@ class EnalyzingTest(TestCase):
     sbml = SBMLReader().readSBMLFromString(xml.decode("utf-8"))
     if sbml.getNumErrors() > 0:
       for i in range (0, sbml.getNumErrors()):
-        logging.getLogger(__name__).debug("SBML BAD: " + sbml.getError(i).getMessage())
+        logging.getLogger(__name__).info("SBML BAD: " + sbml.getError(i).getMessage())
       return False, None
     return True, sbml
   

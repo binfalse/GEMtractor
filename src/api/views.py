@@ -20,7 +20,7 @@ import logging
 from django.conf import settings
 import json
 import os
-from django.http import JsonResponse, HttpResponseBadRequest, HttpResponseServerError, HttpResponse
+from django.http import JsonResponse, HttpResponseBadRequest, HttpResponseServerError
 from modules.enalyzer_utils.utils import Utils, InvalidGeneExpression, InvalidBiomodelsId, UnableToRetrieveBiomodel, InvalidBiggId, TooBigForBrowser
 from modules.enalyzer_utils.enalyzer import Enalyzer
 from modules.enalyzer_utils.constants import Constants
@@ -270,7 +270,7 @@ def parse_json_body (request, expected_keys = []):
         return False, "request is missing key: " + k
     
     return True, data
-  except json.decoder.JSONDecodeError as e:
+  except json.decoder.JSONDecodeError:
     return False, "request is not proper json"
 
 def serve_file (request, file_name, file_type):

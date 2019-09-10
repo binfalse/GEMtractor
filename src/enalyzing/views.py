@@ -17,11 +17,8 @@
 from django.shortcuts import render, redirect
 import os
 from modules.enalyzer_utils.utils import Utils
-from django.http import HttpResponse, JsonResponse
-from modules.enalyzer_utils.enalyzer import Enalyzer
 from modules.enalyzer_utils.constants import Constants
 from .forms import ExportForm
-from libsbml import *
 
 def __prepare_context (request):
   context = {}

@@ -4,7 +4,7 @@ from django.test import TestCase
 import os
 import tempfile
 import pyparsing as pp
-from modules.enalyzer_utils.utils import BreakLoops, InvalidGeneExpression, Utils
+from modules.enalyzer_utils.utils import InvalidGeneExpression
 from xml.dom import minidom
 
 class EnalyzerTests (TestCase):
