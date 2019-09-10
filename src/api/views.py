@@ -14,7 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-from django.shortcuts import redirect
+from django.shortcuts import redirect, reverse
 from django.views.decorators.csrf import csrf_exempt
 import logging
 from django.conf import settings
@@ -389,7 +389,7 @@ def export (request):
 @csrf_exempt
 def execute (request):
   if request.method != 'POST':
-    return redirect('index:index')
+    return redirect(reverse('index:learn') + '#api')
 
   succ, data = parse_json_body (request, ["file", "export"])
   if not succ:
