@@ -74,7 +74,7 @@ def get_network (request):
       __logger.info ("getting sbml")
       network = enalyzer.extract_network_from_sbml (enalyzer.get_sbml ())
       if len (network.species) + len (network.reactions) > settings.MAX_ENTITIES_FILTER:
-        raise TooBigForBrowser ("This model is probably too big for your browser... It contains "+str (len (network.species))+" species, "+str (len (network.reactions))+" reactions. We won't load it for filtering, as you're browser is very likely to die when trying to process that amount of data.. Max is currently set to "+settings.MAX_ENTITIES_FILTER+". Please export it w/o filtering or use the API instead.")
+        raise TooBigForBrowser ("This model is probably too big for your browser... It contains "+str (len (network.species))+" species, "+str (len (network.reactions))+" reactions. We won't load it for filtering, as you're browser is very likely to die when trying to process that amount of data.. Max is currently set to "+str (settings.MAX_ENTITIES_FILTER)+". Please export it w/o filtering or use the API instead.")
       __logger.info ("got sbml")
       network.calc_genenet ()
       __logger.info ("got genenet")
@@ -89,7 +89,7 @@ def get_network (request):
           filter_genes = request.session[Constants.SESSION_FILTER_GENES]
       __logger.info ("sending response")
       if len (network.species) + len (network.reactions) + len (network.genenet) > settings.MAX_ENTITIES_FILTER:
-        raise TooBigForBrowser ("This model is probably too big for your browser... It contains "+str (len (network.species))+" species, "+str (len (network.reactions))+" reactions, "+str (len (network.genenet))+" gene combinations. We won't load it for filtering, as you're browser is very likely to die when trying to process that amount of data.. Max is currently set to "+settings.MAX_ENTITIES_FILTER+". Please export it w/o filtering or use the API instead.")
+        raise TooBigForBrowser ("This model is probably too big for your browser... It contains "+str (len (network.species))+" species, "+str (len (network.reactions))+" reactions, "+str (len (network.genenet))+" gene combinations. We won't load it for filtering, as you're browser is very likely to die when trying to process that amount of data.. Max is currently set to "+str (settings.MAX_ENTITIES_FILTER)+". Please export it w/o filtering or use the API instead.")
       net = network.serialize()
       __logger.info ("serialised the network")
       return JsonResponse ({
