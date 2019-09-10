@@ -49,11 +49,7 @@ def model_exists (request, context):
   return False
     
 
-def serve_file (file_path, file_name, file_type):
-  with open(file_path, 'rb') as fh:
-    response = HttpResponse(fh.read(), content_type=file_type)
-    response['Content-Disposition'] = 'attachment; filename=' + file_name
-    return response
+
 
 
 # Create your views here.
@@ -152,7 +148,7 @@ def export(request):
               form.cleaned_data['remove_reaction_genes_removed'],
               form.cleaned_data['remove_reaction_missing_species'])
           if os.path.exists(file_path):
-            return serve_file (file_path, file_name, "application/xml")
+            return Utils.serve_file (file_path, file_name, "application/xml")
           else:
             context['error'] = "error generating SBML file"
         else:
@@ -161,7 +157,7 @@ def export(request):
             file_path = Utils.create_generated_file_web (request.session.session_key)
             net.export_en_dot (file_path)
             if os.path.exists(file_path):
-              return serve_file (file_path, file_name, "application/dot")
+              return Utils.serve_file (file_path, file_name, "application/dot")
             else:
               context['error'] = "error generating file"
           elif form.cleaned_data['network_format'] == 'graphml':
@@ -169,7 +165,7 @@ def export(request):
             file_path = Utils.create_generated_file_web (request.session.session_key)
             net.export_en_graphml (file_path)
             if os.path.exists(file_path):
-              return serve_file (file_path, file_name, "application/xml")
+              return Utils.serve_file (file_path, file_name, "application/xml")
             else:
               context['error'] = "error generating file"
           elif form.cleaned_data['network_format'] == 'gml':
@@ -177,7 +173,7 @@ def export(request):
             file_path = Utils.create_generated_file_web (request.session.session_key)
             net.export_en_gml (file_path)
             if os.path.exists(file_path):
-              return serve_file (file_path, file_name, "application/gml")
+              return Utils.serve_file (file_path, file_name, "application/gml")
             else:
               context['error'] = "error generating file"
           else:
@@ -189,7 +185,7 @@ def export(request):
           file_path = Utils.create_generated_file_web (request.session.session_key)
           SBMLWriter().writeSBML (sbml, file_path)
           if os.path.exists(file_path):
-            return serve_file (file_path, file_name, "application/xml")
+            return Utils.serve_file (file_path, file_name, "application/xml")
           else:
             context['error'] = "error generating file"
         else:
@@ -199,7 +195,7 @@ def export(request):
             file_path = Utils.create_generated_file_web (request.session.session_key)
             net.export_rn_dot (file_path)
             if os.path.exists(file_path):
-              return serve_file (file_path, file_name, "application/dot")
+              return Utils.serve_file (file_path, file_name, "application/dot")
             else:
               context['error'] = "error generating file"
           elif form.cleaned_data['network_format'] == 'graphml':
@@ -207,7 +203,7 @@ def export(request):
             file_path = Utils.create_generated_file_web (request.session.session_key)
             net.export_rn_graphml (file_path)
             if os.path.exists(file_path):
-              return serve_file (file_path, file_name, "application/xml")
+              return Utils.serve_file (file_path, file_name, "application/xml")
             else:
               context['error'] = "error generating file"
           elif form.cleaned_data['network_format'] == 'gml':
@@ -215,11 +211,10 @@ def export(request):
             file_path = Utils.create_generated_file_web (request.session.session_key)
             net.export_rn_gml (file_path)
             if os.path.exists(file_path):
-              return serve_file (file_path, file_name, "application/gml")
+              return Utils.serve_file (file_path, file_name, "application/gml")
             else:
               context['error'] = "error generating file"
           else:
-            # raise NotYetImplemented
             context['error'] = "invalid format"
       else:
         context['error'] = "this is not a valid network type"

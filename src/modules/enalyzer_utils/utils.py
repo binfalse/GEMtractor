@@ -24,6 +24,7 @@ import json
 import re
 from .constants import Constants
 import logging
+from django.http import HttpResponse
 
 class InvalidBiggId (Exception): pass
 class InvalidBiomodelsId (Exception): pass
@@ -241,6 +242,13 @@ class Utils:
       return Utils.get_bigg_model (model_id)
     if model_type == Constants.SESSION_MODEL_TYPE_BIOMODELS:
       return Utils.get_biomodel (model_id)
+      
+  @staticmethod
+  def serve_file (file_path, file_name, file_type):
+    with open(file_path, 'rb') as fh:
+      response = HttpResponse(fh.read(), content_type=file_type)
+      response['Content-Disposition'] = 'attachment; filename=' + file_name
+      return response
     
   @staticmethod
   def del_session_key (request, context, key):

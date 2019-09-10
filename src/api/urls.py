@@ -14,4 +14,5 @@ urlpatterns = [
     path('select_biomodel', views.select_biomodel, name='select_biomodel'),
     path('get_session_data', views.get_session_data, name='get_session_data'),
     path('clear_data', views.clear_data, name='clear_data'),
+    path('execute', views.execute, name='execute'),
     ]

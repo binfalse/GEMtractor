@@ -20,11 +20,13 @@ import logging
 from django.conf import settings
 import json
 import os
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponseBadRequest, HttpResponseServerError, HttpResponse
 from modules.enalyzer_utils.utils import Utils, InvalidGeneExpression, InvalidBiomodelsId, UnableToRetrieveBiomodel, InvalidBiggId, TooBigForBrowser
 from modules.enalyzer_utils.enalyzer import Enalyzer
 from modules.enalyzer_utils.constants import Constants
 import urllib
+import tempfile
+from libsbml import SBMLWriter
 
 logging.config.dictConfig(settings.LOGGING)
 __logger = logging.getLogger(__name__)
@@ -267,6 +269,135 @@ def parse_json_body (request, expected_keys = []):
     return True, data
   except json.decoder.JSONDecodeError as e:
     return False, "request is not proper json"
+
+
+
+@csrf_exempt
+def execute (request):
+  if request.method != 'POST':
+    return redirect('index:index')
+
+  succ, data = parse_json_body (request, ["file", "export"])
+  if not succ:
+    return HttpResponseBadRequest(data)
+  
+  inputFile = tempfile.NamedTemporaryFile()
+  with open(inputFile.name, 'w') as f:
+    f.write (data['file'])
+  
+  filter_species = []
+  filter_reactions = []
+  filter_genes = []
+  
+  if "filter" in data:
+    if "species" in data["filter"]:
+      filter_species = data["filter"]["species"]
+    if "reactions" in data["filter"]:
+      filter_reactions = data["filter"]["reactions"]
+    if "genes" in data["filter"]:
+      filter_genes = data["filter"]["genes"]
+  
+  if not isinstance(filter_species, list):
+    return HttpResponseBadRequest("filter needs to be an array")
+  if not isinstance(filter_reactions, list):
+    return HttpResponseBadRequest("filter needs to be an array")
+  if not isinstance(filter_genes, list):
+    return HttpResponseBadRequest("filter needs to be an array")
+  
+  export = data["export"]
+  
+  if "network_type" not in export:
+    return HttpResponseBadRequest ("job is missing the desired network_type (en|rn)")
+  if "network_format" not in export:
+    return HttpResponseBadRequest ("job is missing the desired network_format (sbml|dot|graphml|gml)")
+    
+  
+  remove_reaction_genes_removed = True
+  remove_reaction_missing_species = False
+  
+  if "remove_reaction_genes_removed" in export:
+    remove_reaction_genes_removed = export["remove_reaction_genes_removed"]
+  if "remove_reaction_missing_species" in export:
+    remove_reaction_missing_species = export["remove_reaction_missing_species"]
+  
+  enalyzer = Enalyzer (inputFile.name)
+  try:
+    sbml = enalyzer.get_sbml (
+        filter_species,
+        filter_reactions,
+        filter_genes,
+        remove_reaction_genes_removed,
+        remove_reaction_missing_species)
+  except Exception as e:
+    return HttpResponseBadRequest ("the model has an issue: " + getattr(e, 'message', repr(e)))
+  
+  outputFile = tempfile.NamedTemporaryFile()
+  
+  
+  
+  
+  if export["network_type"] == "en":
+    net = enalyzer.extract_network_from_sbml (sbml)
+    net.calc_genenet ()
+    if export["network_format"] == "sbml":
+      net.export_en_sbml (outputFile.name, sbml.getModel ().getId () + "_EN", sbml.getModel ().getName () + " converted to EnzymeNetwork", filter_species, filter_reactions, filter_genes, remove_reaction_genes_removed, remove_reaction_missing_species)
+      if os.path.exists(outputFile.name):
+        return Utils.serve_file (outputFile.name, "enalyzed-model.sbml", "application/xml")
+      else:
+        return HttpResponseServerError ("couldn't generate the sbml file")
+    elif export["network_format"] == "dot":
+      net.export_en_dot (outputFile.name)
+      if os.path.exists(outputFile.name):
+        return Utils.serve_file (outputFile.name, "enalyzed-model.dot", "application/dot")
+      else:
+        return HttpResponseServerError ("couldn't generate the dot file")
+    elif export["network_format"] == "graphml":
+      net.export_en_graphml (outputFile.name)
+      if os.path.exists(outputFile.name):
+        return Utils.serve_file (outputFile.name, "enalyzed-model.graphml", "application/xml")
+      else:
+        return HttpResponseServerError ("couldn't generate the graphml file")
+    elif export["network_format"] == "gml":
+      net.export_en_gml (outputFile.name)
+      if os.path.exists(outputFile.name):
+        return Utils.serve_file (outputFile.name, "enalyzed-model.gml", "application/gml")
+      else:
+        return HttpResponseServerError ("couldn't generate the gml file")
+  elif export["network_type"] == "rn":
+    if export["network_format"] == "sbml":
+      SBMLWriter().writeSBML (sbml, outputFile.name)
+      if os.path.exists(outputFile.name):
+        return Utils.serve_file (outputFile.name, "enalyzed-model.sbml", "application/xml")
+      else:
+        return HttpResponseServerError ("couldn't generate the sbml file")
+    else:
+      net = enalyzer.extract_network_from_sbml (sbml)
+      if export["network_format"] == "dot":
+        net.export_rn_dot (outputFile.name)
+        if os.path.exists(outputFile.name):
+          return Utils.serve_file (outputFile.name, "enalyzed-model.dot", "application/dot")
+        else:
+          return HttpResponseServerError ("couldn't generate the dot file")
+      elif export["network_format"] == "graphml":
+        net.export_rn_graphml (outputFile.name)
+        if os.path.exists(outputFile.name):
+          return Utils.serve_file (outputFile.name, "enalyzed-model.graphml", "application/xml")
+        else:
+          return HttpResponseServerError ("couldn't generate the graphml file")
+      elif export["network_format"] == "gml":
+        net.export_rn_gml (outputFile.name)
+        if os.path.exists(outputFile.name):
+          return Utils.serve_file (outputFile.name, "enalyzed-model.gml", "application/gml")
+        else:
+          return HttpResponseServerError ("couldn't generate the gml file")
+  
+  
+  __logger.error ("test end")
+  return HttpResponseBadRequest ("job is not well formed, not sure what to do...")
+  
+  
+
+
 
 
 @csrf_exempt
