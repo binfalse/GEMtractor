@@ -116,7 +116,9 @@ class Enalyzer:
     def _extract_genes_from_sbml_notes (self, annotation, default):
         m = re.match (self.__GENE_ASSOCIATION_PATTERN, annotation)
         if m:
-            return m.group (1).strip()
+            g = m.group (1).strip()
+            if len (g) > 0:
+              return g
         return default
     
     def _overwrite_genes_in_sbml_notes (self, new_genes, reaction):
