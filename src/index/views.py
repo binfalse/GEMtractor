@@ -20,6 +20,6 @@ from django.conf import settings
 def index(request):
     return render(request, 'index/index.html', {})
 def imprint(request):
-    return render(request, 'index/imprint.html', {"CACHE_UPLOADED": settings.CACHE_UPLOADED / (60*60)})
+    return render(request, 'index/imprint.html', {"KEEP_UPLOADED": settings.KEEP_UPLOADED / (60*60)})
 def learn(request):
     return render(request, 'index/learn.html', {})
