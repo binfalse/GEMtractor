@@ -137,11 +137,11 @@ def store_filter (request):
   if not succ:
     return JsonResponse ({"status":"failed","error":data})
   
-  if "species" in data:
+  if "species" in data and isinstance(data["species"], list):
     request.session[Constants.SESSION_FILTER_SPECIES] = data["species"]
-  if "reaction" in data:
+  if "reaction" in data and isinstance(data["reaction"], list):
     request.session[Constants.SESSION_FILTER_REACTION] = data["reaction"]
-  if "genes" in data:
+  if "genes" in data and isinstance(data["genes"], list):
     request.session[Constants.SESSION_FILTER_GENES] = data["genes"]
   
   return JsonResponse ({"status":"success",

@@ -84,7 +84,7 @@ var networks = {
  * @param g list of genes' ids to discard
  * 
  */
-function storeFilters (s, r, g) {
+function storeFilters (s, r, g, successFn = undefined) {
 	// send an ajax request to /api/store_filter
 	$.ajax({
 		method: "POST",
@@ -99,16 +99,19 @@ function storeFilters (s, r, g) {
 		success: function (data) {
 		  
 		  if (data.status != 'success') {
-			// got something, but was it successful?
-			$("#filtercontainer").hide ();
-			$("#loading").hide ();
-			$("#error").show ().text ("Failed to update the filters: " + data.error);
-			return;
+				// got something, but was it successful?
+				$("#filtercontainer").hide ();
+				$("#loading").hide ();
+				$("#error").show ().text ("Failed to update the filters: " + data.error);
+				return;
 		  }
 		  
 		  $("#filtercontainer").show ();
 		  $("#loading").hide ();
 		  $("#error").hide ();
+		  
+		  if (successFn)
+				successFn ();
 		},
 		error: function (jqXHR, textStatus, errorThrown) {
 		  $("#filtercontainer").hide ();
@@ -244,7 +247,7 @@ function updateNetwork () {
 	const g = Array.from(filter_genes);
 
 	// update the batch field
-	$("#batch-filter").text ("species: " + s.join (", ") + "\nreactions: " + r.join (", ") + "\ngenes: " + g.join (", "));
+	$("#batch-filter").val ("species: " + s.join (", ") + "\nreactions: " + r.join (", ") + "\ngenes: " + g.join (", "));
 
 	// and store the filter at the backend session
 	storeFilters (s, r, g);
@@ -428,6 +431,35 @@ function loadNetwork () {
 			$("#loading").hide ();
 			$("#error").show ().text ("Failed to retrieve the network: " + errorThrown + " (" + textStatus + ")");
 		}
+	});
+	
+	$("#batch-button").click (function (){
+		filters = $("#batch-filter").val().split("\n");
+		var s = [];
+		var r = [];
+		var g = [];
+		for(var n = 0; n < filters.length; n++) {
+			var l = filters[n].split(":");
+			if (l.length != 2)
+				continue;
+			var ids = l[1].split(",");
+			var cleanids = [];
+			for(var m = 0; m < ids.length; m++) {
+				var i = ids[m].trim ();
+				if (i.length > 0)
+					cleanids.push (i);
+			}
+			if (l[0].trim () === "species")
+				s = cleanids;
+			if (l[0].trim () === "reactions")
+				r = cleanids;
+			if (l[0].trim () === "genes")
+				g = cleanids;
+		}
+	
+		storeFilters (s, r, g, function () {location.reload();});
+		
+		
 	});
 }
 
