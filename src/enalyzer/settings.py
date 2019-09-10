@@ -189,7 +189,7 @@ LOGGING = {
 
 
 #import tempfile
-STORAGE = os.getenv('storage', "/tmp/enalyzer-storage/")
+STORAGE = os.getenv('STORAGE_DIR', "/tmp/enalyzer-storage/")
 
 KEEP_UPLOADED = 1.5*60*60
 KEEP_GENERATED = 10*60
