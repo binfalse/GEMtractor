@@ -5,4 +5,4 @@ WORKDIR /code
 COPY requirements.txt /code
 RUN pip3 install -r /code/requirements.txt
 VOLUME /code
-CMD gunicorn --bind 0.0.0.0:80 enalyzer.wsgi:application
+CMD gunicorn --timeout 600 --bind 0.0.0.0:80 enalyzer.wsgi:application
