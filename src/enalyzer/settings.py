@@ -26,7 +26,7 @@ with open('secret_key.txt') as f:
 
 # SECURITY WARNING: don't run with debug turned on in production!
 # TODO
-DEBUG = os.getenv('DJANGO_DEBUG', True)
+DEBUG = os.getenv('DJANGO_DEBUG', 'True').lower () in ["true", "yes", "t", "y", "1"]
 
 ALLOWED_HOSTS = ['localhost','127.0.0.1']
 if "DJANGO_ALLOWED_HOSTS" in os.environ:
@@ -191,19 +191,19 @@ LOGGING = {
 STORAGE = os.getenv('STORAGE_DIR', "/tmp/enalyzer-storage/")
 
 # how long to keep uploaded files
-KEEP_UPLOADED = os.getenv('KEEP_UPLOADED', 1.5*60*60)
+KEEP_UPLOADED = float (os.getenv('KEEP_UPLOADED', 1.5*60*60))
 # how long to keep generated files (there are basically just for immediate download)
-KEEP_GENERATED = os.getenv('KEEP_GENERATED', 10*60)
+KEEP_GENERATED = float (os.getenv('KEEP_GENERATED', 10*60))
 
 # how long to keep the bigg model list (that is the list of available models from bigg)
-CACHE_BIGG = os.getenv('CACHE_BIGG', 60*60*24)
+CACHE_BIGG = float (os.getenv('CACHE_BIGG', 60*60*24))
 # how long to keep a single cached model obtained from bigg
-CACHE_BIGG_MODEL = os.getenv('CACHE_BIGG_MODEL', 7*60*60*24)
+CACHE_BIGG_MODEL = float (os.getenv('CACHE_BIGG_MODEL', 7*60*60*24))
 
 # how long to keep the biomodel's search result
-CACHE_BIOMODELS = os.getenv('CACHE_BIOMODELS', 60*60*24)
+CACHE_BIOMODELS = float (os.getenv('CACHE_BIOMODELS', 60*60*24))
 # how long to keep a single cached model from biomodels
-CACHE_BIOMODELS_MODEL = os.getenv('CACHE_BIOMODELS_MODEL', 5*60*60*24)
+CACHE_BIOMODELS_MODEL = float (os.getenv('CACHE_BIOMODELS_MODEL', 5*60*60*24))
 
 # urls for model retrieval
 URLS_BIGG_MODELS = "http://bigg.ucsd.edu/api/v2/models/"
@@ -213,5 +213,5 @@ URLS_BIOMODEL_INFO = lambda model_id: "https://www.ebi.ac.uk/biomodels/"+model_i
 URLS_BIOMODEL_SBML = lambda model_id, filename: "https://www.ebi.ac.uk/biomodels/model/download/"+model_id+"?filename="+filename
 
 # what's the max number of entities to allow in the browser
-MAX_ENTITIES_FILTER = os.getenv('MAX_ENTITIES_FILTER', 10000)
+MAX_ENTITIES_FILTER = int (os.getenv('MAX_ENTITIES_FILTER', 10000))
 
