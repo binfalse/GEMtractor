@@ -29,13 +29,13 @@ from .utils import BreakLoops, InvalidGeneExpression, Utils
 # * you know that ((a and b) and c) is the same as (a and (b and c)) etc... we don't care about the ordering, if you care you need to post process the results
 # * there is no list of modifiers
 
-class Enalyzer:
-    """class to extract protein-protein-interaction-networks from chemical reaction networks"""
+class GEMtractor:
+    """class to filter and extract protein-protein-interaction-networks from chemical reaction networks"""
 
     
     
     def __init__(self, sbml_file):
-      """ Get a new enalyzer for an sbml model
+      """ Get a new GEMtractor for an sbml model
       
       Parameters:
       -----------
@@ -137,7 +137,7 @@ class Enalyzer:
     def get_sbml (self, filter_species = None, filter_reactions = None, filter_genes = None, remove_reaction_genes_removed = True, remove_reaction_missing_species = False):
       """ Get a filtered SBML document from a file
       
-      do not use the same enalyzer object for two different SBML files!!
+      do not use the same GEMtractor object for two different SBML files!!
       
       Parameters:
       -----------
@@ -159,8 +159,8 @@ class Enalyzer:
       name = model.getName ()
       if name is None or len (name) < 1:
           name = model.getId()
-      model.setId (model.getId() + "_enalyzed_ReactionNetwork")
-      model.setName ("enalyzed ReactionNetwork of " + name)
+      model.setId (model.getId() + "_gemtracted_ReactionNetwork")
+      model.setName ("GEMtracted ReactionNetwork of " + name)
       self.__logger.info("got proper sbml model")
       
       self.__logger.debug("append a note")

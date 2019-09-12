@@ -15,7 +15,7 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 from django.test import TestCase, Client
-from modules.enalyzer_utils.constants import Constants
+from modules.gemtractor.constants import Constants
 import json
 import tempfile
 from libsbml import SBMLReader
@@ -89,7 +89,7 @@ class ApiTest(TestCase):
     self.assertEqual(len (response.json()["data"]), 0)
     
     # create session
-    response = self.client.get('/enalyzing/')
+    response = self.client.get('/gemtract/')
     response = self.client.get('/api/get_session_data')
     self._expect_response (response, True)
     self.assertEqual("yes", response.json()["data"]["session"]["has_session"])
@@ -124,10 +124,10 @@ class ApiTest(TestCase):
     
     d = tempfile.TemporaryDirectory()
     with self.settings(STORAGE=d.name):
-      with self.settings(URLS_BIGG_MODELS='https://binfalse.de/enalyzer/404/trigger'):
+      with self.settings(URLS_BIGG_MODELS='https://binfalse.de/GEMtractor/404/trigger'):
         response = self.client.get('/api/get_bigg_models')
         self._expect_response (response, False)
-      with self.settings(URLS_BIGG_MODELS='https://hopefully.no.t.existent.domainexception/enalyzer/404/trigger'):
+      with self.settings(URLS_BIGG_MODELS='https://hopefully.no.t.existent.domainexception/GEMtractor/404/trigger'):
         response = self.client.get('/api/get_bigg_models')
         self._expect_response (response, False)
     
@@ -171,10 +171,10 @@ class ApiTest(TestCase):
     
     d = tempfile.TemporaryDirectory()
     with self.settings(STORAGE=d.name):
-      with self.settings(URLS_BIGG_MODEL = lambda model_id: "'https://binfalse.de/enalyzer/404/trigger/"+model_id+".xml"):
+      with self.settings(URLS_BIGG_MODEL = lambda model_id: "'https://binfalse.de/GEMtractor/404/trigger/"+model_id+".xml"):
         response = self.client.post('/api/select_bigg_model', json.dumps({'bigg_id': "e_coli_core"}),content_type="application/json")
         self._expect_response (response, False)
-      with self.settings(URLS_BIGG_MODEL = lambda model_id: "https://hopefully.no.t.existent.domainexception/enalyzer/404/trigger/"+model_id+".xml"):
+      with self.settings(URLS_BIGG_MODEL = lambda model_id: "https://hopefully.no.t.existent.domainexception/GEMtractor/404/trigger/"+model_id+".xml"):
         response = self.client.post('/api/select_bigg_model', json.dumps({'bigg_id': "e_coli_core"}),content_type="application/json")
         self._expect_response (response, False)
   
@@ -199,10 +199,10 @@ class ApiTest(TestCase):
     
     d = tempfile.TemporaryDirectory()
     with self.settings(STORAGE=d.name):
-      with self.settings(URLS_BIOMODELS='https://binfalse.de/enalyzer/404/trigger'):
+      with self.settings(URLS_BIOMODELS='https://binfalse.de/GEMtractor/404/trigger'):
         response = self.client.get('/api/get_biomodels')
         self._expect_response (response, False)
-      with self.settings(URLS_BIOMODELS='https://hopefully.no.t.existent.domainexception/enalyzer/404/trigger'):
+      with self.settings(URLS_BIOMODELS='https://hopefully.no.t.existent.domainexception/GEMtractor/404/trigger'):
         response = self.client.get('/api/get_biomodels')
         self._expect_response (response, False)
     
@@ -254,17 +254,17 @@ class ApiTest(TestCase):
     
     d = tempfile.TemporaryDirectory()
     with self.settings(STORAGE=d.name):
-      with self.settings(URLS_BIOMODEL_INFO = lambda model_id: "'https://binfalse.de/enalyzer/404/trigger/"+model_id+".xml"):
+      with self.settings(URLS_BIOMODEL_INFO = lambda model_id: "'https://binfalse.de/GEMtractor/404/trigger/"+model_id+".xml"):
         response = self.client.post('/api/select_biomodel', json.dumps({'biomodels_id': "e_coli_core"}),content_type="application/json")
         self._expect_response (response, False)
-      with self.settings(URLS_BIOMODEL_INFO = lambda model_id: "https://hopefully.no.t.existent.domainexception/enalyzer/404/trigger/"+model_id+".xml"):
+      with self.settings(URLS_BIOMODEL_INFO = lambda model_id: "https://hopefully.no.t.existent.domainexception/GEMtractor/404/trigger/"+model_id+".xml"):
         response = self.client.post('/api/select_biomodel', json.dumps({'biomodels_id': "e_coli_core"}),content_type="application/json")
         self._expect_response (response, False)
       
-      with self.settings(URLS_BIOMODEL_SBML = lambda model_id, filename: "'https://binfalse.de/enalyzer/404/trigger/"+model_id+"."+filename):
+      with self.settings(URLS_BIOMODEL_SBML = lambda model_id, filename: "'https://binfalse.de/gemtract/404/trigger/"+model_id+"."+filename):
         response = self.client.post('/api/select_biomodel', json.dumps({'biomodels_id': "e_coli_core"}),content_type="application/json")
         self._expect_response (response, False)
-      with self.settings(URLS_BIOMODEL_SBML = lambda model_id, filename: "https://hopefully.no.t.existent.domainexception/enalyzer/404/trigger/"+model_id+"."+filename):
+      with self.settings(URLS_BIOMODEL_SBML = lambda model_id, filename: "https://hopefully.no.t.existent.domainexception/gemtract/404/trigger/"+model_id+"."+filename):
         response = self.client.post('/api/select_biomodel', json.dumps({'biomodels_id': "e_coli_core"}),content_type="application/json")
         self._expect_response (response, False)
       

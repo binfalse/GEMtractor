@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}
+GEMtract
+{% endblock %}
+{% block content %}
+
+{% if error %}
+ <div class="w3-panel w3-red">
+<p>{{error}}</p>
+</div>  
+{% endif %}
+
+{% if model_name %}
+
+<div class="w3-bar w3-white w3-border" id="skeleton-tabs-top">
+  <div class="w3-bar-item w3-hide-small">Model: {{model_name}}</div>
+<a href="{% url 'gemtract:index' %}" class="w3-bar-item {% if current_url == 'gemtract/' %}w3-flat-clouds{% endif %} w3-hide-small">Select other model</a>
+<a href="{% url 'gemtract:index' %}" class="w3-bar-item {% if current_url == 'gemtract/' %}w3-flat-clouds{% endif %} w3-hide-large w3-hide-medium">Select model</a>
+<a href="{% url 'gemtract:filter' %}" class="w3-bar-item {% if current_url == 'gemtract/filter' %}w3-flat-clouds{% endif %}">Filter</a>
+<a href="{% url 'gemtract:export' %}" class="w3-bar-item {% if current_url == 'gemtract/export' %}w3-flat-clouds{% endif %}">Export</a>
+</div>
+
+
+
+{% endif %}
+
+
+
+
+{% block gemtract %}{% endblock %}
+
+
+{% endblock %}

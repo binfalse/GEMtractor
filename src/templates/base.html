@@ -4,15 +4,15 @@
 <html>
 	<head>
 		<!--
-		This page is part of the enalyzer
+		This page is part of the GEMtractor
 		Copyright (C) 2019 Martin Scharm <https://binfalse.de>
  
-		The enalyzer is free software: you can redistribute it and/or modify
+		The GEMtractor is free software: you can redistribute it and/or modify
 		it under the terms of the GNU General Public License as published by
 		the Free Software Foundation, either version 3 of the License, or
 		(at your option) any later version.
 
-		The enalyzer is distributed in the hope that it will be useful,
+		The GEMtractor is distributed in the hope that it will be useful,
 		but WITHOUT ANY WARRANTY; without even the implied warranty of
 		MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 		GNU General Public License for more details.
@@ -21,7 +21,7 @@
 		along with this program. If not, see <http://www.gnu.org/licenses/>.
 		-->
 
-		<title>{% block title %}{% endblock %} | enalyzer</title>
+		<title>{% block title %}{% endblock %} | GEMtractor</title>
 		<meta charset="UTF-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<script src="{% static 'js/jquery-3.4.1.min.js' %}"></script>
@@ -39,15 +39,9 @@
 			<div class="w3-bar w3-flat-silver w3-center">
 				<a class="w3-bar-item w3-button w3-padding-large w3-hide-medium w3-hide-large w3-right" href="javascript:void(0)" onclick="toggleNaviMobile()" title="Toggle Navigation Menu"><i class="fa fa-bars"></i></a>
 				<a href="/" class="w3-bar-item w3-button w3-padding-large">
-<!--
-					<object data="{% static 'pics/gemtractor-landscape-white.svg' %}" type="image/svg+xml">
--->
 						<img src="{% static 'pics/gemtractor-landscape.png' %}" title="GEMtractor" alt="GEMtractor"/>
-<!--
-					</object>
--->
 				</a>
-				<a href="/enalyzing" class="w3-bar-item w3-button w3-padding-large w3-hide-small">Start</a>
+				<a href="/gemtract" class="w3-bar-item w3-button w3-padding-large w3-hide-small">Start</a>
 				<a href="/learn" class="w3-bar-item w3-button w3-padding-large w3-hide-small">Learn</a>
 				<a href="/imprint#imprint" class="w3-bar-item w3-button w3-padding-large w3-hide-small">Imprint</a>
 				<a href="/imprint#privacy" class="w3-bar-item w3-button w3-padding-large w3-hide-small">Privacy</a>
@@ -56,7 +50,7 @@
 		
 		
 		<div id="navMobi" class="w3-bar-block w3-flat-midnight-blue w3-hide w3-hide-large w3-hide-medium w3-top">
-			<a href="/enalyzing" class="w3-bar-item w3-button w3-padding-large" onclick="toggleNaviMobile()">Start</a>
+			<a href="/gemtract" class="w3-bar-item w3-button w3-padding-large" onclick="toggleNaviMobile()">Start</a>
 			<a href="/learn" class="w3-bar-item w3-button w3-padding-large" onclick="toggleNaviMobile()">Learn</a>
 			<a href="/imprint#imprint" class="w3-bar-item w3-button w3-padding-large" onclick="toggleNaviMobile()">Imprint</a>
 			<a href="/imprint#privacy" class="w3-bar-item w3-button w3-padding-large" onclick="toggleNaviMobile()">Privacy</a>

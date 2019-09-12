@@ -67,7 +67,7 @@ class Utils:
     if note is None or len (note) < 1 or "</body>" not in note:
         note = '<notes><body xmlns="http://www.w3.org/1999/xhtml"></body></notes>'
     
-    additional_note = "<p>This file was generated at the enalyzer (https://enalyzer.bio.informatik.uni-rostock.de/) using the following settings:</p>"
+    additional_note = "<p>This file was generated at the GEMtractor (https://gemtractor.bio.informatik.uni-rostock.de/) using the following settings:</p>"
     if filter_species is not None and len (filter_species) > 0:
       additional_note = additional_note + "<p>Filter Species:</p><ul>"
       for s in filter_species:

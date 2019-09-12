@@ -14,20 +14,23 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
+from django.conf import settings
 from django.shortcuts import redirect, reverse
 from django.views.decorators.csrf import csrf_exempt
-import logging
-from django.conf import settings
-import json
-import os
 from django.http import JsonResponse, HttpResponseBadRequest, HttpResponseServerError
-from modules.enalyzer_utils.utils import Utils, InvalidGeneExpression, InvalidBiomodelsId, UnableToRetrieveBiomodel, InvalidBiggId, TooBigForBrowser
-from modules.enalyzer_utils.enalyzer import Enalyzer
-from modules.enalyzer_utils.constants import Constants
+
+from modules.gemtractor.gemtractor import GEMtractor
+from modules.gemtractor.constants import Constants
+from modules.gemtractor.utils import Utils, InvalidGeneExpression, InvalidBiomodelsId, UnableToRetrieveBiomodel, InvalidBiggId, TooBigForBrowser
+
+from gemtract.forms import ExportForm
+
+import os
+import json
 import urllib
+import logging
 import tempfile
 from libsbml import SBMLWriter
-from enalyzing.forms import ExportForm
 
 logging.config.dictConfig(settings.LOGGING)
 __logger = logging.getLogger(__name__)
@@ -72,10 +75,10 @@ def get_network (request):
     return redirect('index:index')
   
   if Constants.SESSION_MODEL_ID in request.session:
-    enalyzer = Enalyzer (Utils.get_model_path (request.session[Constants.SESSION_MODEL_TYPE], request.session[Constants.SESSION_MODEL_ID], request.session.session_key))
+    gemtractor = GEMtractor (Utils.get_model_path (request.session[Constants.SESSION_MODEL_TYPE], request.session[Constants.SESSION_MODEL_ID], request.session.session_key))
     try:
       __logger.info ("getting sbml")
-      network = enalyzer.extract_network_from_sbml (enalyzer.get_sbml ())
+      network = gemtractor.extract_network_from_sbml (gemtractor.get_sbml ())
       if len (network.species) + len (network.reactions) > settings.MAX_ENTITIES_FILTER:
         raise TooBigForBrowser ("This model is probably too big for your browser... It contains "+str (len (network.species))+" species and "+str (len (network.reactions))+" reactions. We won't load it for filtering, as you're browser is very likely to die when trying to process that amount of data.. Max is currently set to "+str (settings.MAX_ENTITIES_FILTER)+" entities in total. Please export it w/o filtering or use the API instead.")
       __logger.info ("got sbml")
@@ -290,10 +293,10 @@ def export (request):
   
   form = ExportForm(request.POST)
   if (form.is_valid()):
-    file_name = request.session[Constants.SESSION_MODEL_NAME] + "-enalyzed"
+    file_name = request.session[Constants.SESSION_MODEL_NAME] + "-gemtracted"
     
-    enalyzer = Enalyzer (Utils.get_model_path (request.session[Constants.SESSION_MODEL_TYPE], request.session[Constants.SESSION_MODEL_ID], request.session.session_key))
-    sbml = enalyzer.get_sbml (
+    gemtractor = GEMtractor (Utils.get_model_path (request.session[Constants.SESSION_MODEL_TYPE], request.session[Constants.SESSION_MODEL_ID], request.session.session_key))
+    sbml = gemtractor.get_sbml (
       request.session[Constants.SESSION_FILTER_SPECIES],
       request.session[Constants.SESSION_FILTER_REACTION],
       request.session[Constants.SESSION_FILTER_GENES],
@@ -302,7 +305,7 @@ def export (request):
     
     if form.cleaned_data['network_type'] == 'en':
       file_name = file_name + "-EnzymeNetwork"
-      net = enalyzer.extract_network_from_sbml (sbml)
+      net = gemtractor.extract_network_from_sbml (sbml)
       net.calc_genenet ()
       if form.cleaned_data['network_format'] == 'sbml':
         file_name = file_name + ".sbml"
@@ -355,7 +358,7 @@ def export (request):
         else:
           return JsonResponse ({"status":"failed","error":"error generating file"})
       else:
-        net = enalyzer.extract_network_from_sbml (sbml)
+        net = gemtractor.extract_network_from_sbml (sbml)
         if form.cleaned_data['network_format'] == 'dot':
           file_name = file_name + ".dot"
           file_path = Utils.create_generated_file_web (request.session.session_key)
@@ -434,9 +437,9 @@ def execute (request):
   if "remove_reaction_missing_species" in export:
     remove_reaction_missing_species = export["remove_reaction_missing_species"]
   
-  enalyzer = Enalyzer (inputFile.name)
+  gemtractor = GEMtractor (inputFile.name)
   try:
-    sbml = enalyzer.get_sbml (
+    sbml = gemtractor.get_sbml (
         filter_species,
         filter_reactions,
         filter_genes,
@@ -451,57 +454,57 @@ def execute (request):
   
   
   if export["network_type"] == "en":
-    net = enalyzer.extract_network_from_sbml (sbml)
+    net = gemtractor.extract_network_from_sbml (sbml)
     net.calc_genenet ()
     if export["network_format"] == "sbml":
       net.export_en_sbml (outputFile.name, sbml.getModel ().getId () + "_EN", sbml.getModel ().getName () + " converted to EnzymeNetwork", filter_species, filter_reactions, filter_genes, remove_reaction_genes_removed, remove_reaction_missing_species)
       if os.path.exists(outputFile.name):
-        return Utils.serve_file (outputFile.name, "enalyzed-model.sbml", "application/xml")
+        return Utils.serve_file (outputFile.name, "gemtracted-model.sbml", "application/xml")
       else:
         return HttpResponseServerError ("couldn't generate the sbml file")
     elif export["network_format"] == "dot":
       net.export_en_dot (outputFile.name)
       if os.path.exists(outputFile.name):
-        return Utils.serve_file (outputFile.name, "enalyzed-model.dot", "application/dot")
+        return Utils.serve_file (outputFile.name, "gemtracted-model.dot", "application/dot")
       else:
         return HttpResponseServerError ("couldn't generate the dot file")
     elif export["network_format"] == "graphml":
       net.export_en_graphml (outputFile.name)
       if os.path.exists(outputFile.name):
-        return Utils.serve_file (outputFile.name, "enalyzed-model.graphml", "application/xml")
+        return Utils.serve_file (outputFile.name, "gemtracted-model.graphml", "application/xml")
       else:
         return HttpResponseServerError ("couldn't generate the graphml file")
     elif export["network_format"] == "gml":
       net.export_en_gml (outputFile.name)
       if os.path.exists(outputFile.name):
-        return Utils.serve_file (outputFile.name, "enalyzed-model.gml", "application/gml")
+        return Utils.serve_file (outputFile.name, "gemtracted-model.gml", "application/gml")
       else:
         return HttpResponseServerError ("couldn't generate the gml file")
   elif export["network_type"] == "rn":
     if export["network_format"] == "sbml":
       SBMLWriter().writeSBML (sbml, outputFile.name)
       if os.path.exists(outputFile.name):
-        return Utils.serve_file (outputFile.name, "enalyzed-model.sbml", "application/xml")
+        return Utils.serve_file (outputFile.name, "gemtracted-model.sbml", "application/xml")
       else:
         return HttpResponseServerError ("couldn't generate the sbml file")
     else:
-      net = enalyzer.extract_network_from_sbml (sbml)
+      net = gemtractor.extract_network_from_sbml (sbml)
       if export["network_format"] == "dot":
         net.export_rn_dot (outputFile.name)
         if os.path.exists(outputFile.name):
-          return Utils.serve_file (outputFile.name, "enalyzed-model.dot", "application/dot")
+          return Utils.serve_file (outputFile.name, "gemtracted-model.dot", "application/dot")
         else:
           return HttpResponseServerError ("couldn't generate the dot file")
       elif export["network_format"] == "graphml":
         net.export_rn_graphml (outputFile.name)
         if os.path.exists(outputFile.name):
-          return Utils.serve_file (outputFile.name, "enalyzed-model.graphml", "application/xml")
+          return Utils.serve_file (outputFile.name, "gemtracted-model.graphml", "application/xml")
         else:
           return HttpResponseServerError ("couldn't generate the graphml file")
       elif export["network_format"] == "gml":
         net.export_rn_gml (outputFile.name)
         if os.path.exists(outputFile.name):
-          return Utils.serve_file (outputFile.name, "enalyzed-model.gml", "application/gml")
+          return Utils.serve_file (outputFile.name, "gemtracted-model.gml", "application/gml")
         else:
           return HttpResponseServerError ("couldn't generate the gml file")
   
@@ -515,18 +518,8 @@ def execute (request):
 
 @csrf_exempt
 def status (request):
-  # TODO heartbeat
   
   Utils.cleanup ()
+  # TODO bit more information
   return JsonResponse ({"status": "success"})
-  # ~ __logger.critical(request.body)
-  # ~ try:
-    # ~ data=json.loads(request.body)
-    # ~ data["answer"] = "abc"
-    # ~ return JsonResponse (data)
-    # ~ #return HttpResponse(serializers.serialize('json', data), content_type='application/json')
-  # ~ except Exception as e:
-    # ~ __logger.critical(e)
-    # ~ return JsonResponse ({"nope": "nope"})
-    # ~ #return HttpResponse(serializers.serialize('json', {"nope": "nope"}), content_type='application/json')
   

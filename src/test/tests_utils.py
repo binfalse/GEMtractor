@@ -15,7 +15,7 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 
-from modules.enalyzer_utils.utils import Utils
+from modules.gemtractor.utils import Utils
 from django.test import TestCase
 import os
 import tempfile

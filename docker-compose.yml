@@ -1,16 +1,16 @@
 version: '3'
 services:
 
-  enalyzer-py:
+  gemtractor-py:
     build: .
-    container_name: enalyzer-py
+    container_name: gemtractor-py
     restart: unless-stopped
     ports:
         - "80"
     environment:
         DJANGO_DEBUG: 'False'
         DJANGO_LOG_LEVEL: INFO
-        DJANGO_ALLOWED_HOSTS: enalyzer-py
+        DJANGO_ALLOWED_HOSTS: gemtractor-py
         MODEL_MAX_ENTITIES_FILTER: 10000
         STORAGE_DIR: /storage
         KEEP_UPLOADED: 5400
@@ -28,15 +28,15 @@ services:
         driver: syslog
             options:
                 # see https://binfalse.de/2018/02/21/logging-with-docker/
-                tag: docker/web/enalyzer/app
+                tag: docker/web/gemtractor/app
 
 
-  enalyzer-web:
+  gemtractor-web:
     image: nginx
-    container_name: enalyzer-web
+    container_name: gemtractor-web
     restart: unless-stopped
     depends_on:
-        - enalyzer-py
+        - gemtractor-py
     ports:
         - "80:80"
     # enable the following if using nginx-proxy (https://hub.docker.com/r/binfalse/nginx-proxy/)
@@ -49,4 +49,4 @@ services:
         driver: syslog
             options:
                 # see https://binfalse.de/2018/02/21/logging-with-docker/
-                tag: docker/web/enalyzer/nginx
+                tag: docker/web/gemtractor/nginx

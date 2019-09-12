@@ -16,8 +16,8 @@
 
 from django.shortcuts import render, redirect
 import os
-from modules.enalyzer_utils.utils import Utils
-from modules.enalyzer_utils.constants import Constants
+from modules.gemtractor.utils import Utils
+from modules.gemtractor.constants import Constants
 from .forms import ExportForm
 
 def __prepare_context (request):
@@ -71,10 +71,10 @@ def index(request):
     Utils.del_session_key (request, None, Constants.SESSION_FILTER_REACTION)
     Utils.del_session_key (request, None, Constants.SESSION_FILTER_GENES)
     
-    return redirect('enalyzing:filter')
+    return redirect('gemtract:filter')
     # filterModel (request)
-    # #return HttpResponseRedirect (reverse ('enalyzing:filter'))
-    # #render(request, 'enalyzing/index.html', {'model': request.session['model']})
+    # #return HttpResponseRedirect (reverse ('gemtract:filter'))
+    # #render(request, 'gemtract/index.html', {'model': request.session['model']})
     
   
   
@@ -89,31 +89,31 @@ def index(request):
     Utils.del_session_key (request, context, Constants.SESSION_FILTER_REACTION)
     Utils.del_session_key (request, context, Constants.SESSION_FILTER_GENES)
     
-  return render(request, 'enalyzing/index.html', context)
+  return render(request, 'gemtract/index.html', context)
 
 
 def filter(request):
   if Constants.SESSION_MODEL_ID not in request.session:
-    return redirect('enalyzing:index')
+    return redirect('gemtract:index')
   
   
   context = __prepare_context (request)
   if not model_exists (request, context):
-    return redirect('enalyzing:index')
+    return redirect('gemtract:index')
   
-  return render(request, 'enalyzing/filter.html', context)
+  return render(request, 'gemtract/filter.html', context)
 
 
 def export(request):
   if Constants.SESSION_MODEL_ID not in request.session:
-    return redirect('enalyzing:index')
+    return redirect('gemtract:index')
   
   context = __prepare_context (request)
   if not model_exists (request, context):
-    return redirect('enalyzing:index')
+    return redirect('gemtract:index')
   
   context = __prepare_context (request)
   
   context['form'] = ExportForm(initial={'network_type':'en','remove_reaction_genes_removed': True, 'remove_reaction_missing_species': False,'network_format': 'sbml'})
-  return render(request, 'enalyzing/export.html', context)
+  return render(request, 'gemtract/export.html', context)
   

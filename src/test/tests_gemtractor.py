@@ -15,27 +15,27 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 
-from modules.enalyzer_utils.enalyzer import Enalyzer
+from modules.gemtractor.gemtractor import GEMtractor
 from django.test import TestCase
 import os
 import tempfile
 import pyparsing as pp
-from modules.enalyzer_utils.utils import InvalidGeneExpression
+from modules.gemtractor.utils import InvalidGeneExpression
 from xml.dom import minidom
 
-class EnalyzerTests (TestCase):
+class GEMtractorTests (TestCase):
   def test_sbml_filter1 (self):
         f = "test/gene-filter-example.xml"
         self.assertTrue (os.path.isfile(f), msg="cannot find test file")
         
-        enalyzer = Enalyzer (f)
-        sbml = enalyzer.get_sbml (filter_species = ["a"], filter_genes = ["y"])
+        gemtractor = GEMtractor (f)
+        sbml = gemtractor.get_sbml (filter_species = ["a"], filter_genes = ["y"])
         self.assertEqual (sbml.getNumErrors(), 0)
         
         self.assertTrue ("modelname" in sbml.getModel ().getName ()) 
         self.assertTrue ("modelid" in sbml.getModel ().getId ())
         
-        net = enalyzer.extract_network_from_sbml (sbml)
+        net = gemtractor.extract_network_from_sbml (sbml)
         self.assertEqual (len (net.species), 3)
         self.assertEqual (len (net.reactions), 3)
         self.assertEqual (len (net.genenet), 0)
@@ -56,14 +56,14 @@ class EnalyzerTests (TestCase):
         f = "test/gene-filter-example-3.xml"
         self.assertTrue (os.path.isfile(f), msg="cannot find test file")
         
-        enalyzer = Enalyzer (f)
-        sbml = enalyzer.get_sbml (filter_species = ["a"], filter_genes = ["a"])
+        gemtractor = GEMtractor (f)
+        sbml = gemtractor.get_sbml (filter_species = ["a"], filter_genes = ["a"])
         self.assertEqual (sbml.getNumErrors(), 0)
         
         self.assertTrue ("modelname" in sbml.getModel ().getName ()) 
         self.assertTrue ("modelid" in sbml.getModel ().getId ())
         
-        net = enalyzer.extract_network_from_sbml (sbml)
+        net = gemtractor.extract_network_from_sbml (sbml)
         self.assertEqual (len (net.species), 3)
         self.assertEqual (len (net.reactions), 3)
         self.assertEqual (len (net.genenet), 0)
@@ -83,14 +83,14 @@ class EnalyzerTests (TestCase):
         f = "test/gene-filter-example-2.xml"
         self.assertTrue (os.path.isfile(f), msg="cannot find test file")
         
-        enalyzer = Enalyzer (f)
-        sbml = enalyzer.get_sbml (filter_species = ["a"], filter_genes = ["a"])
+        gemtractor = GEMtractor (f)
+        sbml = gemtractor.get_sbml (filter_species = ["a"], filter_genes = ["a"])
         self.assertEqual (sbml.getNumErrors(), 0)
         
         self.assertTrue ("modelid" in sbml.getModel ().getName ()) 
         self.assertTrue ("modelid" in sbml.getModel ().getId ())
         
-        net = enalyzer.extract_network_from_sbml (sbml)
+        net = gemtractor.extract_network_from_sbml (sbml)
         self.assertEqual (len (net.species), 3)
         self.assertEqual (len (net.reactions), 3)
         self.assertEqual (len (net.genenet), 0)
@@ -107,11 +107,11 @@ class EnalyzerTests (TestCase):
       
       
       
-        enalyzer = Enalyzer (f)
-        sbml = enalyzer.get_sbml (filter_species = ["b"], remove_reaction_missing_species = False)
+        gemtractor = GEMtractor (f)
+        sbml = gemtractor.get_sbml (filter_species = ["b"], remove_reaction_missing_species = False)
         self.assertEqual (sbml.getNumErrors(), 0)
         
-        net = enalyzer.extract_network_from_sbml (sbml)
+        net = gemtractor.extract_network_from_sbml (sbml)
         self.assertEqual (len (net.species), 3)
         self.assertEqual (len (net.reactions), 3)
         self.assertEqual (len (net.genenet), 0)
@@ -119,11 +119,11 @@ class EnalyzerTests (TestCase):
       
       
       
-        enalyzer = Enalyzer (f)
-        sbml = enalyzer.get_sbml (filter_species = ["a", "b"])
+        gemtractor = GEMtractor (f)
+        sbml = gemtractor.get_sbml (filter_species = ["a", "b"])
         self.assertEqual (sbml.getNumErrors(), 0)
         
-        net = enalyzer.extract_network_from_sbml (sbml)
+        net = gemtractor.extract_network_from_sbml (sbml)
         self.assertEqual (len (net.species), 3)
         self.assertEqual (len (net.reactions), 2)
         self.assertEqual (len (net.genenet), 0)
@@ -131,11 +131,11 @@ class EnalyzerTests (TestCase):
       
       
       
-        enalyzer = Enalyzer (f)
-        sbml = enalyzer.get_sbml (filter_species = ["a", "c"], remove_reaction_missing_species = True)
+        gemtractor = GEMtractor (f)
+        sbml = gemtractor.get_sbml (filter_species = ["a", "c"], remove_reaction_missing_species = True)
         self.assertEqual (sbml.getNumErrors(), 0)
         
-        net = enalyzer.extract_network_from_sbml (sbml)
+        net = gemtractor.extract_network_from_sbml (sbml)
         self.assertEqual (len (net.species), 3)
         self.assertEqual (len (net.reactions), 2)
         self.assertEqual (len (net.genenet), 0)
@@ -143,11 +143,11 @@ class EnalyzerTests (TestCase):
       
       
       
-        enalyzer = Enalyzer (f)
-        sbml = enalyzer.get_sbml (filter_species = ["a", "c"], filter_reactions = ["r3"], remove_reaction_missing_species = True)
+        gemtractor = GEMtractor (f)
+        sbml = gemtractor.get_sbml (filter_species = ["a", "c"], filter_reactions = ["r3"], remove_reaction_missing_species = True)
         self.assertEqual (sbml.getNumErrors(), 0)
         
-        net = enalyzer.extract_network_from_sbml (sbml)
+        net = gemtractor.extract_network_from_sbml (sbml)
         self.assertEqual (len (net.species), 3)
         self.assertEqual (len (net.reactions), 1)
         self.assertEqual (len (net.genenet), 0)
@@ -155,11 +155,11 @@ class EnalyzerTests (TestCase):
       
         
         
-        enalyzer = Enalyzer (f)
-        sbml = enalyzer.get_sbml (filter_genes = ["x", "y"])
+        gemtractor = GEMtractor (f)
+        sbml = gemtractor.get_sbml (filter_genes = ["x", "y"])
         self.assertEqual (sbml.getNumErrors(), 0)
         
-        net = enalyzer.extract_network_from_sbml (sbml)
+        net = gemtractor.extract_network_from_sbml (sbml)
         self.assertEqual (len (net.species), 3)
         self.assertEqual (len (net.reactions), 1)
         self.assertEqual (len (net.genenet), 0)
@@ -167,11 +167,11 @@ class EnalyzerTests (TestCase):
       
         
         
-        enalyzer = Enalyzer (f)
-        sbml = enalyzer.get_sbml (filter_genes = ["x", "y"], remove_reaction_genes_removed = False)
+        gemtractor = GEMtractor (f)
+        sbml = gemtractor.get_sbml (filter_genes = ["x", "y"], remove_reaction_genes_removed = False)
         self.assertEqual (sbml.getNumErrors(), 0)
         
-        net = enalyzer.extract_network_from_sbml (sbml)
+        net = gemtractor.extract_network_from_sbml (sbml)
         self.assertEqual (len (net.species), 3)
         self.assertEqual (len (net.reactions), 3)
         self.assertEqual (len (net.genenet), 0)
@@ -181,11 +181,11 @@ class EnalyzerTests (TestCase):
         f = "test/gene-filter-example.xml"
         self.assertTrue (os.path.isfile(f), msg="cannot find test file")
         
-        enalyzer = Enalyzer (f)
-        sbml = enalyzer.get_sbml ()
+        gemtractor = GEMtractor (f)
+        sbml = gemtractor.get_sbml ()
         self.assertEqual (sbml.getNumErrors(), 0)
         
-        net = enalyzer.extract_network_from_sbml (sbml)
+        net = gemtractor.extract_network_from_sbml (sbml)
         self.assertEqual (len (net.species), 3)
         self.assertEqual (len (net.reactions), 3)
         self.assertEqual (len (net.genenet), 0)
@@ -271,8 +271,8 @@ class EnalyzerTests (TestCase):
               self.assertEqual (c.count ("<edge"), n_genelinks)
         
         net.export_en_sbml (tf.name, "testid")
-        enalyzer2 = Enalyzer (tf.name)
-        sbml = enalyzer2.get_sbml ()
+        gemtractor2 = GEMtractor (tf.name)
+        sbml = gemtractor2.get_sbml ()
         self.assertEqual (sbml.getNumErrors(), 0)
         self.assertEqual (sbml.getModel().getNumSpecies (), len (ns["genenet"]))
         self.assertEqual (sbml.getModel().getNumReactions (), n_genelinks)
@@ -281,13 +281,13 @@ class EnalyzerTests (TestCase):
       
       
   def test_parse_expression (self):
-      enalyzer = Enalyzer (None)
+      gemtractor = GEMtractor (None)
       
-      expr = enalyzer._unfold_complex_expression (enalyzer._parse_expression ("something"))
+      expr = gemtractor._unfold_complex_expression (gemtractor._parse_expression ("something"))
       self.assertEqual (len (expr), 1)
       self.assertEqual (expr[0], "something")
       
-      expr = enalyzer._unfold_complex_expression (enalyzer._parse_expression ("a or ((b and c) or (d and e and f)) or (g and h) or (i or j)"))
+      expr = gemtractor._unfold_complex_expression (gemtractor._parse_expression ("a or ((b and c) or (d and e and f)) or (g and h) or (i or j)"))
       self.assertEqual (len (expr), 6)
       self.assertEqual (expr[0], "a")
       self.assertEqual (expr[1], "b and c")
@@ -296,13 +296,13 @@ class EnalyzerTests (TestCase):
       self.assertEqual (expr[4], "i")
       self.assertEqual (expr[5], "j")
       
-      expr = enalyzer._unfold_complex_expression (enalyzer._parse_expression ("a or (b and c)"))
+      expr = gemtractor._unfold_complex_expression (gemtractor._parse_expression ("a or (b and c)"))
       self.assertEqual (len (expr), 2)
       self.assertEqual (expr[0], "a")
       self.assertEqual (expr[1], "b and c")
       
       with self.assertRaises (InvalidGeneExpression):
-        enalyzer._parse_expression ("a or a (b and c)")
+        gemtractor._parse_expression ("a or a (b and c)")
         
       with self.assertRaises (NotImplementedError):
         pr = pp.ParseResults ()
@@ -311,55 +311,55 @@ class EnalyzerTests (TestCase):
         pr.append ("b")
         pr.append ("or")
         pr.append ("c")
-        enalyzer._unfold_complex_expression (pr)
+        gemtractor._unfold_complex_expression (pr)
         
       with self.assertRaises (NotImplementedError):
         pr = pp.ParseResults ()
         pr.append ("a")
         pr.append ("b")
-        enalyzer._unfold_complex_expression (pr)
+        gemtractor._unfold_complex_expression (pr)
       
   def test_extract_from_notes (self):
-      enalyzer = Enalyzer (None)
+      gemtractor = GEMtractor (None)
       
       note = """
       <html xmlns="http://www.w3.org/1999/xhtml"><p>GENE_ASSOCIATION: (a or (b and c) or d or (f and g and k) or (k and a))</p><p>GENE_LIST: whatever</p><p>SUBSYSTEM: Pyruvate Metabolism</p></html>
       """
-      self.assertEqual (enalyzer._extract_genes_from_sbml_notes (note, "def"), "(a or (b and c) or d or (f and g and k) or (k and a))")
+      self.assertEqual (gemtractor._extract_genes_from_sbml_notes (note, "def"), "(a or (b and c) or d or (f and g and k) or (k and a))")
       
       
       note = """
       <html xmlns="http://www.w3.org/1999/xhtml"><p>GENE_ASSOCIATION:(a or (b and c) or d or (f and g and k) or (k and a))</p><p>GENE_LIST: whatever</p><p>SUBSYSTEM: Pyruvate Metabolism</p></html>
       """
-      self.assertEqual (enalyzer._extract_genes_from_sbml_notes (note, "def"), "(a or (b and c) or d or (f and g and k) or (k and a))")
+      self.assertEqual (gemtractor._extract_genes_from_sbml_notes (note, "def"), "(a or (b and c) or d or (f and g and k) or (k and a))")
       
       
       note = """
       <html xmlns="http://www.w3.org/1999/xhtml"><p>GENE_ASSOCIATION:a or b</p><p>GENEsadfsdflism</p></html>
       """
-      self.assertEqual (enalyzer._extract_genes_from_sbml_notes (note, "def"), "a or b")
+      self.assertEqual (gemtractor._extract_genes_from_sbml_notes (note, "def"), "a or b")
       
       
       note = """
       <html xmlns="http://www.w3.org/1999/xhtml"><p>GENE_ASSOCIATION:gene</p><p>GENEsadfsdflism</p></html>
       """
-      self.assertEqual (enalyzer._extract_genes_from_sbml_notes (note, "def"), "gene")
+      self.assertEqual (gemtractor._extract_genes_from_sbml_notes (note, "def"), "gene")
       
       
       note = """
       <html xmlns="http://www.w3.org/1999/xhtml"><p>GENE_ASSOCIATION:            gene         </p><p>GENEsadfsdflism</p></html>
       """
-      self.assertEqual (enalyzer._extract_genes_from_sbml_notes (note, "def"), "gene")
+      self.assertEqual (gemtractor._extract_genes_from_sbml_notes (note, "def"), "gene")
       
       
       note = """
       <html xmlns="http://www.w3.org/1999/xhtml"><p></p><p>GENEsadfsdflism</p></html>
       """
-      self.assertEqual (enalyzer._extract_genes_from_sbml_notes (note, "def"), "def")
+      self.assertEqual (gemtractor._extract_genes_from_sbml_notes (note, "def"), "def")
       
       
   def test_implode_genes (self):
       genes = ['a', 'b and c', 'sdkflj alskd2345 34lk5 w34knflk324']
       
-      enalyzer = Enalyzer (None)
-      self.assertEqual ("(a) or (b and c) or (sdkflj alskd2345 34lk5 w34knflk324)", enalyzer._implode_genes (genes))
+      gemtractor = GEMtractor (None)
+      self.assertEqual ("(a) or (b and c) or (sdkflj alskd2345 34lk5 w34knflk324)", gemtractor._implode_genes (genes))

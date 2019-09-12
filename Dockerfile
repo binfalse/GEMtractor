@@ -11,4 +11,4 @@ VOLUME ["/code"]
 WORKDIR /code
 
 # start gunicorn to serve the python stuff
-CMD gunicorn --timeout 600 --bind 0.0.0.0:80 enalyzer.wsgi:application
+CMD gunicorn --timeout 600 --bind 0.0.0.0:80 gemtractor.wsgi:application

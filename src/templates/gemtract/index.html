@@ -1,5 +1,5 @@
-{% extends "enalyzing/skeleton.html" %}
-{% block enalyzing %}
+{% extends "gemtract/skeleton.html" %}
+{% block gemtract %}
 
 
 <h1>Step 1: Select a model</h1>
@@ -44,7 +44,7 @@ You can either choose a model from a public repository or upload your own model:
       </div>
       <div id="choose-biomodels" style="display:none" class="">
         <p>
-          Here you can select a model from <a href="https://www.ebi.ac.uk/biomodels/">Biomodels</a> to start your enalysis &mdash; their models are dedicated to the public domain.
+          Here you can select a model from <a href="https://www.ebi.ac.uk/biomodels/">Biomodels</a> to start your analysis &mdash; their models are dedicated to the public domain.
           Please consult the <a href="https://www.ebi.ac.uk/biomodels/termsofuse">Biomodels' Terms of Use</a> for more information and cite them where appropriate.
         </p>
         <div class="w3-row">
@@ -86,7 +86,7 @@ You can either choose a model from a public repository or upload your own model:
 
 <script>
   token = '{{ csrf_token }}';
-  filter_url = "{% url 'enalyzing:filter' %}";
+  filter_url = "{% url 'gemtract:filter' %}";
   prepareIndex ();
 </script>
 

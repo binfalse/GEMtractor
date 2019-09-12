@@ -15,7 +15,7 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 
-from modules.enalyzer_utils.network import Species, Reaction
+from modules.gemtractor.network import Species, Reaction
 from django.test import TestCase
 
 # there are also many tests in EnalyzerTests

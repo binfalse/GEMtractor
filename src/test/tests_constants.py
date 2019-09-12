@@ -15,7 +15,7 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 
-from modules.enalyzer_utils.constants import Constants
+from modules.gemtractor.constants import Constants
 from django.test import TestCase
 
 class ConstantsTests (TestCase):

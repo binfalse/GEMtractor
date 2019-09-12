@@ -1,5 +1,5 @@
 """
-WSGI config for enalyzer project.
+WSGI config for GEMtractor project.
 
 It exposes the WSGI callable as a module-level variable named ``application``.
 
@@ -11,6 +11,6 @@ import os
 
 from django.core.wsgi import get_wsgi_application
 
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "enalyzer.settings")
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "gemtractor.settings")
 
 application = get_wsgi_application()

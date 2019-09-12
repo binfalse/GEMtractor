@@ -21,37 +21,37 @@ import os
 import json
 from xml.dom import minidom
 from libsbml import SBMLReader
-from modules.enalyzer_utils.utils import Utils
+from modules.gemtractor.utils import Utils
 
 import logging
 # logging.getLogger(__name__).debug("---->>>>> " + str(j))
 
 
 # Create your tests here.
-class EnalyzingTest(TestCase):
+class GemtractTest(TestCase):
   def setUp(self):
     self.client = Client()
     
   def test_untained_gets (self):
-    response = self.client.get('/enalyzing/')
+    response = self.client.get('/gemtract/')
     self.assertEqual(response.status_code, 200)
     self.assertTrue (b"Select a model" in response.content)
     
-    response = self.client.get('/enalyzing/filter')
+    response = self.client.get('/gemtract/filter')
     self.assertEqual(response.status_code, 302)
-    self.assertEqual("/enalyzing/", response["location"])
+    self.assertEqual("/gemtract/", response["location"])
     
-    response = self.client.get('/enalyzing/export')
+    response = self.client.get('/gemtract/export')
     self.assertEqual(response.status_code, 302)
-    self.assertEqual("/enalyzing/", response["location"])
+    self.assertEqual("/gemtract/", response["location"])
     
   def test_index_lost_model (self):
     d = tempfile.TemporaryDirectory()
     with self.settings(STORAGE=d.name):
       with open("test/gene-filter-example.xml") as fp:
-        response = self.client.post('/enalyzing/', {"custom-model": fp})
+        response = self.client.post('/gemtract/', {"custom-model": fp})
         self.assertEqual(response.status_code, 302)
-        self.assertEqual("/enalyzing/filter", response["location"])
+        self.assertEqual("/gemtract/filter", response["location"])
         
         # test session uploaded file
     
@@ -68,7 +68,7 @@ class EnalyzingTest(TestCase):
         os.remove (uploaded_file)
         
         
-        response = self.client.get('/enalyzing/')
+        response = self.client.get('/gemtract/')
         self.assertEqual(response.status_code, 200)
         self.assertTrue (b"Select a model" in response.content)
         # expect an error, as the file is lost...
@@ -78,9 +78,9 @@ class EnalyzingTest(TestCase):
     d = tempfile.TemporaryDirectory()
     with self.settings(STORAGE=d.name):
       with open("test/gene-filter-example.xml") as fp:
-        response = self.client.post('/enalyzing/', {"custom-model": fp})
+        response = self.client.post('/gemtract/', {"custom-model": fp})
         self.assertEqual(response.status_code, 302)
-        self.assertEqual("/enalyzing/filter", response["location"])
+        self.assertEqual("/gemtract/filter", response["location"])
         
         # test session uploaded file
     
@@ -97,17 +97,17 @@ class EnalyzingTest(TestCase):
         os.remove (uploaded_file)
         
         
-        response = self.client.get('/enalyzing/filter')
+        response = self.client.get('/gemtract/filter')
         self.assertEqual(response.status_code, 302)
-        self.assertEqual("/enalyzing/", response["location"])
+        self.assertEqual("/gemtract/", response["location"])
     
   def test_export_lost_model (self):
     d = tempfile.TemporaryDirectory()
     with self.settings(STORAGE=d.name):
       with open("test/gene-filter-example.xml") as fp:
-        response = self.client.post('/enalyzing/', {"custom-model": fp})
+        response = self.client.post('/gemtract/', {"custom-model": fp})
         self.assertEqual(response.status_code, 302)
-        self.assertEqual("/enalyzing/filter", response["location"])
+        self.assertEqual("/gemtract/filter", response["location"])
         
         # test session uploaded file
     
@@ -124,18 +124,18 @@ class EnalyzingTest(TestCase):
         os.remove (uploaded_file)
         
         
-        response = self.client.get('/enalyzing/export')
+        response = self.client.get('/gemtract/export')
         self.assertEqual(response.status_code, 302)
-        self.assertEqual("/enalyzing/", response["location"])
+        self.assertEqual("/gemtract/", response["location"])
     
     
   def test_workflow_upload (self):
     d = tempfile.TemporaryDirectory()
     with self.settings(STORAGE=d.name):
       with open("test/gene-filter-example.xml") as fp:
-        response = self.client.post('/enalyzing/', {"custom-model": fp})
+        response = self.client.post('/gemtract/', {"custom-model": fp})
         self.assertEqual(response.status_code, 302)
-        self.assertEqual("/enalyzing/filter", response["location"])
+        self.assertEqual("/gemtract/filter", response["location"])
         
         # test session uploaded file
     
@@ -155,13 +155,13 @@ class EnalyzingTest(TestCase):
         self.assertEqual(len(f["filter_genes"]), 4)
         
         
-        response = self.client.get('/enalyzing/filter')
+        response = self.client.get('/gemtract/filter')
         self.assertEqual(response.status_code, 200)
         self.assertTrue (b"Filter Model Entities" in response.content)
         
         
         
-        response = self.client.get('/enalyzing/export')
+        response = self.client.get('/gemtract/export')
         self.assertEqual(response.status_code, 200)
         self.assertTrue (b"Export Your Model" in response.content)
         

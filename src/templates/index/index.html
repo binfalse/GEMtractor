@@ -1,12 +1,9 @@
 {% extends "base.html" %}
 {% load static %}
 {% block title %}
-hello
+Hello
 {% endblock %}
 {% block content %}
-<!--
-<h1>welcome, enalyzer!</h1>
--->
 <div id="indexlogo">
 <object data="{% static 'pics/gemtractor-landscape.svg' %}" type="image/svg+xml">
   <img src="{% static 'pics/gemtractor-landscape.png' %}" title="GEMtractor" alt="GEMtractor" />
@@ -23,10 +20,10 @@ hello
   You may then extract the protein-interaction-network from the concentrated model, and finally export you network in several formats for subsequent analyses.
 </p>
 <p>
-  There is an API, so you may use the enalyzer from your programs. The analyzer is free software and also available as a Docker image. Thus, running your own analyzer is as easy as calling a single command line &mdash; including all the benefits, such as privacy and speed! Read more about the setup at ... TODO
+  There is an API, so you may use the GEMtractor from your programs. The GEMtractor is free software and also available as a Docker image. Thus, running your own GEMtractor is as easy as calling a single command line &mdash; including all the benefits, such as privacy and speed! Read more about the setup at ... TODO
 </p>
 <p>
-  If you dare to give it a try, click <a href="{% url 'enalyzing:index' %}">enalyze</a> from the top panel.
+  If you dare to harvest your models, click <a href="{% url 'gemtract:index' %}">Start</a> from the top panel.
 </p>
 
 {% endblock %}

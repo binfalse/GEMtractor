@@ -146,7 +146,7 @@ class Network:
     """ export the chemical reaction network in DOT format """
     nodemap = {}
     with open(filename, 'w') as f:
-      f.write ("digraph enalyzer {\n")
+      f.write ("digraph GEMtractor {\n")
       #TODO comment incl time and version?
       for identifier, species in self.species.items ():
           nodemap[identifier] = 's' + identifier
@@ -167,7 +167,7 @@ class Network:
       self.calc_genenet ()
     nodemap = {}
     with open(filename, 'w') as f:
-      f.write ("digraph enalyzer {\n")
+      f.write ("digraph GEMtractor {\n")
       #TODO comment incl time and version?
       num = 0
       for gene in self.genenet:
@@ -223,7 +223,7 @@ class Network:
   def create_gml_prefix ():
     n =     "graph [\n"
     #TODO time and version?
-    n = n + "\tcomment \"generated using ENAlyzer\"\n"
+    n = n + "\tcomment \"generated using the GEMtractor\"\n"
     n = n + "\tdirected 1\n"
     return n
   @staticmethod
@@ -291,7 +291,7 @@ class Network:
     n = n + "\txmlns:y=\"http://www.yworks.com/xml/graphml\">\n\n"
     n = n + "\t<key for=\"node\" id=\"layout\" yfiles.type=\"nodegraphics\"/>\n"
     n = n + "\t<key for=\"node\" id=\"type\" attr.type=\"string\"><default>species</default></key>\n"
-    n = n + "\t<graph id=\"enalyzer\" edgedefault=\"directed\">\n"
+    n = n + "\t<graph id=\"GEMtractor\" edgedefault=\"directed\">\n"
     return n
   @staticmethod
   def create_graphml_node (nid, ntype, nshape, nlabel):
@@ -313,10 +313,10 @@ class Network:
     #TODO dc modified?
     if model is None:
       return False
-    model.setId (model_id + "_enalyzed_EnzymeNetwork")
+    model.setId (model_id + "_GEMtracted_EnzymeNetwork")
     if model_name is None:
       model_name = model_id
-    model.setName ("enalyzed EnzymeNetwork of " + model_name)
+    model.setName ("GEMtracted EnzymeNetwork of " + model_name)
     
     # print ("adding note to en sbml")
     Utils.add_model_note (model, filter_species, filter_reactions, filter_genes, remove_reaction_genes_removed, remove_reaction_missing_species)
