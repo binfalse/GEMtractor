@@ -14,7 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, reverse
 import os
 from modules.gemtractor.utils import Utils
 from modules.gemtractor.constants import Constants
@@ -56,25 +56,25 @@ def index(request):
     request.session[Constants.SESSION_HAS_SESSION] = Constants.SESSION_HAS_SESSION_VALUE
     request.session.save()
   
-  if request.method == 'POST' and 'custom-model' in request.FILES and request.FILES['custom-model']:
-    model = request.FILES['custom-model']
+  # ~ if request.method == 'POST' and 'custom-model' in request.FILES and request.FILES['custom-model']:
+    # ~ model = request.FILES['custom-model']
     
-    filename = Utils.get_upload_path (request.session.session_key)
-    with open(filename, 'wb+') as destination:
-      for chunk in model.chunks():
-        destination.write(chunk)
+    # ~ filename = Utils.get_upload_path (request.session.session_key)
+    # ~ with open(filename, 'wb+') as destination:
+      # ~ for chunk in model.chunks():
+        # ~ destination.write(chunk)
     
-    request.session[Constants.SESSION_MODEL_ID] = os.path.basename(filename)
-    request.session[Constants.SESSION_MODEL_NAME] = model.name
-    request.session[Constants.SESSION_MODEL_TYPE] = Constants.SESSION_MODEL_TYPE_UPLOAD
-    Utils.del_session_key (request, None, Constants.SESSION_FILTER_SPECIES)
-    Utils.del_session_key (request, None, Constants.SESSION_FILTER_REACTION)
-    Utils.del_session_key (request, None, Constants.SESSION_FILTER_GENES)
+    # ~ request.session[Constants.SESSION_MODEL_ID] = os.path.basename(filename)
+    # ~ request.session[Constants.SESSION_MODEL_NAME] = model.name
+    # ~ request.session[Constants.SESSION_MODEL_TYPE] = Constants.SESSION_MODEL_TYPE_UPLOAD
+    # ~ Utils.del_session_key (request, None, Constants.SESSION_FILTER_SPECIES)
+    # ~ Utils.del_session_key (request, None, Constants.SESSION_FILTER_REACTION)
+    # ~ Utils.del_session_key (request, None, Constants.SESSION_FILTER_GENES)
     
-    return redirect('gemtract:filter')
-    # filterModel (request)
-    # #return HttpResponseRedirect (reverse ('gemtract:filter'))
-    # #render(request, 'gemtract/index.html', {'model': request.session['model']})
+    # ~ return redirect('gemtract:filter')
+    # ~ # filterModel (request)
+    # ~ # #return HttpResponseRedirect (reverse ('gemtract:filter'))
+    # ~ # #render(request, 'gemtract/index.html', {'model': request.session['model']})
     
   
   
@@ -88,6 +88,10 @@ def index(request):
     Utils.del_session_key (request, context, Constants.SESSION_FILTER_SPECIES)
     Utils.del_session_key (request, context, Constants.SESSION_FILTER_REACTION)
     Utils.del_session_key (request, context, Constants.SESSION_FILTER_GENES)
+  else:
+    context["NEXT_s"] = "Step 2"
+    context["NEXT_t"] = "Filter Model Entities"
+    context["NEXT_l"] = reverse ('gemtract:filter')
     
   return render(request, 'gemtract/index.html', context)
 
@@ -101,6 +105,12 @@ def filter(request):
   if not model_exists (request, context):
     return redirect('gemtract:index')
   
+  context["PREV_s"] = "Step 1"
+  context["PREV_t"] = "Select other model"
+  context["PREV_l"] = reverse ('gemtract:index')
+  context["NEXT_s"] = "Step 3"
+  context["NEXT_t"] = "Export restults"
+  context["NEXT_l"] = reverse ('gemtract:export')
   return render(request, 'gemtract/filter.html', context)
 
 
@@ -115,5 +125,8 @@ def export(request):
   context = __prepare_context (request)
   
   context['form'] = ExportForm(initial={'network_type':'en','remove_reaction_genes_removed': True, 'remove_reaction_missing_species': False,'network_format': 'sbml'})
+  context["PREV_s"] = "Step 2"
+  context["PREV_t"] = "Filter Model Entities"
+  context["PREV_l"] = reverse ('gemtract:filter')
   return render(request, 'gemtract/export.html', context)
   

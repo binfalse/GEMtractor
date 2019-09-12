@@ -1,7 +1,7 @@
 {% load static %}
 {# HTML5 declaration #}
 <!DOCTYPE html>
-<html>
+<html lang="en">
 	<head>
 		<!--
 		This page is part of the GEMtractor
@@ -56,12 +56,16 @@
 			<a href="/imprint#privacy" class="w3-bar-item w3-button w3-padding-large" onclick="toggleNaviMobile()">Privacy</a>
 		</div>
 		
-		
-		<div class="w3-content">
+		<div class="w3-content maincontent">
 			<div class="w3-container w3-content w3-white w3-padding-64 w3-margin-top w3-card">
-			{% block content %}{% endblock %}
-		</div>
-			
+				{% block content %}{% endblock %}
+			</div>
+			{% if PREV_l %}
+			<div class="prev"><a href="{{PREV_l}}"><strong>{{PREV_s}}</strong><br>{{PREV_t}}</a></div>
+			{% endif %}
+			{% if NEXT_l %}
+			<div class="next"><a href="{{NEXT_l}}"><strong>{{NEXT_s}}</strong><br>{{NEXT_t}}</a></div>
+			{% endif %}
 		</div>
 		
 		<footer class="w3-container w3-padding-64 w3-center w3-opacity w3-xlarge">
