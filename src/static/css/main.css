@@ -18,6 +18,11 @@
 
 body {
     /*background-color: red;*/
+    font-family: 'Source Sans Pro', sans-serif;
+    font-size: 16px;
+}
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Vesper Libre', serif;
 }
 .w3-content,
 #navMobi {
