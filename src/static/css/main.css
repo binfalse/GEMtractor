@@ -28,8 +28,9 @@ h1, h2, h3, h4, h5, h6 {
 #navMobi {
     margin-top:46px
 }
-.w3-striped tbody tr:nth-child(2n) {
-        background-color:#2c3e50;
+.w3-striped tbody tr:nth-child(2n),
+ .w3-striped thead{
+        background-color:#ecf0f1;
 }
 .filter-excluded {
     opacity: 0.3;
@@ -77,4 +78,18 @@ a.bigg_id:hover {
 .sorted-desc .fa-sort,
 .sorted-asc .fa-sort {
   display: none
+}
+#indexlogo * {
+  width: 400px;
+  max-width: 100%;
+}
+.w3-top object,
+.w3-top img {
+  height: 1.3em;
+}
+#skeleton-tabs-top {
+  margin-bottom: 30px;
+}
+#custom-model {
+  display: none;
 }

@@ -31,31 +31,40 @@
 		<link rel="stylesheet" href="{% static 'css/main.css' %}" type="text/css" />
 		<link rel="stylesheet" href="{% static 'webfonts/fonts.css' %}" type="text/css" />
 		<link rel="stylesheet" href="{% static 'css/fontawesome-5.10.1.css' %}" type="text/css" />
+		<link rel="icon" href="{% static 'pics/gemtractor-portrait.png' %}">
 	</head>
 	<body class="w3-flat-clouds">
 		
 		<div class="w3-top">
-			<div class="w3-bar w3-flat-midnight-blue w3-card w3-center">
+			<div class="w3-bar w3-flat-silver w3-center">
 				<a class="w3-bar-item w3-button w3-padding-large w3-hide-medium w3-hide-large w3-right" href="javascript:void(0)" onclick="toggleNaviMobile()" title="Toggle Navigation Menu"><i class="fa fa-bars"></i></a>
-				<a href="/" class="w3-bar-item w3-button w3-padding-large">home</a>
-				<a href="/enalyzing" class="w3-bar-item w3-button w3-padding-large w3-hide-small">enalyze</a>
-				<a href="/learn" class="w3-bar-item w3-button w3-padding-large w3-hide-small">learn</a>
-				<a href="/imprint#imprint" class="w3-bar-item w3-button w3-padding-large w3-hide-small">imprint</a>
-				<a href="/imprint#privacy" class="w3-bar-item w3-button w3-padding-large w3-hide-small">privacy</a>
+				<a href="/" class="w3-bar-item w3-button w3-padding-large">
+<!--
+					<object data="{% static 'pics/gemtractor-landscape-white.svg' %}" type="image/svg+xml">
+-->
+						<img src="{% static 'pics/gemtractor-landscape.png' %}" title="GEMtractor" alt="GEMtractor"/>
+<!--
+					</object>
+-->
+				</a>
+				<a href="/enalyzing" class="w3-bar-item w3-button w3-padding-large w3-hide-small">Start</a>
+				<a href="/learn" class="w3-bar-item w3-button w3-padding-large w3-hide-small">Learn</a>
+				<a href="/imprint#imprint" class="w3-bar-item w3-button w3-padding-large w3-hide-small">Imprint</a>
+				<a href="/imprint#privacy" class="w3-bar-item w3-button w3-padding-large w3-hide-small">Privacy</a>
 			</div>
 		</div>
 		
 		
 		<div id="navMobi" class="w3-bar-block w3-flat-midnight-blue w3-hide w3-hide-large w3-hide-medium w3-top">
-			<a href="/enalyzing" class="w3-bar-item w3-button w3-padding-large" onclick="toggleNaviMobile()">enalyze</a>
-			<a href="/learn" class="w3-bar-item w3-button w3-padding-large" onclick="toggleNaviMobile()">learn</a>
-			<a href="/imprint#imprint" class="w3-bar-item w3-button w3-padding-large" onclick="toggleNaviMobile()">imprint</a>
-			<a href="/imprint#privacy" class="w3-bar-item w3-button w3-padding-large" onclick="toggleNaviMobile()">privacy</a>
+			<a href="/enalyzing" class="w3-bar-item w3-button w3-padding-large" onclick="toggleNaviMobile()">Start</a>
+			<a href="/learn" class="w3-bar-item w3-button w3-padding-large" onclick="toggleNaviMobile()">Learn</a>
+			<a href="/imprint#imprint" class="w3-bar-item w3-button w3-padding-large" onclick="toggleNaviMobile()">Imprint</a>
+			<a href="/imprint#privacy" class="w3-bar-item w3-button w3-padding-large" onclick="toggleNaviMobile()">Privacy</a>
 		</div>
 		
 		
 		<div class="w3-content">
-			<div class="w3-container w3-content w3-flat-wet-asphalt w3-padding-64 w3-margin-top w3-card-4">
+			<div class="w3-container w3-content w3-white w3-padding-64 w3-margin-top w3-card">
 			{% block content %}{% endblock %}
 		</div>
 			

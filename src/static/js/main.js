@@ -686,7 +686,15 @@ function prepareIndex () {
 					console.log (errorThrown + " -- " + textStatus)
         }
     });
-        
+  
+  
+  $('#custom-model').change (function() {
+		var fileName = '';
+		fileName = $(this).val();
+		if (fileName.indexOf("\\") !== -1)
+			fileName = fileName.substring(fileName.lastIndexOf("\\") + 1, fileName.length);
+		$('#upload-name').html(fileName);
+	 });
 }
 
 

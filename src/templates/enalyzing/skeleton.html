@@ -12,7 +12,7 @@ enalyzing
 
 {% if model_name %}
 
-<div class="w3-bar w3-flat-silver">
+<div class="w3-bar w3-white w3-border" id="skeleton-tabs-top">
   <div class="w3-bar-item w3-hide-small">Model: {{model_name}}</div>
 <a href="{% url 'enalyzing:index' %}" class="w3-bar-item {% if current_url == 'enalyzing/' %}w3-flat-clouds{% endif %} w3-hide-small">Select other model</a>
 <a href="{% url 'enalyzing:index' %}" class="w3-bar-item {% if current_url == 'enalyzing/' %}w3-flat-clouds{% endif %} w3-hide-large w3-hide-medium">Select model</a>

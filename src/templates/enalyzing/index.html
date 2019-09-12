@@ -9,7 +9,7 @@ To start your analysis you need to select a model.
 You can either choose a model from a public repository or upload your own model:
 </p>
 
-<div class="w3-bar w3-flat-silver">
+<div class="w3-bar  w3-white w3-border">
   <div class="w3-bar-item w3-hide-small">Choose Method:</div>
   <button id="choose-public-model-tab" class="w3-bar-item w3-button" onclick="tab('choose-public-model', 'choose-public-model-tab')">Public Model</button>
   <button id="upload-model-tab" class="w3-bar-item w3-button" onclick="tab('upload-model', 'upload-model-tab')">Upload Model</button>
@@ -19,7 +19,7 @@ You can either choose a model from a public repository or upload your own model:
 <div class="w3-margin">
   <div id="choose-public-model" style="display:none" class="">
     <p>We currently support the following databases:</p>
-    <div class="w3-bar w3-flat-silver">
+    <div class="w3-bar  w3-white w3-border">
       <div class="w3-bar-item w3-hide-small">Choose Database:</div>
       <button id="choose-public-model-bigg-tab" class="w3-bar-item w3-button" onclick="tab('choose-bigg', 'choose-public-model-bigg-tab')">BIGG</button>
       <button id="choose-public-model-biomodels-tab" class="w3-bar-item w3-button" onclick="tab('choose-biomodels', 'choose-public-model-biomodels-tab')">Biomodels</button>
@@ -49,7 +49,7 @@ You can either choose a model from a public repository or upload your own model:
         </p>
         <div class="w3-row">
           <div class="w3-threequarter">
-            <input type="text" name="biomodelsid" id="biomodelsid" placeholder="model id (BIOMD.... or MODEL...)" class="w3-input" >
+            <input type="text" name="biomodelsid" id="biomodelsid" placeholder="model id (BIOMD.... or MODEL...)" class="w3-input w3-flat-clouds" >
           </div>
           <div class="w3-quarter">
             <button class="w3-input w3-button w3-flat-silver" id="specific-biomodel"><i class="fa fa-spinner w3-spin" id="specific-biomodel-loading" style="display:none"></i> Obtain Specific Model</button>
@@ -73,8 +73,12 @@ You can either choose a model from a public repository or upload your own model:
     <p>Upload a custom model from your system:</p>
     <form method="post" enctype="multipart/form-data">
       {% csrf_token %}
-      <input type="file" name="custom-model">
-    <button type="submit">Upload</button>
+      <label for="custom-model" id="upload-label" class="w3-button w3-flat-clouds">
+        <span id="upload-label">Click to select file for Upload:</span>
+        <strong><span id="upload-name">none selected</span></strong>
+      </label>
+      <input type="file" name="custom-model" id="custom-model">
+    <button type="submit" class="w3-button w3-flat-silver">Upload</button>
     </form>
   </div>
 </div>
