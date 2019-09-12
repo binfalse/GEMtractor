@@ -506,7 +506,6 @@ def execute (request):
           return HttpResponseServerError ("couldn't generate the gml file")
   
   
-  __logger.error ("test end")
   return HttpResponseBadRequest ("job is not well formed, not sure what to do...")
   
   

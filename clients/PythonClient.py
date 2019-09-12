@@ -5,7 +5,7 @@ import urllib.request
 
 # read the model into a variable
 with open ("../src/test/gene-filter-example-2.xml", "r") as f:
-  model=f.read().replace('\n', '')
+  model=f.read()
 
 # encode the job
 job = {
@@ -30,8 +30,10 @@ req.add_header('Content-Length', len(job_bytes))
 # fire the job
 try:
     response = urllib.request.urlopen(req, job_bytes)
+    # do whatever you want with the returned file:
     print (response.read())
 except urllib.error.HTTPError  as e:
+    # there was a problem...!?
     print ("bad request: " + str (getattr(e, 'code', repr(e))) +  getattr(e, 'message', repr(e)))
     print (e.readlines())
 
