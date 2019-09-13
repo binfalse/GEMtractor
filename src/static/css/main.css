@@ -99,7 +99,7 @@ top: 200px;
 text-align: center;
 background-color: #fff;
 padding: 20px;
-z-index: -99;
+z-index: 1;
 width: 200px;
 border-top-left-radius: 25px;
 border-top-right-radius: 25px;
@@ -119,4 +119,8 @@ transform: rotate(90deg);
 .prev,.next {
 display:none
 }
+}
+#maincard {
+z-index: 2;
+  
 }
