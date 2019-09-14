@@ -30,6 +30,8 @@ def __prepare_context (request):
     context[Constants.SESSION_FILTER_REACTION] = request.session[Constants.SESSION_FILTER_REACTION]
   if Constants.SESSION_FILTER_GENES in request.session:
     context[Constants.SESSION_FILTER_GENES] = request.session[Constants.SESSION_FILTER_GENES]
+  if Constants.SESSION_FILTER_GENE_COMPLEXES in request.session:
+    context[Constants.SESSION_FILTER_GENE_COMPLEXES] = request.session[Constants.SESSION_FILTER_GENE_COMPLEXES]
   context['current_url'] = request.resolver_match.route
   return context
 
@@ -70,6 +72,7 @@ def index(request):
     # ~ Utils.del_session_key (request, None, Constants.SESSION_FILTER_SPECIES)
     # ~ Utils.del_session_key (request, None, Constants.SESSION_FILTER_REACTION)
     # ~ Utils.del_session_key (request, None, Constants.SESSION_FILTER_GENES)
+    # ~ Utils.del_session_key (request, None, Constants.SESSION_FILTER_GENE_COMPLEXES)
     
     # ~ return redirect('gemtract:filter')
     # ~ # filterModel (request)
@@ -88,6 +91,7 @@ def index(request):
     Utils.del_session_key (request, context, Constants.SESSION_FILTER_SPECIES)
     Utils.del_session_key (request, context, Constants.SESSION_FILTER_REACTION)
     Utils.del_session_key (request, context, Constants.SESSION_FILTER_GENES)
+    Utils.del_session_key (request, context, Constants.SESSION_FILTER_GENE_COMPLEXES)
   else:
     context["NEXT_s"] = "Step 2"
     context["NEXT_t"] = "Filter Model Entities"

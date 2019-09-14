@@ -41,6 +41,12 @@
     <td id="g_cur"></td>
     <td id="g_inconsistent"></td>
   </tr>
+  <tr>
+    <th>gene complexes</th>
+    <td id="gc_org"></td>
+    <td id="gc_cur"></td>
+    <td id="gc_inconsistent"></td>
+  </tr>
   </table>
 
   <h2>Reduce Model Size</h2>
@@ -57,6 +63,7 @@
     <button id="filter-species-tab" class="w3-bar-item w3-button" onclick="tab('filter-species', 'filter-species-tab')">Species</button>
     <button id="filter-reaction-tab" class="w3-bar-item w3-button" onclick="tab('filter-reaction', 'filter-reaction-tab')">Reaction</button>
     <button id="filter-gene-tab" class="w3-bar-item w3-button" onclick="tab('filter-gene', 'filter-gene-tab')">Gene</button>
+    <button id="filter-gene-complex-tab" class="w3-bar-item w3-button" onclick="tab('filter-gene-complex', 'filter-gene-complex-tab')">Gene Complexes</button>
     <button id="filter-batch-tab" class="w3-bar-item w3-button" onclick="tab('filter-batch', 'filter-batch-tab')">Batch</button>
   </div>
 
@@ -70,7 +77,7 @@
              <th>include <i class='fas fa-sort'></i></th>
              <th>ID <i class='fas fa-sort'></i></th>
              <th>Name <i class='fas fa-sort'></i></th>
-             <th>Occurences <i class='fas fa-sort'></i></th>
+             <th title="Occurences in Reactions">#Reactions <i class='fas fa-sort'></i></th>
            </thead>
            <tbody id="species-table"></tbody>
         </table>
@@ -90,14 +97,28 @@
         </table>
       </div>
       <div id="filter-gene" class="w3-responsive" style="display:none" class="">
-		<p>You may sort the following table by clicking on the header cell.</p>
-        <p>A red gene indicates, that the gene is not used in any reaction anymore. Thus, it will be excluded even if you keep it selected here!</p>
+	<p>You may sort the following table by clicking on the header cell.</p>
+        <p>Unselecting a gene will also remove all complexes in which it appears (they will be highlighted in read under the <em>Gene Complex</em> tab). A red gene indicates, that the gene is not used in any reaction anymore. Thus, it will be excluded even if you keep it selected here!</p>
         <table class="w3-table w3-striped sortable notfirst">
            <thead>
              <th>include <i class='fas fa-sort'></i></th>
              <th>ID <i class='fas fa-sort'></i></th>
+             <th title="Occurences in Reactions">#Reactions <i class='fas fa-sort'></i></th>
+             <th title="Occurences in Gene Complexes">#Complexes <i class='fas fa-sort'></i></th>
            </thead>
            <tbody id="gene-table"></tbody>
+        </table>
+      </div>
+      <div id="filter-gene-complex" class="w3-responsive" style="display:none" class="">
+	<p>You may sort the following table by clicking on the header cell.</p>
+        <p>Unselecting a gene complex will <strong>not</strong> remove the single genes appearing in that complex! Other complexes, which are a superset of a removed complex, will be highlighted in red.</p>
+        <table class="w3-table w3-striped sortable notfirst">
+           <thead>
+             <th>include <i class='fas fa-sort'></i></th>
+             <th>ID <i class='fas fa-sort'></i></th>
+             <th title="Occurences in Reactions">#Reactions <i class='fas fa-sort'></i></th>
+           </thead>
+           <tbody id="gene-complex-table"></tbody>
         </table>
       </div>
       <div id="filter-batch" style="display:none" class="">

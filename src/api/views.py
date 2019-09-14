@@ -65,6 +65,7 @@ def clear_data (request):
   Utils.del_session_key (request, None, Constants.SESSION_FILTER_SPECIES)
   Utils.del_session_key (request, None, Constants.SESSION_FILTER_REACTION)
   Utils.del_session_key (request, None, Constants.SESSION_FILTER_GENES)
+  Utils.del_session_key (request, None, Constants.SESSION_FILTER_GENE_COMPLEXES)
   return JsonResponse ({
           "status":"success"
         })
@@ -82,17 +83,20 @@ def get_network (request):
       if len (network.species) + len (network.reactions) > settings.MAX_ENTITIES_FILTER:
         raise TooBigForBrowser ("This model is probably too big for your browser... It contains "+str (len (network.species))+" species and "+str (len (network.reactions))+" reactions. We won't load it for filtering, as you're browser is very likely to die when trying to process that amount of data.. Max is currently set to "+str (settings.MAX_ENTITIES_FILTER)+" entities in total. Please export it w/o filtering or use the API instead.")
       __logger.info ("got sbml")
-      network.calc_genenet ()
-      __logger.info ("got genenet")
+      # ~ network.calc_genenet ()
+      # ~ __logger.info ("got genenet")
       filter_species = []
       filter_reaction = []
       filter_genes = []
+      filter_gene_complexes = []
       if Constants.SESSION_FILTER_SPECIES in request.session:
         filter_species = request.session[Constants.SESSION_FILTER_SPECIES]
       if Constants.SESSION_FILTER_REACTION in request.session:
         filter_reaction = request.session[Constants.SESSION_FILTER_REACTION]
       if Constants.SESSION_FILTER_GENES in request.session:
           filter_genes = request.session[Constants.SESSION_FILTER_GENES]
+      if Constants.SESSION_FILTER_GENE_COMPLEXES in request.session:
+          filter_gene_complexes = request.session[Constants.SESSION_FILTER_GENE_COMPLEXES]
       __logger.info ("sending response")
       if len (network.species) + len (network.reactions) + len (network.genenet) > settings.MAX_ENTITIES_FILTER:
         raise TooBigForBrowser ("This model is probably too big for your browser... It contains "+str (len (network.species))+" species, "+str (len (network.reactions))+" reactions and "+str (len (network.genenet))+" gene combinations. We won't load it for filtering, as you're browser is very likely to die when trying to process that amount of data.. Max is currently set to "+str (settings.MAX_ENTITIES_FILTER)+" entities in total. Please export it w/o filtering or use the API instead.")
@@ -105,6 +109,7 @@ def get_network (request):
             Constants.SESSION_FILTER_SPECIES: filter_species,
             Constants.SESSION_FILTER_REACTION: filter_reaction,
             Constants.SESSION_FILTER_GENES: filter_genes,
+            Constants.SESSION_FILTER_GENE_COMPLEXES: filter_gene_complexes,
             }
             })
     except TooBigForBrowser as e:
@@ -128,7 +133,15 @@ def prepare_filter (request):
     request.session[Constants.SESSION_FILTER_REACTION] = []
   if not Constants.SESSION_FILTER_GENES in request.session:
     request.session[Constants.SESSION_FILTER_GENES] = []
-  
+  if not Constants.SESSION_FILTER_GENE_COMPLEXES in request.session:
+    request.session[Constants.SESSION_FILTER_GENE_COMPLEXES] = []
+
+def sort_gene_complexes (complexes):
+  c2 = []
+  for c in complexes:
+    c2.append (" + ".join (sorted (c.split (" + "))))
+  return c2
+
 def store_filter (request):
   if request.method != 'POST':
     # TODO
@@ -146,12 +159,15 @@ def store_filter (request):
     request.session[Constants.SESSION_FILTER_REACTION] = data["reaction"]
   if "genes" in data and isinstance(data["genes"], list):
     request.session[Constants.SESSION_FILTER_GENES] = data["genes"]
+  if "gene_complexes" in data and isinstance(data["gene_complexes"], list):
+    request.session[Constants.SESSION_FILTER_GENE_COMPLEXES] = sort_gene_complexes (data["gene_complexes"])
   
   return JsonResponse ({"status":"success",
             "filter": {
             Constants.SESSION_FILTER_SPECIES: request.session[Constants.SESSION_FILTER_SPECIES],
             Constants.SESSION_FILTER_REACTION: request.session[Constants.SESSION_FILTER_REACTION],
             Constants.SESSION_FILTER_GENES: request.session[Constants.SESSION_FILTER_GENES],
+            Constants.SESSION_FILTER_GENE_COMPLEXES: request.session[Constants.SESSION_FILTER_GENE_COMPLEXES],
             }})
   
 def get_bigg_models (request):
@@ -190,6 +206,7 @@ def select_bigg_model (request):
     Utils.del_session_key (request, {}, Constants.SESSION_FILTER_SPECIES)
     Utils.del_session_key (request, {}, Constants.SESSION_FILTER_REACTION)
     Utils.del_session_key (request, {}, Constants.SESSION_FILTER_GENES)
+    Utils.del_session_key (request, {}, Constants.SESSION_FILTER_GENE_COMPLEXES)
     return JsonResponse ({"status":"success"})
 
   except InvalidBiggId  as e:
@@ -244,6 +261,7 @@ def select_biomodel (request):
     Utils.del_session_key (request, {}, Constants.SESSION_FILTER_SPECIES)
     Utils.del_session_key (request, {}, Constants.SESSION_FILTER_REACTION)
     Utils.del_session_key (request, {}, Constants.SESSION_FILTER_GENES)
+    Utils.del_session_key (request, {}, Constants.SESSION_FILTER_GENE_COMPLEXES)
     return JsonResponse ({"status":"success"})
 
   except UnableToRetrieveBiomodel  as e:
@@ -300,6 +318,7 @@ def export (request):
       request.session[Constants.SESSION_FILTER_SPECIES],
       request.session[Constants.SESSION_FILTER_REACTION],
       request.session[Constants.SESSION_FILTER_GENES],
+      request.session[Constants.SESSION_FILTER_GENE_COMPLEXES],
       form.cleaned_data['remove_reaction_genes_removed'],
       form.cleaned_data['remove_reaction_missing_species'])
     
@@ -314,6 +333,7 @@ def export (request):
             request.session[Constants.SESSION_FILTER_SPECIES],
             request.session[Constants.SESSION_FILTER_REACTION],
             request.session[Constants.SESSION_FILTER_GENES],
+            request.session[Constants.SESSION_FILTER_GENE_COMPLEXES],
             form.cleaned_data['remove_reaction_genes_removed'],
             form.cleaned_data['remove_reaction_missing_species'])
         if os.path.exists(file_path):

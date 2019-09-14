@@ -20,7 +20,7 @@ from .utils import Utils
 
 # TODO: logging
 class Species:
-  def __init__ (self, name, identifier):
+  def __init__ (self, identifier, name):
     self.__logger = logging.getLogger(__name__)
     self.name = name
     self.identifier = identifier
@@ -30,9 +30,9 @@ class Species:
     
   def serialize (self):
     return {
-      "identifier" : self.identifier,
+      "id" : self.identifier,
       "name" : self.name,
-      "occurence" : self.occurence
+      "occ" : self.occurence
       }
     
 
@@ -55,15 +55,90 @@ class Reaction:
     species.occurence.append (self.identifier)
     self.produced.append (species.identifier)
       
+  def serialize (self, species_mapper, gene_mapper, gene_complex_mapper):
+    ret =  {
+      "id" : self.identifier,
+      "name" : self.name,
+      "rev" : self.reversible,
+      "cons" : [],
+      "prod" : [],
+      "genes" : [],
+      "genec" : []
+      }
+    for s in self.consumed:
+      ret["cons"].append (species_mapper[s])
+    for s in self.produced:
+      ret["prod"].append (species_mapper[s])
+    for g in self.genes:
+      if g in gene_mapper:
+        ret["genes"].append (gene_mapper[g])
+      else:
+        ret["genec"].append (gene_complex_mapper[g])
+    return ret
+
+class Gene:
+  def __init__(self, identifier):
+    self.identifier = identifier
+    self.reactions = []
+    self.links = []
+      
   def serialize (self):
     return {
-      "identifier" : self.identifier,
-      "name" : self.name,
-      "reversible" : self.reversible,
-      "consumed" : self.consumed,
-      "produced" : self.produced,
-      "genes" : self.genes
+      "id" : self.identifier,
+      "reactions": self.reactions,
+      "cplx": []
       }
+
+class GeneComplex:
+  def __init__(self, gene = None):
+    self.genes = set ()
+    self.reactions = []
+    self.links = []
+    self.identifier = None
+    if gene is not None:
+      self.genes.add (gene)
+    
+  def add_gene (self, gene):
+    self.genes.add (gene)
+    
+  def add_genes (self, gene_complex):
+    for g in gene_complex.genes:
+      self.genes.add (g)
+      
+  def get_id (self):
+    if self.identifier is None:
+      self.calc_id ()
+    return self.identifier
+  
+  def calc_id (self):
+    if self.identifier is not None:
+      raise RuntimeError ("cannot overwrite the id of a gene complex")
+  
+    gl = []
+    for g in self.genes:
+      gl.append (g.identifier)
+    self.identifier = " + ".join (sorted (gl))
+      
+  def to_string (self):
+    gs = ""
+    for g in self.genes:
+      gs += g.identifier + "+"
+    return "GeneComplex["+gs+"]"
+    
+  def serialize (self, gene_mapper):
+    if self.identifier is None:
+      self.calc_id ()
+    
+    ret = {
+      "id": self.identifier,
+      "genes" : [],
+      "reactions": self.reactions
+      }
+    for g in self.genes:
+      ret["genes"].append (gene_mapper[g.identifier])
+    return ret
+    
+  
 
 class Network:
 
@@ -71,75 +146,159 @@ class Network:
     self.__logger = logging.getLogger(__name__)
     self.species = {}
     self.reactions = {}
+    self.genes = {}
+    self.gene_complexes = {}
     self.genenet = {}
     
-  def add_species (self, species):
-    self.species[species.identifier] = species
+  def add_species (self, identifier, name):
+    if identifier not in self.species:
+      self.species[identifier] = Species (identifier, name)
+    return self.species[identifier]
 
-  def add_reaction (self, reaction):
-    self.reactions[reaction.identifier] = reaction
+  def add_reaction (self, identifier, name):
+    if identifier not in self.reactions:
+      self.reactions[identifier] = Reaction (identifier, name)
+    return self.reactions[identifier]
+  
+  def add_gene (self, identifier):
+    if identifier not in self.genes:
+      self.genes[identifier] = Gene (identifier)
+    return self.genes[identifier]
+
+  def add_genes (self, reaction, gene_complexes):
+    # ~ logc = []
+    for gc in gene_complexes:
+      # ~ log = []
+      if len (gc.genes) == 1:
+        g = self.add_gene (next(iter(gc.genes)).identifier)
+        reaction.genes.append (g.identifier)
+        g.reactions.append (reaction.identifier)
+      else:
+        gcomplex = GeneComplex ()
+        for g in gc.genes:
+          gcomplex.add_gene (self.add_gene (g.identifier))
+        gcomplex.calc_id ()
+        reaction.genes.append (gcomplex.identifier)
+        gcomplex.reactions.append (reaction.identifier)
+        self.gene_complexes[gcomplex.identifier] = (gcomplex)
+    
+    # ~ if identifier not in self.genes:
+      # ~ self.genes[identifier] = Gene (identifier)
+    # ~ return self.genes[identifier]
 
   def serialize (self):
     self.__logger.debug ("serialising the network")
     json = {
-      "species": {},
-      "reactions": {},
-      "genenet": {}}
-    
-    for gene in self.genenet:
-      json["genenet"][gene] = {"links": [], "reactions": []}
-      for associated in self.genenet[gene]["links"]:
-        json["genenet"][gene]["links"].append (associated)
-      for reaction in self.genenet[gene]["reactions"]:
-        json["genenet"][gene]["reactions"].append (reaction)
+      "species": [],
+      "reactions": [],
+      "genes": [],
+      "genec": [],
+      }
+      
+    species_mapper = {}
+    reaction_mapper = {}
+    gene_mapper = {}
+    gene_complex_mapper = {}
     
     for identifier, species in self.species.items ():
       self.__logger.debug ("serialising species " + identifier)
-      json["species"][identifier] = species.serialize ()
+      s_ser = species.serialize ()
+      species_mapper[identifier] = len (json["species"])
+      json["species"].append (s_ser)
+    
+    print (self.genes)
+    for identifier, gene in self.genes.items ():
+      self.__logger.debug ("serialising gene " + identifier)
+      g_ser = gene.serialize ()
+      gene_mapper[identifier] = len (json["genes"])
+      json["genes"].append (g_ser)
+    
+    for identifier, gene_complex in self.gene_complexes.items ():
+      self.__logger.debug ("serialising gene complex " + identifier)
+      g_ser = gene_complex.serialize (gene_mapper)
+      gene_complex_mapper[identifier] = len (json["genec"])
+      json["genec"].append (g_ser)
+      # add gene-genecomplex information
+      for g in gene_complex.genes:
+        json["genes"][gene_mapper[g.identifier]]["cplx"].append (gene_complex_mapper[identifier])
+    
+    
     for identifier, reaction in self.reactions.items ():
       self.__logger.debug ("serialising reaction " + identifier)
-      json["reactions"][identifier] = reaction.serialize ()
+      # json["reactions"][reaction.num] = reaction.serialize ()
+      r_ser = reaction.serialize (species_mapper, gene_mapper, gene_complex_mapper)
+      reaction_mapper[identifier] = len (json["reactions"])
+      json["reactions"].append (r_ser)
+    
+    
+    # further reduce return size: replace reaction ids in species occurrences
+    for s in json["species"]:
+      o = []
+      for occ in s["occ"]:
+        o.append (reaction_mapper[occ])
+      s["occ"] = o
+    
+    # further reduce return size: replace reaction ids in gene occurrences
+    for g in json["genes"]:
+      o = []
+      for occ in g["reactions"]:
+        o.append (reaction_mapper[occ])
+      g["reactions"] = o
+    for g in json["genec"]:
+      o = []
+      for occ in g["reactions"]:
+        o.append (reaction_mapper[occ])
+      g["reactions"] = o
+    
+    
+    # ~ for gene in self.genenet:
+      # ~ json["genenet"][gene] = {"links": [], "reactions": []}
+      # ~ for associated in self.genenet[gene]["links"]:
+        # ~ json["genenet"][gene]["links"].append (associated)
+      # ~ for reaction in self.genenet[gene]["reactions"]:
+        # ~ json["genenet"][gene]["reactions"].append (reaction)
+      
     return json
 
 
-  def calc_genenet (self):
-    self.__logger.info ("calc gene net")
-    self.genenet = {}
+  # ~ def calc_genenet (self):
+    # ~ self.__logger.info ("calc gene net")
+    # ~ self.genenet = {}
     
-    num = 0
-    for identifier, reaction in self.reactions.items ():
-      num += 1
-      if num % 100 == 0:
-        self.__logger.info ("calc gene associations for reaction " + str (num))
-      self.__logger.debug ("calc gene associations for reaction " + reaction.identifier)
-      for gene in reaction.genes:
-        self.__logger.debug ("processing gene " + gene)
-        if gene not in self.genenet:
-          self.genenet[gene] = {"links": set (), "reactions": [identifier]}
-        else:
-          self.genenet[gene]["reactions"].append (identifier)
+    # ~ num = 0
+    # ~ for identifier, reaction in self.reactions.items ():
+      # ~ num += 1
+      # ~ if num % 100 == 0:
+        # ~ self.__logger.info ("calc gene associations for reaction " + str (num))
+      # ~ self.__logger.debug ("calc gene associations for reaction " + reaction.identifier)
+      # ~ for gene in reaction.genes:
+        # ~ self.__logger.debug ("processing gene " + gene)
+        # ~ if gene not in self.genenet:
+          # ~ self.genenet[gene] = {"links": set (), "reactions": [identifier]}
+        # ~ else:
+          # ~ self.genenet[gene]["reactions"].append (identifier)
         
-        for species in reaction.consumed:
-          s = self.species[species]
-          #if gene not in s.genes_for_consumption:
-          s.genes_for_consumption.add (gene)
-          if reaction.reversible:
-            # and gene not in s.genes_for_production:
-            s.genes_for_production.add (gene)
-        for species in reaction.produced:
-          s = self.species[species]
-          # if gene not in s.genes_for_production:
-          s.genes_for_production.add (gene)
-          if reaction.reversible:
-            # and gene not in s.genes_for_consumption:
-            s.genes_for_consumption.add (gene)
+        # ~ for species in reaction.consumed:
+          # ~ s = self.species[species]
+          # ~ #if gene not in s.genes_for_consumption:
+          # ~ s.genes_for_consumption.add (gene)
+          # ~ if reaction.reversible:
+            # ~ # and gene not in s.genes_for_production:
+            # ~ s.genes_for_production.add (gene)
+        # ~ for species in reaction.produced:
+          # ~ s = self.species[species]
+          # ~ # if gene not in s.genes_for_production:
+          # ~ s.genes_for_production.add (gene)
+          # ~ if reaction.reversible:
+            # ~ # and gene not in s.genes_for_consumption:
+            # ~ s.genes_for_consumption.add (gene)
     
-    self.__logger.info ("got gene associations")
-    for identifier, species in self.species.items ():
-      for consumption in species.genes_for_consumption:
-        for production in species.genes_for_production:
-          self.genenet[production]["links"].add (consumption)
-    self.__logger.info ("got gene net")
+    # ~ self.__logger.info ("got gene associations")
+    # ~ for identifier, species in self.species.items ():
+      # ~ for consumption in species.genes_for_consumption:
+        # ~ for production in species.genes_for_production:
+          # ~ self.genenet[production]["links"].add (consumption)
+    # ~ self.__logger.info ("got gene net")
     
     
   def export_rn_dot (self, filename):

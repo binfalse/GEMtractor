@@ -22,6 +22,7 @@ class Constants:
   SESSION_FILTER_SPECIES       = "filter_species"
   SESSION_FILTER_REACTION      = "filter_reactions"
   SESSION_FILTER_GENES         = "filter_genes"
+  SESSION_FILTER_GENE_COMPLEXES= "filter_gene_complexes"
   SESSION_HAS_SESSION          = "has_session"
   
   SESSION_MODEL_TYPE_UPLOAD    = "upload"
