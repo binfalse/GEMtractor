@@ -135,7 +135,7 @@ class GEMtractor:
         
       
     
-    def get_sbml (self, filter_species = None, filter_reactions = None, filter_genes = None, filter_gene_complexes = None, remove_reaction_genes_removed = True, remove_reaction_missing_species = False):
+    def get_sbml (self, filter_species = [], filter_reactions = [], filter_genes = [], filter_gene_complexes = [], remove_reaction_genes_removed = True, remove_reaction_missing_species = False):
       """ Get a filtered SBML document from a file
       
       do not use the same GEMtractor object for two different SBML files!!
@@ -165,10 +165,20 @@ class GEMtractor:
       self.__logger.info("got proper sbml model")
       
       self.__logger.debug("append a note")
-      Utils.add_model_note (model, filter_species, filter_reactions, filter_genes, remove_reaction_genes_removed, remove_reaction_missing_species)
+      Utils.add_model_note (model, filter_species, filter_reactions, filter_genes, filter_gene_complexes, remove_reaction_genes_removed, remove_reaction_missing_species)
       
+      if filter_species is None:
+        filter_species = []
+      if filter_reactions is None:
+        filter_reactions = []
+      if filter_genes is None:
+        filter_genes = []
+      if filter_gene_complexes is None:
+        filter_gene_complexes = []
+        
       
-      if filter_species is not None or filter_reactions is not None or filter_genes is not None:
+      # ~ if (filter_species is not None and len(filter_species) > 0) or (filter_reactions is not None and len(filter_reactions) > 0) or (filter_genes is not None and len(filter_genes) > 0) or (filter_gene_complexes is not None and len(filter_gene_complexes) > 0):
+      if len(filter_species) > 0 or len(filter_reactions) > 0 or len(filter_genes) > 0 or len(filter_gene_complexes) > 0:
         try:
           #TODO dc modified?
           self.__logger.debug("filtering things")
@@ -215,7 +225,10 @@ class GEMtractor:
               
               final_genes = []
               for g in current_genes:
-                if g.get_id () not in filter_genes and g not in filter_gene_complexes:
+                # ~ print (g.get_id())
+                # ~ print (g.genes)
+                if g.get_id () not in filter_genes and g.get_id () not in filter_gene_complexes and not g.contains_one_of (filter_genes):
+                  # ~ print (g.get_id() + " will be in model")
                   final_genes.append (g)
               
               if len (final_genes) < 1:
@@ -223,7 +236,7 @@ class GEMtractor:
                   model.removeReaction (n)
                   continue
                 else:
-                  final_genes = [reaction.getId ()]
+                  final_genes = [Gene (reaction.getId ())]
               
               # should we update the genes in the model?
               if (len (final_genes) != len (current_genes)):
@@ -271,9 +284,9 @@ class GEMtractor:
       """
       r = "("
       for g in genes:
-        r += str (g.to_string ()) + " and "
+        r += str (g.to_sbml_string ()) + " or "
       
-      return r + ")"
+      return r[:-4] + ")"
       # ~ return "(" + (") or (".join (genes)) + ")"
     
     
@@ -319,8 +332,6 @@ class GEMtractor:
       
       for n in range (0, model.getNumSpecies()):
         s = model.getSpecies (n)
-        # ~ species[s.getId ()] = Species (s.getName (), s.getId ())
-        # ~ network.add_species (species[s.getId ()])
         species[s.getId ()] = network.add_species (s.getId (), s.getName ())
       
       # TODO remove debugging
@@ -332,6 +343,8 @@ class GEMtractor:
         # TODO: reversible?
         #r = Reaction (reaction.getId (), reaction.getName ())
         r = network.add_reaction (reaction.getId (), reaction.getName ())
+        if reaction.isSetReversible ():
+          r.reversible = reaction.getReversible ()
         
         current_genes = self._get_genes (reaction)
         self.__logger.debug("current genes: " + self._implode_genes (current_genes) + " - reaction: " + reaction.getId ())

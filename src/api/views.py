@@ -21,7 +21,7 @@ from django.http import JsonResponse, HttpResponseBadRequest, HttpResponseServer
 
 from modules.gemtractor.gemtractor import GEMtractor
 from modules.gemtractor.constants import Constants
-from modules.gemtractor.utils import Utils, InvalidGeneExpression, InvalidBiomodelsId, UnableToRetrieveBiomodel, InvalidBiggId, TooBigForBrowser
+from modules.gemtractor.utils import Utils, InvalidGeneExpression, InvalidBiomodelsId, UnableToRetrieveBiomodel, InvalidBiggId, TooBigForBrowser, InvalidGeneComplexExpression
 
 from gemtract.forms import ExportForm
 
@@ -98,7 +98,7 @@ def get_network (request):
       if Constants.SESSION_FILTER_GENE_COMPLEXES in request.session:
           filter_gene_complexes = request.session[Constants.SESSION_FILTER_GENE_COMPLEXES]
       __logger.info ("sending response")
-      if len (network.species) + len (network.reactions) + len (network.genenet) > settings.MAX_ENTITIES_FILTER:
+      if len (network.species) + len (network.reactions) + len (network.genes) + len (network.gene_complexes) > settings.MAX_ENTITIES_FILTER:
         raise TooBigForBrowser ("This model is probably too big for your browser... It contains "+str (len (network.species))+" species, "+str (len (network.reactions))+" reactions and "+str (len (network.genenet))+" gene combinations. We won't load it for filtering, as you're browser is very likely to die when trying to process that amount of data.. Max is currently set to "+str (settings.MAX_ENTITIES_FILTER)+" entities in total. Please export it w/o filtering or use the API instead.")
       net = network.serialize()
       __logger.info ("serialised the network")
@@ -139,6 +139,8 @@ def prepare_filter (request):
 def sort_gene_complexes (complexes):
   c2 = []
   for c in complexes:
+    if " + " not in c:
+      raise InvalidGeneComplexExpression ("do not understand the following gene complex: " + c)
     c2.append (" + ".join (sorted (c.split (" + "))))
   return c2
 
@@ -160,7 +162,10 @@ def store_filter (request):
   if "genes" in data and isinstance(data["genes"], list):
     request.session[Constants.SESSION_FILTER_GENES] = data["genes"]
   if "gene_complexes" in data and isinstance(data["gene_complexes"], list):
-    request.session[Constants.SESSION_FILTER_GENE_COMPLEXES] = sort_gene_complexes (data["gene_complexes"])
+    try:
+      request.session[Constants.SESSION_FILTER_GENE_COMPLEXES] = sort_gene_complexes (data["gene_complexes"])
+    except InvalidGeneComplexExpression as e:
+      return JsonResponse ({"status":"failed","error":str (getattr(e, 'code', repr(e))) + getattr(e, 'message', repr(e))})
   
   return JsonResponse ({"status":"success",
             "filter": {
@@ -425,6 +430,7 @@ def execute (request):
   filter_species = []
   filter_reactions = []
   filter_genes = []
+  filter_gene_complexes = []
   
   if "filter" in data:
     if "species" in data["filter"]:
@@ -433,13 +439,20 @@ def execute (request):
       filter_reactions = data["filter"]["reactions"]
     if "genes" in data["filter"]:
       filter_genes = data["filter"]["genes"]
+    if "gene_complexes" in data["filter"]:
+      try:
+        filter_gene_complexes = sort_gene_complexes (data["filter"]["gene_complexes"])
+      except InvalidGeneComplexExpression as e:
+        return HttpResponseBadRequest ("error: " + str (getattr(e, 'code', repr(e))) + getattr(e, 'message', repr(e)))
   
   if not isinstance(filter_species, list):
-    return HttpResponseBadRequest("filter needs to be an array")
+    return HttpResponseBadRequest("filter species needs to be an array")
   if not isinstance(filter_reactions, list):
-    return HttpResponseBadRequest("filter needs to be an array")
+    return HttpResponseBadRequest("filter for reactions needs to be an array")
   if not isinstance(filter_genes, list):
-    return HttpResponseBadRequest("filter needs to be an array")
+    return HttpResponseBadRequest("filter for genes needs to be an array")
+  if not isinstance(filter_gene_complexes, list):
+    return HttpResponseBadRequest("filter for gene complexes needs to be an array")
   
   export = data["export"]
   
@@ -463,6 +476,7 @@ def execute (request):
         filter_species,
         filter_reactions,
         filter_genes,
+        filter_gene_complexes,
         remove_reaction_genes_removed,
         remove_reaction_missing_species)
   except Exception as e:
@@ -477,7 +491,7 @@ def execute (request):
     net = gemtractor.extract_network_from_sbml (sbml)
     net.calc_genenet ()
     if export["network_format"] == "sbml":
-      net.export_en_sbml (outputFile.name, sbml.getModel ().getId () + "_EN", sbml.getModel ().getName () + " converted to EnzymeNetwork", filter_species, filter_reactions, filter_genes, remove_reaction_genes_removed, remove_reaction_missing_species)
+      net.export_en_sbml (outputFile.name, sbml.getModel ().getId () + "_EN", sbml.getModel ().getName () + " converted to EnzymeNetwork", filter_species, filter_reactions, filter_genes, filter_gene_complexes, remove_reaction_genes_removed, remove_reaction_missing_species)
       if os.path.exists(outputFile.name):
         return Utils.serve_file (outputFile.name, "gemtracted-model.sbml", "application/xml")
       else:

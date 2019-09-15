@@ -321,6 +321,7 @@ Learn
       "species": ["h2o", "atp"],
       "reactions": [],
       "genes": ["gene_abc"],
+      "gene_complexes": ["a + b + c", "x + Y", "b_098 + r_abc"],
     },
     "file": "&lt;sbml&gt;...&lt;/sbml&gt;"
   }
@@ -345,9 +346,10 @@ Learn
       If provided, it may contain the following keys:
       
       <ul>
-	<li><code>species</code>: list of species-identifiers to remove from reactions</li>
-	<li><code>reactions</code>: list of reaction-identifiers to remove from the model</li>
-	<li><code>genes</code>: list of gene-identifiers to remove from reactions</li>
+	<li><code>species</code>: List of species-identifiers to remove from reactions.</li>
+	<li><code>reactions</code>: List of reaction-identifiers to remove from the model.</li>
+	<li><code>genes</code>: List of gene-identifiers to remove from reactions.</li>
+	<li><code>gene_complexes</code>: List of gene-complex-identifiers to remove from reactions. Every item must contain a string of genes in the corresponing gene complex joined with the string <code>" + "</code>code>. Thus, if you want to remove the complex formed by the genes <code>A23</code> and <code>B_42</code>, you would add <code>"A23 + B_42"</code> to this list.</li>
       </ul>
       
       Every list element is supposed to be a string, which corresponds to the <code>id</code> attribute of the SBML entity.

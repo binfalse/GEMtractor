@@ -21,6 +21,7 @@ import os
 import tempfile
 import pyparsing as pp
 from modules.gemtractor.utils import InvalidGeneExpression
+from modules.gemtractor.network import Gene, GeneComplex
 from xml.dom import minidom
 
 class GEMtractorTests (TestCase):
@@ -38,12 +39,12 @@ class GEMtractorTests (TestCase):
         net = gemtractor.extract_network_from_sbml (sbml)
         self.assertEqual (len (net.species), 3)
         self.assertEqual (len (net.reactions), 3)
-        self.assertEqual (len (net.genenet), 0)
         
         
         self.assertEqual (len(net.reactions["r1"].consumed), 0)
         self.assertEqual (len(net.reactions["r1"].produced), 1)
-        self.assertEqual (len(net.reactions["r1"].genes), 6)
+        self.assertEqual (len(net.reactions["r1"].genes), 3)
+        self.assertEqual (len(net.reactions["r1"].genes), 3)
         
         self.assertEqual (len(net.reactions["r2"].consumed), 1)
         self.assertEqual (len(net.reactions["r2"].produced), 1)
@@ -66,16 +67,51 @@ class GEMtractorTests (TestCase):
         net = gemtractor.extract_network_from_sbml (sbml)
         self.assertEqual (len (net.species), 3)
         self.assertEqual (len (net.reactions), 3)
-        self.assertEqual (len (net.genenet), 0)
         
         
         self.assertEqual (len(net.reactions["r1"].consumed), 0)
         self.assertEqual (len(net.reactions["r1"].produced), 1)
-        self.assertEqual (len(net.reactions["r1"].genes), 5)
+        self.assertEqual (len(net.reactions["r1"].genes), 2)
+        self.assertEqual (len(net.reactions["r1"].genec), 2)
         
         self.assertEqual (len(net.reactions["r2"].consumed), 1)
         self.assertEqual (len(net.reactions["r2"].produced), 1)
-        self.assertEqual (len(net.reactions["r2"].genes), 4)
+        self.assertEqual (len(net.reactions["r2"].genes), 1)
+        self.assertEqual (len(net.reactions["r2"].genec), 2)
+        
+        
+        
+        
+  def test_sbml_filter4 (self):
+        f = "test/gene-filter-example-4.xml"
+        self.assertTrue (os.path.isfile(f), msg="cannot find test file")
+        
+        gemtractor = GEMtractor (f)
+        sbml = gemtractor.get_sbml (filter_species = ["a"], filter_genes = ["r"])
+        self.assertEqual (sbml.getNumErrors(), 0)
+        
+        self.assertTrue ("modelname" in sbml.getModel ().getName ()) 
+        self.assertTrue ("modelid" in sbml.getModel ().getId ())
+        
+        net = gemtractor.extract_network_from_sbml (sbml)
+        self.assertEqual (len (net.species), 3)
+        self.assertEqual (len (net.reactions), 3)
+        
+        
+        self.assertEqual (len(net.reactions["r1"].consumed), 0)
+        self.assertEqual (len(net.reactions["r1"].produced), 1)
+        self.assertEqual (len(net.reactions["r1"].genes), 3)
+        self.assertEqual (len(net.reactions["r1"].genec), 3)
+        
+        self.assertEqual (len(net.reactions["r2"].consumed), 1)
+        self.assertEqual (len(net.reactions["r2"].produced), 1)
+        self.assertEqual (len(net.reactions["r2"].genes), 2)
+        self.assertEqual (len(net.reactions["r2"].genec), 3)
+        
+        self.assertEqual (len(net.reactions["r3"].consumed), 0)
+        self.assertEqual (len(net.reactions["r3"].produced), 1)
+        self.assertEqual (len(net.reactions["r3"].genes), 1)
+        self.assertEqual (len(net.reactions["r3"].genec), 0)
         
         
         
@@ -93,16 +129,17 @@ class GEMtractorTests (TestCase):
         net = gemtractor.extract_network_from_sbml (sbml)
         self.assertEqual (len (net.species), 3)
         self.assertEqual (len (net.reactions), 3)
-        self.assertEqual (len (net.genenet), 0)
         
         
         self.assertEqual (len(net.reactions["r1"].consumed), 0)
         self.assertEqual (len(net.reactions["r1"].produced), 1)
-        self.assertEqual (len(net.reactions["r1"].genes), 5)
+        self.assertEqual (len(net.reactions["r1"].genes), 2)
+        self.assertEqual (len(net.reactions["r1"].genec), 2)
         
         self.assertEqual (len(net.reactions["r2"].consumed), 1)
         self.assertEqual (len(net.reactions["r2"].produced), 1)
-        self.assertEqual (len(net.reactions["r2"].genes), 2)
+        self.assertEqual (len(net.reactions["r1"].genes), 2)
+        self.assertEqual (len(net.reactions["r1"].genec), 2)
         
       
       
@@ -114,7 +151,6 @@ class GEMtractorTests (TestCase):
         net = gemtractor.extract_network_from_sbml (sbml)
         self.assertEqual (len (net.species), 3)
         self.assertEqual (len (net.reactions), 3)
-        self.assertEqual (len (net.genenet), 0)
         
       
       
@@ -126,7 +162,6 @@ class GEMtractorTests (TestCase):
         net = gemtractor.extract_network_from_sbml (sbml)
         self.assertEqual (len (net.species), 3)
         self.assertEqual (len (net.reactions), 2)
-        self.assertEqual (len (net.genenet), 0)
         
       
       
@@ -138,7 +173,6 @@ class GEMtractorTests (TestCase):
         net = gemtractor.extract_network_from_sbml (sbml)
         self.assertEqual (len (net.species), 3)
         self.assertEqual (len (net.reactions), 2)
-        self.assertEqual (len (net.genenet), 0)
         
       
       
@@ -150,7 +184,6 @@ class GEMtractorTests (TestCase):
         net = gemtractor.extract_network_from_sbml (sbml)
         self.assertEqual (len (net.species), 3)
         self.assertEqual (len (net.reactions), 1)
-        self.assertEqual (len (net.genenet), 0)
         
       
         
@@ -162,7 +195,6 @@ class GEMtractorTests (TestCase):
         net = gemtractor.extract_network_from_sbml (sbml)
         self.assertEqual (len (net.species), 3)
         self.assertEqual (len (net.reactions), 1)
-        self.assertEqual (len (net.genenet), 0)
         
       
         
@@ -174,7 +206,6 @@ class GEMtractorTests (TestCase):
         net = gemtractor.extract_network_from_sbml (sbml)
         self.assertEqual (len (net.species), 3)
         self.assertEqual (len (net.reactions), 3)
-        self.assertEqual (len (net.genenet), 0)
         
         
   def test_sbml (self):
@@ -188,12 +219,12 @@ class GEMtractorTests (TestCase):
         net = gemtractor.extract_network_from_sbml (sbml)
         self.assertEqual (len (net.species), 3)
         self.assertEqual (len (net.reactions), 3)
-        self.assertEqual (len (net.genenet), 0)
         
         net.calc_genenet ()
         self.assertEqual (len (net.species), 3)
         self.assertEqual (len (net.reactions), 3)
-        self.assertEqual (len (net.genenet), 7)
+        self.assertEqual (len (net.genes), 9)
+        self.assertEqual (len (net.gene_complexes), 3)
         
         self.assertEqual (len(net.species["a"].occurence), 1)
         self.assertEqual (len(net.species["b"].occurence), 2)
@@ -201,7 +232,8 @@ class GEMtractorTests (TestCase):
         
         self.assertEqual (len(net.reactions["r1"].consumed), 1)
         self.assertEqual (len(net.reactions["r1"].produced), 1)
-        self.assertEqual (len(net.reactions["r1"].genes), 6)
+        self.assertEqual (len(net.reactions["r1"].genes), 3)
+        self.assertEqual (len(net.reactions["r1"].genec), 3)
         
         self.assertEqual (len(net.reactions["r2"].consumed), 1)
         self.assertEqual (len(net.reactions["r2"].produced), 1)
@@ -210,10 +242,10 @@ class GEMtractorTests (TestCase):
         ns = net.serialize ()
         self.assertEqual (len (net.species), len (ns["species"]))
         self.assertEqual (len (net.reactions), len (ns["reactions"]))
-        self.assertEqual (len (net.genenet), len (ns["genenet"]))
+        self.assertEqual (len (net.genes), len (ns["genes"]))
+        self.assertEqual (len (net.gene_complexes), len (ns["genec"]))
         self.assertEqual (len (net.species), 3)
         self.assertEqual (len (net.reactions), 3)
-        self.assertEqual (len (net.genenet), 7)
         
         links_in_rn = 0
         for r in net.reactions:
@@ -245,36 +277,41 @@ class GEMtractorTests (TestCase):
               self.assertEqual (c.count ("<edge"), links_in_rn)
         
         n_genelinks = 0
-        for g in net.genenet:
-              n_genelinks += len (net.genenet[g]["links"])
+        for g in net.genes:
+              n_genelinks += len (net.genes[g].links["g"])
+              n_genelinks += len (net.genes[g].links["gc"])
+        for g in net.gene_complexes:
+              n_genelinks += len (net.gene_complexes[g].links["g"])
+              n_genelinks += len (net.gene_complexes[g].links["gc"])
         
         # test enzyme network
         net.export_en_dot (tf.name)
         with open (tf.name, 'r') as r:
               c = r.read().replace('\n', '')
-              self.assertEqual (c.count ("label="), len (ns["genenet"]))
+              self.assertEqual (c.count ("label="), len (ns["genes"]) + len(ns["genec"]))
               self.assertEqual (c.count (" -> "), n_genelinks)
         
         net.export_en_gml (tf.name)
         with open (tf.name, 'r') as r:
               c = r.read().replace('\n', '')
-              self.assertEqual (c.count ("node ["), len (ns["genenet"]))
+              self.assertEqual (c.count ("node ["), len (ns["genes"]) + len(ns["genec"]))
               self.assertEqual (c.count ("edge ["), n_genelinks)
         
         net.export_en_graphml (tf.name)
         xmldoc = minidom.parse(tf.name)
-        self.assertEqual (len (xmldoc.getElementsByTagName('node')), len (ns["genenet"]))
+        self.assertEqual (len (xmldoc.getElementsByTagName('node')), len (ns["genes"]) + len(ns["genec"]))
         with open (tf.name, 'r') as r:
               c = r.read().replace('\n', '')
-              self.assertEqual (c.count ("<node "), len (ns["genenet"]))
-              self.assertEqual (c.count (">gene</data"), len (ns["genenet"]))
+              self.assertEqual (c.count ("<node "), len (ns["genes"]) + len(ns["genec"]))
+              self.assertEqual (c.count (">gene</data"), len (ns["genes"]))
+              self.assertEqual (c.count (">gene_complex</data"), len(ns["genec"]))
               self.assertEqual (c.count ("<edge"), n_genelinks)
         
         net.export_en_sbml (tf.name, "testid")
         gemtractor2 = GEMtractor (tf.name)
         sbml = gemtractor2.get_sbml ()
         self.assertEqual (sbml.getNumErrors(), 0)
-        self.assertEqual (sbml.getModel().getNumSpecies (), len (ns["genenet"]))
+        self.assertEqual (sbml.getModel().getNumSpecies (), len (ns["genes"]) + len(ns["genec"]))
         self.assertEqual (sbml.getModel().getNumReactions (), n_genelinks)
         
         
@@ -285,21 +322,45 @@ class GEMtractorTests (TestCase):
       
       expr = gemtractor._unfold_complex_expression (gemtractor._parse_expression ("something"))
       self.assertEqual (len (expr), 1)
-      self.assertEqual (expr[0], "something")
+      self.assertEqual (len (expr[0].genes), 1)
+      self.assertEqual (next(iter(expr[0].genes)).identifier, "something")
       
       expr = gemtractor._unfold_complex_expression (gemtractor._parse_expression ("a or ((b and c) or (d and e and f)) or (g and h) or (i or j)"))
       self.assertEqual (len (expr), 6)
-      self.assertEqual (expr[0], "a")
-      self.assertEqual (expr[1], "b and c")
-      self.assertEqual (expr[2], "d and e and f")
-      self.assertEqual (expr[3], "g and h")
-      self.assertEqual (expr[4], "i")
-      self.assertEqual (expr[5], "j")
+      self.assertEqual (len (expr[0].genes), 1)
+      self.assertEqual (next(iter(expr[0].genes)).identifier, "a")
+      
+      self.assertEqual (len (expr[1].genes), 2)
+      self.assertTrue (next(iter(expr[1].genes)).identifier, "b")
+      self.assertTrue (next(iter(expr[1].genes)).identifier, "c")
+      
+      self.assertEqual (len (expr[2].genes), 3)
+      self.assertTrue (next(iter(expr[2].genes)).identifier, "d")
+      self.assertTrue (next(iter(expr[3].genes)).identifier, "e")
+      self.assertTrue (next(iter(expr[3].genes)).identifier, "f")
+      
+      self.assertEqual (len (expr[3].genes), 2)
+      self.assertTrue (next(iter(expr[3].genes)).identifier, "g")
+      self.assertTrue (next(iter(expr[3].genes)).identifier, "h")
+      
+      self.assertEqual (len (expr[4].genes), 1)
+      self.assertEqual (next(iter(expr[4].genes)).identifier, "i")
+      
+      self.assertEqual (len (expr[5].genes), 1)
+      self.assertEqual (next(iter(expr[5].genes)).identifier, "j")
+      
+      
       
       expr = gemtractor._unfold_complex_expression (gemtractor._parse_expression ("a or (b and c)"))
       self.assertEqual (len (expr), 2)
-      self.assertEqual (expr[0], "a")
-      self.assertEqual (expr[1], "b and c")
+      self.assertEqual (len (expr[0].genes), 1)
+      self.assertEqual (next(iter(expr[0].genes)).identifier, "a")
+      
+      self.assertEqual (len (expr[1].genes), 2)
+      self.assertTrue (next(iter(expr[1].genes)).identifier, "b")
+      self.assertTrue (next(iter(expr[1].genes)).identifier, "c")
+      
+      
       
       with self.assertRaises (InvalidGeneExpression):
         gemtractor._parse_expression ("a or a (b and c)")
@@ -359,7 +420,16 @@ class GEMtractorTests (TestCase):
       
       
   def test_implode_genes (self):
-      genes = ['a', 'b and c', 'sdkflj alskd2345 34lk5 w34knflk324']
+      genes = [Gene ('a')]
+      genes.append (GeneComplex (Gene ('x')))
+      
+      gc = GeneComplex ()
+      gc.add_gene (Gene ("b"))
+      gc.add_gene (Gene ("c"))
+      genes.append (gc)
+      
+      
+      genes.append (Gene ('sdkflj alskd2345 34lk5 w34knflk324'))
       
       gemtractor = GEMtractor (None)
-      self.assertEqual ("(a) or (b and c) or (sdkflj alskd2345 34lk5 w34knflk324)", gemtractor._implode_genes (genes))
+      self.assertEqual ("((a) or (x) or (b and c) or (sdkflj alskd2345 34lk5 w34knflk324))", gemtractor._implode_genes (genes))

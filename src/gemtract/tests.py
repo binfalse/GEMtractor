@@ -234,7 +234,7 @@ class GemtractTest(TestCase):
         self.assertTrue (self._valid_xml (response.content))
         c = response.content.decode("utf-8")
         self.assertEqual (c.count ("<node "), enSpecies)
-        self.assertEqual (c.count (">gene</data"), enSpecies)
+        self.assertEqual (c.count (">gene</data") + c.count (">gene_complex</data"), enSpecies)
         self.assertEqual (c.count ("<edge"), enReactions)
         
         

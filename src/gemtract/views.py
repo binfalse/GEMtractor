@@ -58,26 +58,26 @@ def index(request):
     request.session[Constants.SESSION_HAS_SESSION] = Constants.SESSION_HAS_SESSION_VALUE
     request.session.save()
   
-  # ~ if request.method == 'POST' and 'custom-model' in request.FILES and request.FILES['custom-model']:
-    # ~ model = request.FILES['custom-model']
+  if request.method == 'POST' and 'custom-model' in request.FILES and request.FILES['custom-model']:
+    model = request.FILES['custom-model']
     
-    # ~ filename = Utils.get_upload_path (request.session.session_key)
-    # ~ with open(filename, 'wb+') as destination:
-      # ~ for chunk in model.chunks():
-        # ~ destination.write(chunk)
+    filename = Utils.get_upload_path (request.session.session_key)
+    with open(filename, 'wb+') as destination:
+      for chunk in model.chunks():
+        destination.write(chunk)
     
-    # ~ request.session[Constants.SESSION_MODEL_ID] = os.path.basename(filename)
-    # ~ request.session[Constants.SESSION_MODEL_NAME] = model.name
-    # ~ request.session[Constants.SESSION_MODEL_TYPE] = Constants.SESSION_MODEL_TYPE_UPLOAD
-    # ~ Utils.del_session_key (request, None, Constants.SESSION_FILTER_SPECIES)
-    # ~ Utils.del_session_key (request, None, Constants.SESSION_FILTER_REACTION)
-    # ~ Utils.del_session_key (request, None, Constants.SESSION_FILTER_GENES)
-    # ~ Utils.del_session_key (request, None, Constants.SESSION_FILTER_GENE_COMPLEXES)
+    request.session[Constants.SESSION_MODEL_ID] = os.path.basename(filename)
+    request.session[Constants.SESSION_MODEL_NAME] = model.name
+    request.session[Constants.SESSION_MODEL_TYPE] = Constants.SESSION_MODEL_TYPE_UPLOAD
+    Utils.del_session_key (request, None, Constants.SESSION_FILTER_SPECIES)
+    Utils.del_session_key (request, None, Constants.SESSION_FILTER_REACTION)
+    Utils.del_session_key (request, None, Constants.SESSION_FILTER_GENES)
+    Utils.del_session_key (request, None, Constants.SESSION_FILTER_GENE_COMPLEXES)
     
-    # ~ return redirect('gemtract:filter')
-    # ~ # filterModel (request)
-    # ~ # #return HttpResponseRedirect (reverse ('gemtract:filter'))
-    # ~ # #render(request, 'gemtract/index.html', {'model': request.session['model']})
+    return redirect('gemtract:filter')
+    # filterModel (request)
+    # #return HttpResponseRedirect (reverse ('gemtract:filter'))
+    # #render(request, 'gemtract/index.html', {'model': request.session['model']})
     
   
   

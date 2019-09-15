@@ -19,8 +19,26 @@ from modules.gemtractor.utils import Utils
 from django.test import TestCase
 import os
 import tempfile
+from libsbml import SBMLReader
+import re
 
 class UtilsTests (TestCase):
+  __regex_species_section_notes = re.compile (r"Filter Species:[^:]*(<ul>[^:]*</ul>)", re.DOTALL)
+  __regex_species_notes = re.compile (r"<li>([^<]+)</li>", re.DOTALL)
+  
+  __regex_reactions_section_notes = re.compile (r"Filter Reactions:[^:]*(<ul>[^:]*</ul>)", re.DOTALL)
+  __regex_reactions_notes = re.compile (r"<li>([^<]+)</li>", re.DOTALL)
+  
+  __regex_genes_section_notes = re.compile (r"Filter Genes:[^:]*(<ul>[^:]*</ul>)", re.DOTALL)
+  __regex_genes_notes = re.compile (r"<li>([^<]+)</li>", re.DOTALL)
+  
+  __regex_gene_complexes_section_notes = re.compile (r"Filter Gene Complexes:[^:]*(<ul>[^:]*</ul>)", re.DOTALL)
+  __regex_gene_complexes_notes = re.compile (r"<li>([^<]+)</li>", re.DOTALL)
+  
+  __regex_reaction_genes = re.compile (r"genes are removed:\\s*(\w)", re.DOTALL)
+  __regex_reaction_species = re.compile (r"missing a species:\\s*(\w)", re.DOTALL)
+  
+  
   def test_byte_conversion (self):
     self.assertEqual ("1 Byte", Utils.human_readable_bytes (1))
     self.assertEqual ("0 Bytes", Utils.human_readable_bytes (0))
@@ -49,3 +67,63 @@ class UtilsTests (TestCase):
         Utils._create_dir ("/PYTHON_SHOULD_FAIL")
     
     self.assertTrue(os.path.isdir(d), msg="suddenly the directory is lost!?")
+    
+  def __get_sbml_model (self):
+    sbml = SBMLReader().readSBML("test/gene-filter-example.xml")
+    self.assertTrue (sbml.getNumErrors() == 0)
+    return sbml.getModel()
+    
+  def __test_model_notes (self, model, filter_species, filter_reactions, filter_genes, filter_gene_complexes, remove_reaction_genes_removed, remove_reaction_missing_species):
+    Utils.add_model_note (model, filter_species, filter_reactions, filter_genes, filter_gene_complexes, remove_reaction_genes_removed, remove_reaction_missing_species)
+    notes = model.getNotesString ()
+    
+    if filter_species is not None:
+      section = re.search (UtilsTests.__regex_species_section_notes, notes)
+      self.assertTrue (section is not None)
+      snotes = re.findall (UtilsTests.__regex_species_notes, section.group(1))
+      self.assertEqual (len (snotes), len (filter_species))
+      for n in snotes:
+        self.assertTrue (n in filter_species)
+      for n in filter_species:
+        self.assertTrue (n in snotes)
+    
+    if filter_reactions is not None:
+      section = re.search (UtilsTests.__regex_reactions_section_notes, notes)
+      self.assertTrue (section is not None)
+      snotes = re.findall (UtilsTests.__regex_reactions_notes, section.group(1))
+      self.assertEqual (len (snotes), len (filter_reactions))
+      for n in snotes:
+        self.assertTrue (n in filter_reactions)
+      for n in filter_reactions:
+        self.assertTrue (n in snotes)
+    
+    if filter_genes is not None:
+      section = re.search (UtilsTests.__regex_genes_section_notes, notes)
+      self.assertTrue (section is not None)
+      snotes = re.findall (UtilsTests.__regex_genes_notes, section.group(1))
+      self.assertEqual (len (snotes), len (filter_genes))
+      for n in snotes:
+        self.assertTrue (n in filter_genes)
+      for n in filter_genes:
+        self.assertTrue (n in snotes)
+    
+    if filter_gene_complexes is not None:
+      section = re.search (UtilsTests.__regex_gene_complexes_section_notes, notes)
+      self.assertTrue (section is not None)
+      snotes = re.findall (UtilsTests.__regex_gene_complexes_notes, section.group(1))
+      self.assertEqual (len (snotes), len (filter_gene_complexes))
+      for n in snotes:
+        self.assertTrue (n in filter_gene_complexes)
+      for n in filter_gene_complexes:
+        self.assertTrue (n in snotes)
+    
+    self.assertTrue ("genes are removed: " + str (remove_reaction_genes_removed) in notes)
+    self.assertTrue ("missing a species: " + str (remove_reaction_missing_species) in notes)
+    
+    
+  
+  def test_sbml_notes (self):
+    self.__test_model_notes (self.__get_sbml_model (), ["S1", "S2"], ["R1", "R2"], ["G1, G2", "G3"], ["COMPLX1", "COMPLX2"], True, False)
+    self.__test_model_notes (self.__get_sbml_model (), ["S1", "S2"], None, None, None, True, False)
+    self.__test_model_notes (self.__get_sbml_model (), None, None, ["S1", "S2"], None, True, False)
+    self.__test_model_notes (self.__get_sbml_model (), None, None, None, ["S1", "S2"], False, True)
