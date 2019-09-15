@@ -26,7 +26,14 @@ Learn
     <li><a href="#gene-association">How does the GEMtractor identify genes that are associated to a reaction?</a></li>
     <li><a href="#gene-names">Why do genes have such a strange name?</a></li>
     <li><a href="#no-gene-name">What if no gene is associated to a reaction?</a></li>
-    <li><a href="#currency-metabolites">How can i discard currency metabolites (such as H, H2O or ATP)?</a></li>
+    <li><a href="#filter-species">What exactly happens when I remove a species during filtering?</a></li>
+    <li><a href="#filter-reaction">What exactly happens when I remove a reaction during filtering?</a></li>
+    <li><a href="#filter-gene">What exactly happens when I remove a gene during filtering?</a></li>
+    <li><a href="#filter-gene-complex">What exactly happens when I remove a gene complex during filtering?</a></li>
+    <li><a href="#gene-complex">What is a gene complex?</a></li>
+    <li><a href="#batch-filter">How does the batch filtering work?</a></li>
+    <li><a href="#what-currency-metabolites"></a>What are currency metabolites?</li>
+    <li><a href="#currency-metabolites">How can i discard currency metabolites (such as H<sup>+</sup>, H<sub>2</sub>O or ATP)?</a></li>
     <li><a href="#which-biomodels">How did the GEMtractor select the models from Biomodels?</a></li>
     <li><a href="#which-bigg">How did the GEMtractor select the models from BiGG?</a></li>
     <li><a href="#stored-data">Which data does the GEMtractor store on the server?</a></li>
@@ -137,14 +144,72 @@ Learn
 		</div>
 		<p>
             If the GEMtractor cannot find a gene-association, it assumes there is only a single gene and gives it the id of the reaction.
-            See also <a href="gene-association">How does the GEMtractor identify genes that are associated to a reaction?</a>
+            See also <a href="#gene-association">How does the GEMtractor identify genes that are associated to a reaction?</a>
         </p>
 	</div>
 	
 	<div class="w3-padding w3-card w3-white w3-margin">
 		<div class=" anchor-heading">
+			<a name="filter-species" id="filter-species"></a>
+			<h3>What exactly happens when I remove a species during filtering?</h3>
+		</div>
+		<p></p>
+	</div>
+	
+	<div class="w3-padding w3-card w3-white w3-margin">
+		<div class=" anchor-heading">
+			<a name="filter-reaction" id="filter-reaction"></a>
+			<h3>What exactly happens when I remove a reaction during filtering?</h3>
+		</div>
+		<p></p>
+	</div>
+	
+	<div class="w3-padding w3-card w3-white w3-margin">
+		<div class=" anchor-heading">
+			<a name="filter-gene" id="filter-gene"></a>
+			<h3>What exactly happens when I remove a gene during filtering?</h3>
+		</div>
+		<p></p>
+	</div>
+	
+	<div class="w3-padding w3-card w3-white w3-margin">
+		<div class=" anchor-heading">
+			<a name="filter-gene-complex" id="filter-gene-complex"></a>
+			<h3>What exactly happens when I remove a gene complex during filtering?</h3>
+		</div>
+		<p></p>
+	</div>
+	
+	<div class="w3-padding w3-card w3-white w3-margin">
+		<div class=" anchor-heading">
+			<a name="gene-complex" id="gene-complex"></a>
+			<h3>What is a gene complex?</h3>
+		</div>
+		<p></p>
+	</div>
+	
+	<div class="w3-padding w3-card w3-white w3-margin">
+		<div class=" anchor-heading">
+			<a name="batch-filter" id="batch-filter"></a>
+			<h3>How does the batch filtering work?</h3>
+		</div>
+		<p></p>
+	</div>
+	
+	<div class="w3-padding w3-card w3-white w3-margin">
+		<div class=" anchor-heading">
+			<a name="what-currency-metabolites" id="what-currency-metabolites"></a>
+			<h3>What are currency metabolites?</h3>
+		</div>
+		<p>
+		  See also <a href="#currency-metabolites">How can i discard currency metabolites (such as H<sup>+</sup>, H<sub>2</sub>O or ATP)</a>
+		</p>
+	</div>
+	
+	<div class="w3-padding w3-card w3-white w3-margin">
+		<div class=" anchor-heading">
 			<a name="currency-metabolites" id="currency-metabolites"></a>
-			<h3>How can i discard currency metabolites (such as H, H2O or ATP)?</h3>
+			<h3>How can i discard currency metabolites (such as H<sup>+</sup>, H<sub>2</sub>O or ATP)?</h3>
 		</div>
 		<p>
 		  The tables listing the enitities on the filter page are sortable.
@@ -154,6 +219,7 @@ Learn
             If you want to discard currency metabolites, you can sort the species table by the occurences.
             This will bring the currency metabolites to the top of the page, making it easy to get rid of them, as shown in this screen shot:
             <img src="{% static 'pics/screenshot-currency-metabolites.png' %}" class="w3-image w3-padding" alt="image of a sorted species table">
+	    See also <a href="#what-currency-metabolites">What are currency metabolites?</a>
         </p>
 	</div>
 	

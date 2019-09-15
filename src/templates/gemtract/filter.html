@@ -71,7 +71,7 @@
     <div id="filter-tables" class="w3-margin">
       <div id="filter-species" class="w3-responsive" style="display:none">
 		<p>You may sort the following table by clicking on the header cell.</p>
-        <p>A red row indicates, that the corresponding species does not participate in any reaction anymore, so you may want to exclude it as well? If uncheck a species, it will not be removed from the entire model, but it will be removed from all reactions (it may still be used in other entities, such as functions or triggers). However, there may be ghost species afterwards, not participating in any reaction.</p>
+        <p>A red row indicates, that the corresponding species does not participate in any reaction anymore, so you may want to exclude it as well? If uncheck a species, it will not be removed from the entire model, but it will be removed from all reactions (it may still be used in other entities, such as functions or triggers). However, there may be ghost species afterwards, not participating in any reaction. See also: <a href="{% url 'index:learn' %}#filter-species">What exactly happens when I remove a species during filtering?</a></p>
         <table class="w3-table w3-striped sortable notfirst">
            <thead>
              <th>include <i class='fas fa-sort'></i></th>
@@ -84,7 +84,7 @@
       </div>
       <div id="filter-reaction" class="w3-responsive" style="display:none" class="">
 		<p>You may sort the following table by clicking on the header cell.</p>
-        <p>A red row indicates, that your filter would keep the reaction in the model, but some (or all) of it's species and/or all associated genes were removed. So the reaction may be wrong afterwards, and you may want to exclude the reaction as well? If you export the <em>reaction network</em> and you removed all it's species, the reaction will be removed as well. If you export the <em>enzyme network,</em> the reaction will be removed if all it's species are removed or all it's genes are removed.</p>
+        <p>A red row indicates, that your filter would keep the reaction in the model, but some (or all) of it's species and/or all associated genes were removed. So the reaction may be wrong afterwards, and you may want to exclude the reaction as well? If you export the <em>reaction network</em> and you removed all it's species, the reaction will be removed as well. If you export the <em>enzyme network,</em> the reaction will be removed if all it's species are removed or all it's genes are removed. See also: <a href="{% url 'index:learn' %}#filter-reaction">What exactly happens when I remove a reaction during filtering?</a></p>
         <table class="w3-table w3-striped sortable notfirst">
            <thead>
              <th>include <i class='fas fa-sort'></i></th>
@@ -98,7 +98,7 @@
       </div>
       <div id="filter-gene" class="w3-responsive" style="display:none" class="">
 	<p>You may sort the following table by clicking on the header cell.</p>
-        <p>Unselecting a gene will also remove all complexes in which it appears (they will be highlighted in read under the <em>Gene Complex</em> tab). A red gene indicates, that the gene is not used in any reaction anymore. Thus, it will be excluded even if you keep it selected here!</p>
+        <p>Unselecting a gene will also remove all complexes in which it appears (they will be highlighted in read under the <em>Gene Complex</em> tab). A red gene indicates, that the gene is not used in any reaction anymore. Thus, it will be excluded even if you keep it selected here! See also: <a href="{% url 'index:learn' %}#gene-association">How does the GEMtractor identify genes that are associated to a reaction?</a> and <a href="{% url 'index:learn' %}#filter-gene">What exactly happens when I remove a gene during filtering?</a></p>
         <table class="w3-table w3-striped sortable notfirst">
            <thead>
              <th>include <i class='fas fa-sort'></i></th>
@@ -111,7 +111,7 @@
       </div>
       <div id="filter-gene-complex" class="w3-responsive" style="display:none" class="">
 	<p>You may sort the following table by clicking on the header cell.</p>
-        <p>Unselecting a gene complex will <strong>not</strong> remove the single genes appearing in that complex! Other complexes, which are a superset of a removed complex, will be highlighted in red.</p>
+        <p>Unselecting a gene complex will <strong>not</strong> remove the individual genes appearing in that complex! Other complexes, which are a superset of a removed complex, will be highlighted in red and italics. If you do not remove those yourself, they are assumed to be still available in the model. See also: <a href="{% url 'index:learn' %}#gene-association">How does the GEMtractor identify genes that are associated to a reaction?</a> and <a href="{% url 'index:learn' %}#gene-complex">What is a gene complex?</a> and <a href="{% url 'index:learn' %}#filter-gene-complex">What exactly happens when I remove a gene complex during filtering?</a></p>
         <table class="w3-table w3-striped sortable notfirst">
            <thead>
              <th>include <i class='fas fa-sort'></i></th>
@@ -129,6 +129,9 @@
         <textarea id="batch-filter" rows="20">
         </textarea>
 	<button id="batch-button" class="w3-btn w3-flat-silver">apply batch</button>
+	<p>
+	  For more information, see <a href="{% url 'index:learn' %}#batch-filter">How does the batch filtering work?</a>
+	</p>
       </div>
     </div>
 
