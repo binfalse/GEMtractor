@@ -124,11 +124,6 @@ transform: rotate(90deg);
 display:none
 }
 }
-/*
-#maincard {
-z-index: 2;
-}
-*/
 .w3-top {
   z-index: 3;
 }
