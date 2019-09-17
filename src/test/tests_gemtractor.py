@@ -307,13 +307,25 @@ class GEMtractorTests (TestCase):
               self.assertEqual (c.count (">gene_complex</data"), len(ns["genec"]))
               self.assertEqual (c.count ("<edge"), n_genelinks)
         
-        net.export_en_sbml (tf.name, "testid")
+        net.export_en_sbml (tf.name, gemtractor, "testid")
         gemtractor2 = GEMtractor (tf.name)
         sbml = gemtractor2.get_sbml ()
         self.assertEqual (sbml.getNumErrors(), 0)
         self.assertEqual (sbml.getModel().getNumSpecies (), len (ns["genes"]) + len(ns["genec"]))
         self.assertEqual (sbml.getModel().getNumReactions (), n_genelinks)
-        
+        model = sbml.getModel()
+        found_x = False
+        for n in range (model.getNumSpecies ()):
+          s = model.getSpecies (n)
+          identifier = s.getName ()
+          if " + " in identifier:
+            print (s.getAnnotationString ())
+            self.assertTrue ("<bqbiol:hasPart>" in s.getAnnotationString ())
+            self.assertEqual (len (net.gene_complexes[identifier].genes), s.getAnnotationString ().count ("<rdf:li rdf:resource="))
+          elif identifier == "x":
+            self.assertTrue (len (s.getAnnotationString ()) > 100)
+            found_x = True
+        self.assertTrue (found_x, msg="didnt find gene x")
         
       
       

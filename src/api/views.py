@@ -334,7 +334,7 @@ def export (request):
       if form.cleaned_data['network_format'] == 'sbml':
         file_name = file_name + ".sbml"
         file_path = Utils.create_generated_file_web (request.session.session_key)
-        net.export_en_sbml (file_path, request.session[Constants.SESSION_MODEL_ID], request.session[Constants.SESSION_MODEL_NAME],
+        net.export_en_sbml (file_path, gemtractor, request.session[Constants.SESSION_MODEL_ID], request.session[Constants.SESSION_MODEL_NAME],
             request.session[Constants.SESSION_FILTER_SPECIES],
             request.session[Constants.SESSION_FILTER_REACTION],
             request.session[Constants.SESSION_FILTER_GENES],
@@ -491,7 +491,7 @@ def execute (request):
     net = gemtractor.extract_network_from_sbml (sbml)
     net.calc_genenet ()
     if export["network_format"] == "sbml":
-      net.export_en_sbml (outputFile.name, sbml.getModel ().getId () + "_EN", sbml.getModel ().getName () + " converted to EnzymeNetwork", filter_species, filter_reactions, filter_genes, filter_gene_complexes, remove_reaction_genes_removed, remove_reaction_missing_species)
+      net.export_en_sbml (outputFile.name, gemtractor, sbml.getModel ().getId () + "_EN", sbml.getModel ().getName () + " converted to EnzymeNetwork", filter_species, filter_reactions, filter_genes, filter_gene_complexes, remove_reaction_genes_removed, remove_reaction_missing_species)
       if os.path.exists(outputFile.name):
         return Utils.serve_file (outputFile.name, "gemtracted-model.sbml", "application/xml")
       else:

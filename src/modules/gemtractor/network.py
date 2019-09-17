@@ -15,8 +15,9 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import logging
-from libsbml import SBMLDocument, SBMLWriter
+from libsbml import SBMLDocument, SBMLWriter, LIBSBML_OPERATION_SUCCESS
 from .utils import Utils
+import re
 
 # TODO: logging
 class Species:
@@ -170,6 +171,7 @@ class Network:
     self.genes = {}
     self.gene_complexes = {}
     self.have_gene_net = False
+    self.__annotation_about_pattern = re.compile (r"<rdf:Description rdf:about=['\"]#[^'\"]+['\"]>", re.IGNORECASE)
     
   def add_species (self, identifier, name):
     if identifier not in self.species:
@@ -181,26 +183,26 @@ class Network:
       self.reactions[identifier] = Reaction (identifier, name)
     return self.reactions[identifier]
   
-  def add_gene (self, identifier):
-    if identifier not in self.genes:
-      self.genes[identifier] = Gene (identifier)
-    return self.genes[identifier]
+  def add_gene (self, gene):
+    if gene.identifier not in self.genes:
+      self.genes[gene.identifier] = Gene (gene.identifier)
+    return self.genes[gene.identifier]
 
   def add_genes (self, reaction, gene_complexes):
     for gc in gene_complexes:
       if type (gc) is Gene:
-        g = self.add_gene (gc.identifier)
+        g = self.add_gene (gc)
         reaction.genes.append (g.identifier)
         g.reactions.append (reaction.identifier)
       elif type (gc) is GeneComplex:
         if len (gc.genes) == 1:
-          g = self.add_gene (next(iter(gc.genes)).identifier)
+          g = self.add_gene (next(iter(gc.genes)))
           reaction.genes.append (g.identifier)
           g.reactions.append (reaction.identifier)
         else:
           gcomplex = GeneComplex ()
           for g in gc.genes:
-            gcomplex.add_gene (self.add_gene (g.identifier))
+            gcomplex.add_gene (self.add_gene (g))
           gcomplex.calc_id ()
           reaction.genec.append (gcomplex.identifier)
           gcomplex.reactions.append (reaction.identifier)
@@ -538,7 +540,7 @@ class Network:
     return n
       
       
-  def export_en_sbml (self, filename, model_id, model_name = None, filter_species = None, filter_reactions = None, filter_genes = None, filter_gene_complexes = None, remove_reaction_genes_removed = True, remove_reaction_missing_species = False):
+  def export_en_sbml (self, filename, gemtractor, model_id, model_name = None, filter_species = None, filter_reactions = None, filter_genes = None, filter_gene_complexes = None, remove_reaction_genes_removed = True, remove_reaction_missing_species = False):
     if not self.have_gene_net:
       self.calc_genenet ()
     
@@ -546,6 +548,7 @@ class Network:
     model = sbml.createModel ()
     #TODO dc modified?
     if model is None:
+      self.__logger.error ("could not create model...")
       return False
     model.setId (model_id + "_GEMtracted_EnzymeNetwork")
     if model_name is None:
@@ -564,12 +567,12 @@ class Network:
     num = 0
     for gene in self.genes:
       num += 1
-      nodemap[gene] = Network.create_sbml_species (model, 'g' + str (num), gene, compartment)
+      nodemap[gene] = self.__create_sbml_gene (model, 'g' + str (num), gene, compartment, gemtractor)
       # TODO: add other information if available
     
     for gene in self.gene_complexes:
       num += 1
-      nodemap[gene] = Network.create_sbml_species (model, 'gc' + str (num), gene, compartment)
+      nodemap[gene] = self.__create_sbml_gene_complex (model, 'gc' + str (num), gene, compartment, gemtractor, self.gene_complexes[gene].genes, nodemap)
       # TODO: add other information if available
     
     num = 0
@@ -590,15 +593,60 @@ class Network:
     
     return SBMLWriter().writeSBML (sbml, filename)
 
-  @staticmethod
-  def create_sbml_species (model, identifier, name, compartment):
+  
+  def __create_sbml_gene_complex (self, model, identifier, name, compartment, gemtractor, genes, nodemap):
     g = model.createSpecies ()
     g.setId (identifier)
+    g.setMetaId (identifier)
     g.setName (name)
     g.setCompartment(compartment.getId())
     g.setHasOnlySubstanceUnits(False)
     g.setBoundaryCondition(False)
     g.setConstant(False)
+    
+    annotations = ""
+    
+    for gene in genes:
+      print (gene.identifier)
+      print (nodemap[gene.identifier])
+      annotations += '<rdf:li rdf:resource="#' + nodemap[gene.identifier].getMetaId () + '" />'
+    
+    if len (annotations) > 0:
+      annotations = """
+        <annotation>
+         <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/">
+          <rdf:Description rdf:about="#""" + identifier + """">
+            <bqbiol:hasPart>
+              <rdf:Bag>""" + annotations + """</rdf:Bag>
+            </bqbiol:hasPart>
+          </rdf:Description>
+         </rdf:RDF>
+        </annotation>"""
+      if g.setAnnotation (annotations) != LIBSBML_OPERATION_SUCCESS:
+        self.__logger.error ("unable to add annotation to gene " + identifier)
+        self.__logger.debug ("annotation was: " + annotations)
+    else:
+      self.__logger.warn ("gene complex has no genes: " + identifier)
+    
+    return g
+  
+  def __create_sbml_gene (self, model, identifier, name, compartment, gemtractor):
+    g = model.createSpecies ()
+    g.setId (identifier)
+    g.setMetaId (identifier)
+    g.setName (name)
+    g.setCompartment(compartment.getId())
+    g.setHasOnlySubstanceUnits(False)
+    g.setBoundaryCondition(False)
+    g.setConstant(False)
+    
+    annotations = gemtractor.get_gene_product_annotations (name)
+    if annotations is not None:
+      annotations = self.__annotation_about_pattern.sub('<rdf:Description rdf:about="#'+identifier+'">', annotations)
+      if g.setAnnotation (annotations) != LIBSBML_OPERATION_SUCCESS:
+        self.__logger.error ("unable to add annotation to gene " + identifier)
+        self.__logger.debug ("annotation was: " + annotations)
+    
     return g
 
   @staticmethod

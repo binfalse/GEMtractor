@@ -48,6 +48,7 @@ class GEMtractor:
       self.__logger = logging.getLogger(__name__)
       self.__reaction_gene_map = {}
       self.__sbml_file = sbml_file
+      self.__fbc_plugin = None
     
     def __get_expression_parser (self):
         variables = pp.Word(pp.alphanums + "_-.") 
@@ -133,7 +134,13 @@ class GEMtractor:
         # also update the GENE_LIST using __GENE_LIST_PATTERN
         # but for this we need the list of genes here (not only the logic expression)
         
-      
+    
+    def get_gene_product_annotations (self, gene):
+      if self.__fbc_plugin is not None:
+        gp = self.__fbc_plugin.getGeneProductByLabel (gene)
+        if gp is not None:
+          return self.__fbc_plugin.getGeneProductByLabel (gene).getAnnotationString()
+      return None
     
     def get_sbml (self, filter_species = [], filter_reactions = [], filter_genes = [], filter_gene_complexes = [], remove_reaction_genes_removed = True, remove_reaction_missing_species = False):
       """ Get a filtered SBML document from a file
@@ -163,6 +170,8 @@ class GEMtractor:
       model.setId (model.getId() + "_gemtracted_ReactionNetwork")
       model.setName ("GEMtracted ReactionNetwork of " + name)
       self.__logger.info("got proper sbml model")
+      
+      self.__fbc_plugin = model.getPlugin ("fbc")
       
       self.__logger.debug("append a note")
       Utils.add_model_note (model, filter_species, filter_reactions, filter_genes, filter_gene_complexes, remove_reaction_genes_removed, remove_reaction_missing_species)
@@ -257,7 +266,7 @@ class GEMtractor:
         gpa = rfbc.getGeneProductAssociation()
         if gpa is not None:
           g = self._implode_genes (genes)
-          gpa.setAssociation(FbcAssociation_parseFbcInfixAssociation (g, model.getPlugin ("fbc")))
+          gpa.setAssociation(FbcAssociation_parseFbcInfixAssociation (g, self.__fbc_plugin))
         else:
           self.__logger.debug('no fbc to update: ' + reaction.getId ())
       
@@ -310,7 +319,7 @@ class GEMtractor:
       else:
           self.__logger.debug('no fbc: ' + reaction.getId ())
       
-      return self._extract_genes_from_sbml_notes (reaction.getNotesString(), reaction.getId ())
+      return self._extract_genes_from_sbml_notes (reaction.getNotesString(), "reaction_" + reaction.getId ())
         
         
     
