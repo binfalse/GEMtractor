@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sbml xmlns="http://www.sbml.org/sbml/level3/version1/core" level="3" version="1">
+  <model id="modelid" name="modelname">
+    <listOfCompartments>
+      <compartment id="c" constant="true" name="Cytoplasm"/>
+    </listOfCompartments>
+    <listOfSpecies>
+      <species id="a" compartment="c" boundaryCondition="false" constant="false" hasOnlySubstanceUnits="false" />
+      <species id="b" compartment="c" boundaryCondition="false" constant="false" hasOnlySubstanceUnits="false" />
+      <species id="c" compartment="c" boundaryCondition="false" constant="false" hasOnlySubstanceUnits="false" />
+    </listOfSpecies>
+    <listOfReactions>
+      <reaction id="r1" reversible="false" fast="false">
+        <notes>
+          <html xmlns="http://www.w3.org/1999/xhtml"><p>GENE_ASSOCIATION: (a or (b and c) or d or (f and g and k) or (k and a) or x)</p><p>GENE_LIST: b0351 b1241</p><p>SUBSYSTEM: Pyruvate Metabolism</p></html>
+        </notes>
+        <listOfReactants>
+          <speciesReference constant="true" species="a"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference constant="true" species="b"/>
+        </listOfProducts>
+      </reaction>
+      <reaction id="r2" reversible="false" fast="false">
+        <notes>
+          <html xmlns="http://www.w3.org/1999/xhtml"><p>GENE_ASSOCIATION: (a or (b and c) or d or (f and g and k) or (k and a))</p><p>GENE_LIST: b0351 b1241</p><p>SUBSYSTEM: Pyruvate Metabolism</p></html>
+        </notes>
+        <listOfReactants>
+          <speciesReference constant="true" species="b"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference constant="true" species="c"/>
+        </listOfProducts>
+        <listOfModifiers>
+            <modifierSpeciesReference species="b"/>
+            <modifierSpeciesReference species="a"/>
+        </listOfModifiers>
+      </reaction>
+      <reaction id="r3" reversible="false" fast="false">
+        <listOfProducts>
+          <speciesReference constant="true" species="c"/>
+        </listOfProducts>
+        <listOfModifiers>
+            <modifierSpeciesReference species="b"/>
+            <modifierSpeciesReference species="a"/>
+        </listOfModifiers>
+      </reaction>
+    </listOfReactions>
+  </model>
+</sbml>

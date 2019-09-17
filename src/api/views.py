@@ -370,6 +370,14 @@ def export (request):
             return JsonResponse ({"status":"success", "name": file_name, "mime": "application/gml"})
           else:
             return JsonResponse ({"status":"failed","error":"error generating file"})
+        elif form.cleaned_data['network_format'] == 'csv':
+          file_name = file_name + ".csv"
+          file_path = Utils.create_generated_file_web (request.session.session_key)
+          net.export_en_csv (file_path)
+          if os.path.exists(file_path):
+            return JsonResponse ({"status":"success", "name": file_name, "mime": "text/csv"})
+          else:
+            return JsonResponse ({"status":"failed","error":"error generating file"})
         else:
           return JsonResponse ({"status":"failed","error":"invalid format"})
     elif form.cleaned_data['network_type'] == 'rn':
@@ -406,6 +414,14 @@ def export (request):
           net.export_rn_gml (file_path)
           if os.path.exists(file_path):
             return JsonResponse ({"status":"success", "name": file_name, "mime": "application/gml"})
+          else:
+            return JsonResponse ({"status":"failed","error":"error generating file"})
+        elif form.cleaned_data['network_format'] == 'csv':
+          file_name = file_name + ".csv"
+          file_path = Utils.create_generated_file_web (request.session.session_key)
+          net.export_rn_csv (file_path)
+          if os.path.exists(file_path):
+            return JsonResponse ({"status":"success", "name": file_name, "mime": "text/csv"})
           else:
             return JsonResponse ({"status":"failed","error":"error generating file"})
         else:
@@ -459,7 +475,7 @@ def execute (request):
   if "network_type" not in export:
     return HttpResponseBadRequest ("job is missing the desired network_type (en|rn)")
   if "network_format" not in export:
-    return HttpResponseBadRequest ("job is missing the desired network_format (sbml|dot|graphml|gml)")
+    return HttpResponseBadRequest ("job is missing the desired network_format (sbml|dot|graphml|gml|csv)")
     
   
   remove_reaction_genes_removed = True
@@ -514,6 +530,12 @@ def execute (request):
         return Utils.serve_file (outputFile.name, "gemtracted-model.gml", "application/gml")
       else:
         return HttpResponseServerError ("couldn't generate the gml file")
+    elif export["network_format"] == "csv":
+      net.export_en_csv (outputFile.name)
+      if os.path.exists(outputFile.name):
+        return Utils.serve_file (outputFile.name, "gemtracted-model.csv", "text/csv")
+      else:
+        return HttpResponseServerError ("couldn't generate the csv file")
   elif export["network_type"] == "rn":
     if export["network_format"] == "sbml":
       SBMLWriter().writeSBML (sbml, outputFile.name)
@@ -541,6 +563,12 @@ def execute (request):
           return Utils.serve_file (outputFile.name, "gemtracted-model.gml", "application/gml")
         else:
           return HttpResponseServerError ("couldn't generate the gml file")
+      elif export["network_format"] == "csv":
+        net.export_rn_csv (outputFile.name)
+        if os.path.exists(outputFile.name):
+          return Utils.serve_file (outputFile.name, "gemtracted-model.csv", "text/csv")
+        else:
+          return HttpResponseServerError ("couldn't generate the csv file")
   
   
   return HttpResponseBadRequest ("job is not well formed, not sure what to do...")

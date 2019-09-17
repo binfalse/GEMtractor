@@ -9,6 +9,7 @@ FORMAT = (
     ('graphml', 'GraphML'),
     ('dot', 'DOT'),
     ('gml', 'GML'),
+    ('csv', 'CSV'),
 )
 
 class ExportForm (forms.Form):
