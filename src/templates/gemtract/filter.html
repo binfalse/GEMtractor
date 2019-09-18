@@ -110,7 +110,7 @@
       </div>
       <div id="filter-gene-complex" class="w3-responsive" style="display:none" class="">
 	<p>You may sort the following table by clicking on the header cell.</p>
-        <p>Unselecting an enzyme complex will <strong>not</strong> remove the individual enzymes appearing in that complex! Other complexes, which are a superset of a removed complex, will be highlighted in red and italics TODO. If you do not remove those yourself, they are assumed to be still available in the model. See also: <a href="{% url 'index:learn' %}#gene-association">How does the GEMtractor identify genes that are associated to a reaction?</a> and <a href="{% url 'index:learn' %}#enzyme-complex">What is an enzyme complex?</a> and <a href="{% url 'index:learn' %}#filter-enzyme-complex">What exactly happens when I remove an enzyme complex during filtering?</a></p>
+        <p>Unselecting an enzyme complex will <strong>not</strong> remove the individual enzymes appearing in that complex! Other complexes, which are a superset of a removed complex, will be highlighted in red-italics &mdash; move your mouse over the complex' id to learn which sub-complexes are to be removed. If you do not remove those yourself, they are assumed to be still available in the model. See also: <a href="{% url 'index:learn' %}#gene-association">How does the GEMtractor identify genes that are associated to a reaction?</a> and <a href="{% url 'index:learn' %}#enzyme-complex">What is an enzyme complex?</a> and <a href="{% url 'index:learn' %}#filter-enzyme-complex">What exactly happens when I remove an enzyme complex during filtering?</a></p>
         <table class="w3-table w3-striped sortable notfirst">
            <thead>
              <th>include <i class='fas fa-sort'></i></th>

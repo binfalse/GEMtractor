@@ -136,6 +136,7 @@ function updateNetwork () {
 	$("#reaction-table tr").removeClass ("filter-inconsistent").removeClass ("filter-excluded");
 	$("#gene-table tr").removeClass ("filter-inconsistent").removeClass ("filter-excluded");
 	$("#gene-complex-table tr").removeClass ("filter-inconsistent").removeClass ("filter-excluded").removeClass ("filter-supercomplex");
+	$("#gene-complex-table tr td:nth-child(2)").attr("title", "");
 
 	// prepare inconsistency sets
 	var inconsistent = [new Set(),new Set(),new Set(),new Set()];
@@ -187,7 +188,11 @@ function updateNetwork () {
 					continue;
 				const other = networks.original.enzc[key].enzs;
 				if (this_complex.every (r => other.includes (r))) {
-					$("#" + idMap[networks.original.enzc[key].id]).addClass ("filter-inconsistent").addClass ("filter-supercomplex");
+					const domid = "#" + idMap[networks.original.enzc[key].id]
+					$(domid).addClass ("filter-inconsistent").addClass ("filter-supercomplex");
+					if ($(domid +" td:nth-child(2)").attr("title").length < 1)
+						$(domid +" td:nth-child(2)").attr("title", "Subcomplexes removed: ");
+					$(domid +" td:nth-child(2)").attr("title", $(domid +" td:nth-child(2)").attr("title") + "["+entId+"] ");
 				}
 			}
 	});
