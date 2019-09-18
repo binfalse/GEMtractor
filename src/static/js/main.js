@@ -736,7 +736,7 @@ function prepareIndex () {
       
       
   // select a specific biomodel
-  $('#specific-biomodel').click (function () {
+  function select_specific_biomodel () {
 		const modelid = $("#biomodelsid").val ().trim ();
 		if (!modelid.match (/^(BIOMD|MODEL)[0-9]{10}$/)) {
 			$("#error").show ().text ("Invalid model id. Please go to Biomodels to copy a valid model id, such as MODEL1212060001 or BIOMD0000000469.");
@@ -746,7 +746,10 @@ function prepareIndex () {
 		$("#specific-biomodel-loading").show ();
 		// select the model
 		select_biomodel (modelid);
-	});
+	}
+  $('#specific-biomodel').click (select_specific_biomodel);
+	$("#biomodelsid").keyup(function(e){if(e.keyCode == 13) select_specific_biomodel ()});
+	
   
 	// download the biomodels list  
 	$.ajax({
