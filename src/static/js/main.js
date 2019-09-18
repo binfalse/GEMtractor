@@ -144,52 +144,42 @@ function updateNetwork () {
 	filter_genec = new Set();
 
 	// check species for deselection
-	$("#species-table input[type=checkbox]").each (function (item){
-		if (!$(this).prop("checked")) {
+	$("#species-table input[type=checkbox]:not(:checked)").each (function (item){
 			const domId=$(this).parent ().parent ().attr ("id");
 			const entId = idReMap[domId];
 			// if unchecked, fade it out
 			$("#" + domId).addClass ("filter-excluded");
 			filter_species.add (entId);
-			//~ networks.original.species[entId].occ.forEach (function (r) {
-				//~ // mark reactions, in which this species appears, as inconsistent
-				//~ $("#" + idMap[r]).addClass ("filter-inconsistent");
-				//~ inconsistent[1].add (r);
-			//~ });
-		}
 	});
 
 	// check reactions for deselection
-	$("#reaction-table input[type=checkbox]").each (function (item){
-		if (!$(this).prop("checked")) {
+	$("#reaction-table input[type=checkbox]:not(:checked)").each (function (item){
 			const domId=$(this).parent ().parent ().attr ("id");
 			const entId = idReMap[domId];
 			// if unchecked, fade it out
 			$("#" + domId).addClass ("filter-excluded");
 			filter_reaction.add (entId);
-		}
 	});
 
 	// check genes for deselection
-	$("#gene-table input[type=checkbox]").each (function (item){
-		if (!$(this).prop("checked")) {
+	$("#gene-table input[type=checkbox]:not(:checked)").each (function (item){
 			const domId=$(this).parent ().parent ().attr ("id");
 			const entId = idReMap[domId];
 			// if unchecked, fade it out
 			$("#" + domId).addClass ("filter-excluded");
 			filter_genes.add (entId);
-		}
 	});
 
 	// check genes for deselection
-	$("#gene-complex-table input[type=checkbox]").each (function (item){
-		if (!$(this).prop("checked")) {
+	$("#gene-complex-table input[type=checkbox]:not(:checked)").each (function (item){
 			const domId=$(this).parent ().parent ().attr ("id");
 			const entId = idReMap[domId];
 			// if unchecked, fade it out
 			$("#" + domId).addClass ("filter-excluded");
 			filter_genec.add (entId);
-		}
+			
+			// find super-complexes and highlight them
+			
 	});
 
 	// check reactions for missing genes
