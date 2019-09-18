@@ -64,17 +64,17 @@ class Reaction:
       "rev" : self.reversible,
       "cons" : [],
       "prod" : [],
-      "genes" : [],
-      "genec" : []
+      "enzs" : [],
+      "enzc" : []
       }
     for s in self.consumed:
       ret["cons"].append (species_mapper[s])
     for s in self.produced:
       ret["prod"].append (species_mapper[s])
     for g in self.genes:
-      ret["genes"].append (gene_mapper[g])
+      ret["enzs"].append (gene_mapper[g])
     for g in self.genec:
-      ret["genec"].append (gene_complex_mapper[g])
+      ret["enzc"].append (gene_complex_mapper[g])
     return ret
 
 class Gene:
@@ -153,11 +153,11 @@ class GeneComplex:
     
     ret = {
       "id": self.identifier,
-      "genes" : [],
+      "enzs" : [],
       "reactions": self.reactions
       }
     for g in self.genes:
-      ret["genes"].append (gene_mapper[g.identifier])
+      ret["enzs"].append (gene_mapper[g.identifier])
     return ret
     
   
@@ -215,8 +215,8 @@ class Network:
     json = {
       "species": [],
       "reactions": [],
-      "genes": [],
-      "genec": [],
+      "enzs": [],
+      "enzc": [],
       }
       
     species_mapper = {}
@@ -233,17 +233,17 @@ class Network:
     for identifier, gene in self.genes.items ():
       self.__logger.debug ("serialising gene " + identifier)
       g_ser = gene.serialize ()
-      gene_mapper[identifier] = len (json["genes"])
-      json["genes"].append (g_ser)
+      gene_mapper[identifier] = len (json["enzs"])
+      json["enzs"].append (g_ser)
     
     for identifier, gene_complex in self.gene_complexes.items ():
       self.__logger.debug ("serialising gene complex " + identifier)
       g_ser = gene_complex.serialize (gene_mapper)
-      gene_complex_mapper[identifier] = len (json["genec"])
-      json["genec"].append (g_ser)
+      gene_complex_mapper[identifier] = len (json["enzc"])
+      json["enzc"].append (g_ser)
       # add gene-genecomplex information
       for g in gene_complex.genes:
-        json["genes"][gene_mapper[g.identifier]]["cplx"].append (gene_complex_mapper[identifier])
+        json["enzs"][gene_mapper[g.identifier]]["cplx"].append (gene_complex_mapper[identifier])
     
     
     for identifier, reaction in self.reactions.items ():
@@ -262,12 +262,12 @@ class Network:
       s["occ"] = o
     
     # further reduce return size: replace reaction ids in gene occurrences
-    for g in json["genes"]:
+    for g in json["enzs"]:
       o = []
       for occ in g["reactions"]:
         o.append (reaction_mapper[occ])
       g["reactions"] = o
-    for g in json["genec"]:
+    for g in json["enzc"]:
       o = []
       for occ in g["reactions"]:
         o.append (reaction_mapper[occ])
@@ -300,7 +300,7 @@ class Network:
             s.genes_for_consumption["g"].add (gene)
       
       for gene in reaction.genec:
-        self.__logger.debug ("processing gene complev " + gene)
+        self.__logger.debug ("processing gene complex " + gene)
         for species in reaction.consumed:
           s = self.species[species]
           s.genes_for_consumption["gc"].add (gene)
@@ -416,11 +416,11 @@ class Network:
       for gene in self.genes:
         num += 1
         nodemap[gene] = str (num)
-        f.write (Network.create_gml_node (nodemap[gene], "gene", "ellipse", gene))
+        f.write (Network.create_gml_node (nodemap[gene], "enzyme", "ellipse", gene))
       for gene in self.gene_complexes:
         num += 1
         nodemap[gene] = str (num)
-        f.write (Network.create_gml_node (nodemap[gene], "gene_complex", "ellipse", gene))
+        f.write (Network.create_gml_node (nodemap[gene], "enzyme_complex", "ellipse", gene))
         
         
       for gene in self.genes:
@@ -492,11 +492,11 @@ class Network:
       for gene in self.genes:
         num += 1
         nodemap[gene] = 'g' + str (num)
-        f.write (Network.create_graphml_node (nodemap[gene], "gene", "ellipse", gene))
+        f.write (Network.create_graphml_node (nodemap[gene], "enzyme", "ellipse", gene))
       for gene in self.gene_complexes:
         num += 1
         nodemap[gene] = 'gc' + str (num)
-        f.write (Network.create_graphml_node (nodemap[gene], "gene_complex", "ellipse", gene))
+        f.write (Network.create_graphml_node (nodemap[gene], "enzyme_complex", "ellipse", gene))
       num = 0
       for gene in self.genes:
           for associated in self.genes[gene].links["g"]:

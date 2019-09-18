@@ -64,8 +64,8 @@ def clear_data (request):
   Utils.del_session_key (request, None, Constants.SESSION_MODEL_TYPE)
   Utils.del_session_key (request, None, Constants.SESSION_FILTER_SPECIES)
   Utils.del_session_key (request, None, Constants.SESSION_FILTER_REACTION)
-  Utils.del_session_key (request, None, Constants.SESSION_FILTER_GENES)
-  Utils.del_session_key (request, None, Constants.SESSION_FILTER_GENE_COMPLEXES)
+  Utils.del_session_key (request, None, Constants.SESSION_FILTER_ENZYMES)
+  Utils.del_session_key (request, None, Constants.SESSION_FILTER_ENZYME_COMPLEXES)
   return JsonResponse ({
           "status":"success"
         })
@@ -87,16 +87,16 @@ def get_network (request):
       # ~ __logger.info ("got genenet")
       filter_species = []
       filter_reaction = []
-      filter_genes = []
-      filter_gene_complexes = []
+      filter_enzymes = []
+      filter_enzyme_complexes = []
       if Constants.SESSION_FILTER_SPECIES in request.session:
         filter_species = request.session[Constants.SESSION_FILTER_SPECIES]
       if Constants.SESSION_FILTER_REACTION in request.session:
         filter_reaction = request.session[Constants.SESSION_FILTER_REACTION]
-      if Constants.SESSION_FILTER_GENES in request.session:
-          filter_genes = request.session[Constants.SESSION_FILTER_GENES]
-      if Constants.SESSION_FILTER_GENE_COMPLEXES in request.session:
-          filter_gene_complexes = request.session[Constants.SESSION_FILTER_GENE_COMPLEXES]
+      if Constants.SESSION_FILTER_ENZYMES in request.session:
+          filter_enzymes = request.session[Constants.SESSION_FILTER_ENZYMES]
+      if Constants.SESSION_FILTER_ENZYME_COMPLEXES in request.session:
+          filter_enzyme_complexes = request.session[Constants.SESSION_FILTER_ENZYME_COMPLEXES]
       __logger.info ("sending response")
       if len (network.species) + len (network.reactions) + len (network.genes) + len (network.gene_complexes) > settings.MAX_ENTITIES_FILTER:
         raise TooBigForBrowser ("This model is probably too big for your browser... It contains "+str (len (network.species))+" species, "+str (len (network.reactions))+" reactions and "+str (len (network.genenet))+" gene combinations. We won't load it for filtering, as you're browser is very likely to die when trying to process that amount of data.. Max is currently set to "+str (settings.MAX_ENTITIES_FILTER)+" entities in total. Please export it w/o filtering or use the API instead.")
@@ -108,8 +108,8 @@ def get_network (request):
             "filter": {
             Constants.SESSION_FILTER_SPECIES: filter_species,
             Constants.SESSION_FILTER_REACTION: filter_reaction,
-            Constants.SESSION_FILTER_GENES: filter_genes,
-            Constants.SESSION_FILTER_GENE_COMPLEXES: filter_gene_complexes,
+            Constants.SESSION_FILTER_ENZYMES: filter_enzymes,
+            Constants.SESSION_FILTER_ENZYME_COMPLEXES: filter_enzyme_complexes,
             }
             })
     except TooBigForBrowser as e:
@@ -131,10 +131,10 @@ def prepare_filter (request):
     request.session[Constants.SESSION_FILTER_SPECIES] = []
   if not Constants.SESSION_FILTER_REACTION in request.session:
     request.session[Constants.SESSION_FILTER_REACTION] = []
-  if not Constants.SESSION_FILTER_GENES in request.session:
-    request.session[Constants.SESSION_FILTER_GENES] = []
-  if not Constants.SESSION_FILTER_GENE_COMPLEXES in request.session:
-    request.session[Constants.SESSION_FILTER_GENE_COMPLEXES] = []
+  if not Constants.SESSION_FILTER_ENZYMES in request.session:
+    request.session[Constants.SESSION_FILTER_ENZYMES] = []
+  if not Constants.SESSION_FILTER_ENZYME_COMPLEXES in request.session:
+    request.session[Constants.SESSION_FILTER_ENZYME_COMPLEXES] = []
 
 def sort_gene_complexes (complexes):
   c2 = []
@@ -159,11 +159,11 @@ def store_filter (request):
     request.session[Constants.SESSION_FILTER_SPECIES] = data["species"]
   if "reaction" in data and isinstance(data["reaction"], list):
     request.session[Constants.SESSION_FILTER_REACTION] = data["reaction"]
-  if "genes" in data and isinstance(data["genes"], list):
-    request.session[Constants.SESSION_FILTER_GENES] = data["genes"]
-  if "gene_complexes" in data and isinstance(data["gene_complexes"], list):
+  if "enzymes" in data and isinstance(data["enzymes"], list):
+    request.session[Constants.SESSION_FILTER_ENZYMES] = data["enzymes"]
+  if "enzyme_complexes" in data and isinstance(data["enzyme_complexes"], list):
     try:
-      request.session[Constants.SESSION_FILTER_GENE_COMPLEXES] = sort_gene_complexes (data["gene_complexes"])
+      request.session[Constants.SESSION_FILTER_ENZYME_COMPLEXES] = sort_gene_complexes (data["enzyme_complexes"])
     except InvalidGeneComplexExpression as e:
       return JsonResponse ({"status":"failed","error":str (getattr(e, 'code', repr(e))) + getattr(e, 'message', repr(e))})
   
@@ -171,8 +171,8 @@ def store_filter (request):
             "filter": {
             Constants.SESSION_FILTER_SPECIES: request.session[Constants.SESSION_FILTER_SPECIES],
             Constants.SESSION_FILTER_REACTION: request.session[Constants.SESSION_FILTER_REACTION],
-            Constants.SESSION_FILTER_GENES: request.session[Constants.SESSION_FILTER_GENES],
-            Constants.SESSION_FILTER_GENE_COMPLEXES: request.session[Constants.SESSION_FILTER_GENE_COMPLEXES],
+            Constants.SESSION_FILTER_ENZYMES: request.session[Constants.SESSION_FILTER_ENZYMES],
+            Constants.SESSION_FILTER_ENZYME_COMPLEXES: request.session[Constants.SESSION_FILTER_ENZYME_COMPLEXES],
             }})
   
 def get_bigg_models (request):
@@ -210,8 +210,8 @@ def select_bigg_model (request):
     request.session[Constants.SESSION_MODEL_TYPE] = Constants.SESSION_MODEL_TYPE_BIGG
     Utils.del_session_key (request, {}, Constants.SESSION_FILTER_SPECIES)
     Utils.del_session_key (request, {}, Constants.SESSION_FILTER_REACTION)
-    Utils.del_session_key (request, {}, Constants.SESSION_FILTER_GENES)
-    Utils.del_session_key (request, {}, Constants.SESSION_FILTER_GENE_COMPLEXES)
+    Utils.del_session_key (request, {}, Constants.SESSION_FILTER_ENZYMES)
+    Utils.del_session_key (request, {}, Constants.SESSION_FILTER_ENZYME_COMPLEXES)
     return JsonResponse ({"status":"success"})
 
   except InvalidBiggId  as e:
@@ -265,8 +265,8 @@ def select_biomodel (request):
     request.session[Constants.SESSION_MODEL_TYPE] = Constants.SESSION_MODEL_TYPE_BIOMODELS
     Utils.del_session_key (request, {}, Constants.SESSION_FILTER_SPECIES)
     Utils.del_session_key (request, {}, Constants.SESSION_FILTER_REACTION)
-    Utils.del_session_key (request, {}, Constants.SESSION_FILTER_GENES)
-    Utils.del_session_key (request, {}, Constants.SESSION_FILTER_GENE_COMPLEXES)
+    Utils.del_session_key (request, {}, Constants.SESSION_FILTER_ENZYMES)
+    Utils.del_session_key (request, {}, Constants.SESSION_FILTER_ENZYME_COMPLEXES)
     return JsonResponse ({"status":"success"})
 
   except UnableToRetrieveBiomodel  as e:
@@ -322,9 +322,9 @@ def export (request):
     sbml = gemtractor.get_sbml (
       request.session[Constants.SESSION_FILTER_SPECIES],
       request.session[Constants.SESSION_FILTER_REACTION],
-      request.session[Constants.SESSION_FILTER_GENES],
-      request.session[Constants.SESSION_FILTER_GENE_COMPLEXES],
-      form.cleaned_data['remove_reaction_genes_removed'],
+      request.session[Constants.SESSION_FILTER_ENZYMES],
+      request.session[Constants.SESSION_FILTER_ENZYME_COMPLEXES],
+      form.cleaned_data['remove_reaction_enzymes_removed'],
       form.cleaned_data['remove_reaction_missing_species'])
     
     if form.cleaned_data['network_type'] == 'en':
@@ -337,9 +337,9 @@ def export (request):
         net.export_en_sbml (file_path, gemtractor, request.session[Constants.SESSION_MODEL_ID], request.session[Constants.SESSION_MODEL_NAME],
             request.session[Constants.SESSION_FILTER_SPECIES],
             request.session[Constants.SESSION_FILTER_REACTION],
-            request.session[Constants.SESSION_FILTER_GENES],
-            request.session[Constants.SESSION_FILTER_GENE_COMPLEXES],
-            form.cleaned_data['remove_reaction_genes_removed'],
+            request.session[Constants.SESSION_FILTER_ENZYMES],
+            request.session[Constants.SESSION_FILTER_ENZYME_COMPLEXES],
+            form.cleaned_data['remove_reaction_enzymes_removed'],
             form.cleaned_data['remove_reaction_missing_species'])
         if os.path.exists(file_path):
           return JsonResponse ({"status":"success", "name": file_name, "mime": "application/xml"})
@@ -445,19 +445,19 @@ def execute (request):
   
   filter_species = []
   filter_reactions = []
-  filter_genes = []
-  filter_gene_complexes = []
+  filter_enzymes = []
+  filter_enzyme_complexes = []
   
   if "filter" in data:
     if "species" in data["filter"]:
       filter_species = data["filter"]["species"]
     if "reactions" in data["filter"]:
       filter_reactions = data["filter"]["reactions"]
-    if "genes" in data["filter"]:
-      filter_genes = data["filter"]["genes"]
-    if "gene_complexes" in data["filter"]:
+    if "enzymes" in data["filter"]:
+      filter_enzymes = data["filter"]["enzymes"]
+    if "enzyme_complexes" in data["filter"]:
       try:
-        filter_gene_complexes = sort_gene_complexes (data["filter"]["gene_complexes"])
+        filter_enzyme_complexes = sort_gene_complexes (data["filter"]["enzyme_complexes"])
       except InvalidGeneComplexExpression as e:
         return HttpResponseBadRequest ("error: " + str (getattr(e, 'code', repr(e))) + getattr(e, 'message', repr(e)))
   
@@ -465,10 +465,10 @@ def execute (request):
     return HttpResponseBadRequest("filter species needs to be an array")
   if not isinstance(filter_reactions, list):
     return HttpResponseBadRequest("filter for reactions needs to be an array")
-  if not isinstance(filter_genes, list):
-    return HttpResponseBadRequest("filter for genes needs to be an array")
-  if not isinstance(filter_gene_complexes, list):
-    return HttpResponseBadRequest("filter for gene complexes needs to be an array")
+  if not isinstance(filter_enzymes, list):
+    return HttpResponseBadRequest("filter for enzymes needs to be an array")
+  if not isinstance(filter_enzyme_complexes, list):
+    return HttpResponseBadRequest("filter for enzyme complexes needs to be an array")
   
   export = data["export"]
   
@@ -478,11 +478,11 @@ def execute (request):
     return HttpResponseBadRequest ("job is missing the desired network_format (sbml|dot|graphml|gml|csv)")
     
   
-  remove_reaction_genes_removed = True
+  remove_reaction_enzymes_removed = True
   remove_reaction_missing_species = False
   
-  if "remove_reaction_genes_removed" in export:
-    remove_reaction_genes_removed = export["remove_reaction_genes_removed"]
+  if "remove_reaction_enzymes_removed" in export:
+    remove_reaction_enzymes_removed = export["remove_reaction_enzymes_removed"]
   if "remove_reaction_missing_species" in export:
     remove_reaction_missing_species = export["remove_reaction_missing_species"]
   
@@ -491,9 +491,9 @@ def execute (request):
     sbml = gemtractor.get_sbml (
         filter_species,
         filter_reactions,
-        filter_genes,
-        filter_gene_complexes,
-        remove_reaction_genes_removed,
+        filter_enzymes,
+        filter_enzyme_complexes,
+        remove_reaction_enzymes_removed,
         remove_reaction_missing_species)
   except Exception as e:
     return HttpResponseBadRequest ("the model has an issue: " + getattr(e, 'message', repr(e)))
@@ -507,7 +507,7 @@ def execute (request):
     net = gemtractor.extract_network_from_sbml (sbml)
     net.calc_genenet ()
     if export["network_format"] == "sbml":
-      net.export_en_sbml (outputFile.name, gemtractor, sbml.getModel ().getId () + "_EN", sbml.getModel ().getName () + " converted to EnzymeNetwork", filter_species, filter_reactions, filter_genes, filter_gene_complexes, remove_reaction_genes_removed, remove_reaction_missing_species)
+      net.export_en_sbml (outputFile.name, gemtractor, sbml.getModel ().getId () + "_EN", sbml.getModel ().getName () + " converted to EnzymeNetwork", filter_species, filter_reactions, filter_enzymes, filter_enzyme_complexes, remove_reaction_enzymes_removed, remove_reaction_missing_species)
       if os.path.exists(outputFile.name):
         return Utils.serve_file (outputFile.name, "gemtracted-model.sbml", "application/xml")
       else:

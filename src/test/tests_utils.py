@@ -29,13 +29,13 @@ class UtilsTests (TestCase):
   __regex_reactions_section_notes = re.compile (r"Filter Reactions:[^:]*(<ul>[^:]*</ul>)", re.DOTALL)
   __regex_reactions_notes = re.compile (r"<li>([^<]+)</li>", re.DOTALL)
   
-  __regex_genes_section_notes = re.compile (r"Filter Genes:[^:]*(<ul>[^:]*</ul>)", re.DOTALL)
+  __regex_genes_section_notes = re.compile (r"Filter Enzymes:[^:]*(<ul>[^:]*</ul>)", re.DOTALL)
   __regex_genes_notes = re.compile (r"<li>([^<]+)</li>", re.DOTALL)
   
-  __regex_gene_complexes_section_notes = re.compile (r"Filter Gene Complexes:[^:]*(<ul>[^:]*</ul>)", re.DOTALL)
+  __regex_gene_complexes_section_notes = re.compile (r"Filter Enzyme Complexes:[^:]*(<ul>[^:]*</ul>)", re.DOTALL)
   __regex_gene_complexes_notes = re.compile (r"<li>([^<]+)</li>", re.DOTALL)
   
-  __regex_reaction_genes = re.compile (r"genes are removed:\\s*(\w)", re.DOTALL)
+  __regex_reaction_genes = re.compile (r"enzymes are removed:\\s*(\w)", re.DOTALL)
   __regex_reaction_species = re.compile (r"missing a species:\\s*(\w)", re.DOTALL)
   
   
@@ -73,8 +73,8 @@ class UtilsTests (TestCase):
     self.assertTrue (sbml.getNumErrors() == 0)
     return sbml.getModel()
     
-  def __test_model_notes (self, model, filter_species, filter_reactions, filter_genes, filter_gene_complexes, remove_reaction_genes_removed, remove_reaction_missing_species):
-    Utils.add_model_note (model, filter_species, filter_reactions, filter_genes, filter_gene_complexes, remove_reaction_genes_removed, remove_reaction_missing_species)
+  def __test_model_notes (self, model, filter_species, filter_reactions, filter_enzymes, filter_enzyme_complexes, remove_reaction_enzymes_removed, remove_reaction_missing_species):
+    Utils.add_model_note (model, filter_species, filter_reactions, filter_enzymes, filter_enzyme_complexes, remove_reaction_enzymes_removed, remove_reaction_missing_species)
     notes = model.getNotesString ()
     
     if filter_species is not None:
@@ -97,27 +97,27 @@ class UtilsTests (TestCase):
       for n in filter_reactions:
         self.assertTrue (n in snotes)
     
-    if filter_genes is not None:
+    if filter_enzymes is not None:
       section = re.search (UtilsTests.__regex_genes_section_notes, notes)
       self.assertTrue (section is not None)
       snotes = re.findall (UtilsTests.__regex_genes_notes, section.group(1))
-      self.assertEqual (len (snotes), len (filter_genes))
+      self.assertEqual (len (snotes), len (filter_enzymes))
       for n in snotes:
-        self.assertTrue (n in filter_genes)
-      for n in filter_genes:
+        self.assertTrue (n in filter_enzymes)
+      for n in filter_enzymes:
         self.assertTrue (n in snotes)
     
-    if filter_gene_complexes is not None:
+    if filter_enzyme_complexes is not None:
       section = re.search (UtilsTests.__regex_gene_complexes_section_notes, notes)
       self.assertTrue (section is not None)
       snotes = re.findall (UtilsTests.__regex_gene_complexes_notes, section.group(1))
-      self.assertEqual (len (snotes), len (filter_gene_complexes))
+      self.assertEqual (len (snotes), len (filter_enzyme_complexes))
       for n in snotes:
-        self.assertTrue (n in filter_gene_complexes)
-      for n in filter_gene_complexes:
+        self.assertTrue (n in filter_enzyme_complexes)
+      for n in filter_enzyme_complexes:
         self.assertTrue (n in snotes)
     
-    self.assertTrue ("genes are removed: " + str (remove_reaction_genes_removed) in notes)
+    self.assertTrue ("enzymes are removed: " + str (remove_reaction_enzymes_removed) in notes)
     self.assertTrue ("missing a species: " + str (remove_reaction_missing_species) in notes)
     
     

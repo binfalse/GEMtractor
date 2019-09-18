@@ -38,10 +38,10 @@
          <div class="w3-half w3-container">
   <p>    <div class="w3-red">
 
-    {{ form.remove_reaction_genes_removed.errors }}
+    {{ form.remove_reaction_enzymes_removed.errors }}
 </div>
-    {{ form.remove_reaction_genes_removed|addclass:'w3-check' }}
-<label for="{{ form.remove_reaction_genes_removed.id_for_label }}">Remove reactions, whose genes were all removed</label>
+    {{ form.remove_reaction_enzymes_removed|addclass:'w3-check' }}
+<label for="{{ form.remove_reaction_enzymes_removed.id_for_label }}">Remove reactions, whose enzymes were all removed</label>
 </p>
 
 
@@ -71,7 +71,7 @@
 <script>
   token = '{{ csrf_token }}';
   network_type_id = '{{ form.network_type.id_for_label }}';
-  remove_reaction_genes_removed_id = '{{ form.remove_reaction_genes_removed.id_for_label }}'
+  remove_reaction_enzymes_removed_id = '{{ form.remove_reaction_enzymes_removed.id_for_label }}'
   prepareExport ();
 </script>
 

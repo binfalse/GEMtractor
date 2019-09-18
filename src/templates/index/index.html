@@ -11,16 +11,18 @@ Hello
 </div>
 
 <p>
-  This is the <strong>GEMtractor.</strong> It supports you in analyzing genome-scale metabolic models (GEMs)!
+  Welcome to the <strong>GEMtractor</strong> &mdash; a platform for trimming and extracting of genome-scale metabolic models (GEMs)!
 </p>
 <p>
-  Choose an SBML model and it will help you to <strong>filter currency metabolites,</strong> to <strong>simulate knock out experiments,</strong> or to <strong>reduce the model size</strong> to e.g. focus on your flux balance results. And much more...
+  The analyzations goes like this:
+  <ol>
+    <li><strong>Choose an SBML model:</strong> Upload your model or select a published model from BiGG Models or Biomodels.</li>
+    <li><strong>Trim the model:</strong> Optionally delete (currency-)metabolites, reactions, genes, or enzyme complexes if you want to concentrate on a reduced version of the model.</li>
+    <li><strong>Export the model:</strong> Optionally extract the enzyme-centric network before downloading the reduced model in different formats for subsequent analyses.</li>
+  </ol>
 </p>
 <p>
-  You may then extract the protein-interaction-network from the concentrated model, and finally export you network in several formats for subsequent analyses.
-</p>
-<p>
-  There is an API, so you may use the GEMtractor from your programs. The GEMtractor is free software and also available as a Docker image. Thus, running your own GEMtractor is as easy as calling a single command line &mdash; including all the benefits, such as privacy and speed! Read more about the setup at ... TODO
+  There is an API, so you may use the GEMtractor from your software tools. <strong>The GEMtractor is free software</strong> and also available as a Docker image. Thus, running your own GEMtractor is as easy as calling a single command line &mdash; including all the benefits, such as privacy and speed! Read more about the setup at ... TODO
 </p>
 <p>
   If you dare to harvest your models, click <a href="{% url 'gemtract:index' %}">Start</a> from the top panel.

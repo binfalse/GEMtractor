@@ -146,13 +146,13 @@ class GemtractTest(TestCase):
         self.assertEqual(len (response.json()["data"]["files"]), 1)
         
         
-        response = self.client.post('/api/store_filter', json.dumps({'species': ["x","y","a"], 'reaction': ["x","y","a"], 'genes': ["x","y","x","y"]}),content_type="application/json")
+        response = self.client.post('/api/store_filter', json.dumps({'species': ["x","y","a"], 'reaction': ["x","y","a"], 'enzymes': ["x","y","x","y"]}),content_type="application/json")
         self.assertEqual(response.status_code, 200)
         self.assertEqual("success", response.json()["status"], msg = "response was: " + str(response.json()))
         f = response.json()["filter"]
         self.assertEqual(len(f["filter_species"]), 3)
         self.assertEqual(len(f["filter_reactions"]), 3)
-        self.assertEqual(len(f["filter_genes"]), 4)
+        self.assertEqual(len(f["filter_enzymes"]), 4)
         
         
         response = self.client.get('/gemtract/filter')
@@ -234,7 +234,7 @@ class GemtractTest(TestCase):
         self.assertTrue (self._valid_xml (response.content))
         c = response.content.decode("utf-8")
         self.assertEqual (c.count ("<node "), enSpecies)
-        self.assertEqual (c.count (">gene</data") + c.count (">gene_complex</data"), enSpecies)
+        self.assertEqual (c.count (">enzyme</data") + c.count (">enzyme_complex</data"), enSpecies)
         self.assertEqual (c.count ("<edge"), enReactions)
         
         
@@ -297,10 +297,10 @@ class GemtractTest(TestCase):
         
         
     
-  def _create_export (self, network_type, network_format, remove_reaction_genes_removed, remove_reaction_missing_species):
+  def _create_export (self, network_type, network_format, remove_reaction_enzymes_removed, remove_reaction_missing_species):
     return ExportForm(data={
       'network_type': network_type,
-      'remove_reaction_genes_removed': remove_reaction_genes_removed,
+      'remove_reaction_enzymes_removed': remove_reaction_enzymes_removed,
       'remove_reaction_missing_species': remove_reaction_missing_species,
       'network_format': network_format,
       })
@@ -327,7 +327,7 @@ class GemtractTest(TestCase):
   def test_export_form(self):
     form = self._create_export ('en', 'sbml', False, True)
     self.assertTrue (form.is_valid())
-    self.assertTrue (form.cleaned_data['remove_reaction_genes_removed'])
+    self.assertTrue (form.cleaned_data['remove_reaction_enzymes_removed'])
     
     form = self._create_export ('blah', 'sbml', False, True)
     self.assertFalse (form.is_valid())

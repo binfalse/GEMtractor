@@ -242,8 +242,8 @@ class GEMtractorTests (TestCase):
         ns = net.serialize ()
         self.assertEqual (len (net.species), len (ns["species"]))
         self.assertEqual (len (net.reactions), len (ns["reactions"]))
-        self.assertEqual (len (net.genes), len (ns["genes"]))
-        self.assertEqual (len (net.gene_complexes), len (ns["genec"]))
+        self.assertEqual (len (net.genes), len (ns["enzs"]))
+        self.assertEqual (len (net.gene_complexes), len (ns["enzc"]))
         self.assertEqual (len (net.species), 3)
         self.assertEqual (len (net.reactions), 3)
         
@@ -288,30 +288,30 @@ class GEMtractorTests (TestCase):
         net.export_en_dot (tf.name)
         with open (tf.name, 'r') as r:
               c = r.read().replace('\n', '')
-              self.assertEqual (c.count ("label="), len (ns["genes"]) + len(ns["genec"]))
+              self.assertEqual (c.count ("label="), len (ns["enzs"]) + len(ns["enzc"]))
               self.assertEqual (c.count (" -> "), n_genelinks)
         
         net.export_en_gml (tf.name)
         with open (tf.name, 'r') as r:
               c = r.read().replace('\n', '')
-              self.assertEqual (c.count ("node ["), len (ns["genes"]) + len(ns["genec"]))
+              self.assertEqual (c.count ("node ["), len (ns["enzs"]) + len(ns["enzc"]))
               self.assertEqual (c.count ("edge ["), n_genelinks)
         
         net.export_en_graphml (tf.name)
         xmldoc = minidom.parse(tf.name)
-        self.assertEqual (len (xmldoc.getElementsByTagName('node')), len (ns["genes"]) + len(ns["genec"]))
+        self.assertEqual (len (xmldoc.getElementsByTagName('node')), len (ns["enzs"]) + len(ns["enzc"]))
         with open (tf.name, 'r') as r:
               c = r.read().replace('\n', '')
-              self.assertEqual (c.count ("<node "), len (ns["genes"]) + len(ns["genec"]))
-              self.assertEqual (c.count (">gene</data"), len (ns["genes"]))
-              self.assertEqual (c.count (">gene_complex</data"), len(ns["genec"]))
+              self.assertEqual (c.count ("<node "), len (ns["enzs"]) + len(ns["enzc"]))
+              self.assertEqual (c.count (">enzyme</data"), len (ns["enzs"]))
+              self.assertEqual (c.count (">enzyme_complex</data"), len(ns["enzc"]))
               self.assertEqual (c.count ("<edge"), n_genelinks)
         
         net.export_en_sbml (tf.name, gemtractor, "testid")
         gemtractor2 = GEMtractor (tf.name)
         sbml = gemtractor2.get_sbml ()
         self.assertEqual (sbml.getNumErrors(), 0)
-        self.assertEqual (sbml.getModel().getNumSpecies (), len (ns["genes"]) + len(ns["genec"]))
+        self.assertEqual (sbml.getModel().getNumSpecies (), len (ns["enzs"]) + len(ns["enzc"]))
         self.assertEqual (sbml.getModel().getNumReactions (), n_genelinks)
         model = sbml.getModel()
         found_x = False

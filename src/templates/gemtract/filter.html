@@ -36,13 +36,13 @@
     <td id="r_inconsistent"></td>
   </tr>
   <tr>
-    <th>genes</th>
+    <th>enzymes</th>
     <td id="g_org"></td>
     <td id="g_cur"></td>
     <td id="g_inconsistent"></td>
   </tr>
   <tr>
-    <th>gene complexes</th>
+    <th>enzyme complexes</th>
     <td id="gc_org"></td>
     <td id="gc_cur"></td>
     <td id="gc_inconsistent"></td>
@@ -52,18 +52,17 @@
   <h2>Reduce Model Size</h2>
 
   <p>
-    You can now discard a subset of the model's entities (species, reactions, or genes) to reduce the model size.
-    With the reduced model you can for example concentrate on FBA results or simulate knock out experiments.
-    Filtering a model may decrease subsequent computations dramatically.
+    You can now discard a subset of the model's entities (species, reactions, enzymes, or enzyme complexes) to reduce the model size.
+    A concentrated model may improve subsequent computations dramatically.
   </p>
 
 
   <div class="w3-bar  w3-white w3-border">
     <div class="w3-bar-item w3-hide-small">Filter:</div>
     <button id="filter-species-tab" class="w3-bar-item w3-button" onclick="tab('filter-species', 'filter-species-tab')">Species</button>
-    <button id="filter-reaction-tab" class="w3-bar-item w3-button" onclick="tab('filter-reaction', 'filter-reaction-tab')">Reaction</button>
-    <button id="filter-gene-tab" class="w3-bar-item w3-button" onclick="tab('filter-gene', 'filter-gene-tab')">Gene</button>
-    <button id="filter-gene-complex-tab" class="w3-bar-item w3-button" onclick="tab('filter-gene-complex', 'filter-gene-complex-tab')">Gene Complexes</button>
+    <button id="filter-reaction-tab" class="w3-bar-item w3-button" onclick="tab('filter-reaction', 'filter-reaction-tab')">Reactions</button>
+    <button id="filter-gene-tab" class="w3-bar-item w3-button" onclick="tab('filter-gene', 'filter-gene-tab')">Enzymes</button>
+    <button id="filter-gene-complex-tab" class="w3-bar-item w3-button" onclick="tab('filter-gene-complex', 'filter-gene-complex-tab')">Enzyme Complexes</button>
     <button id="filter-batch-tab" class="w3-bar-item w3-button" onclick="tab('filter-batch', 'filter-batch-tab')">Batch</button>
   </div>
 
@@ -98,7 +97,7 @@
       </div>
       <div id="filter-gene" class="w3-responsive" style="display:none" class="">
 	<p>You may sort the following table by clicking on the header cell.</p>
-        <p>Unselecting a gene will also remove all complexes in which it appears (they will be highlighted in read under the <em>Gene Complex</em> tab). A red gene indicates, that the gene is not used in any reaction anymore. Thus, it will be excluded even if you keep it selected here! See also: <a href="{% url 'index:learn' %}#gene-association">How does the GEMtractor identify genes that are associated to a reaction?</a> and <a href="{% url 'index:learn' %}#filter-gene">What exactly happens when I remove a gene during filtering?</a></p>
+        <p>Unselecting an enzyme will also remove all complexes in which it appears (they will be highlighted in read under the <em>Enzyme Complex</em> tab). A red enzyme indicates, that the enzyme is not used in any reaction anymore. Thus, it will be excluded even if you keep it selected here. See also: <a href="{% url 'index:learn' %}#gene-association">How does the GEMtractor identify genes that are associated to a reaction?</a> and <a href="{% url 'index:learn' %}#filter-gene">What exactly happens when I remove an enzyme during filtering?</a></p>
         <table class="w3-table w3-striped sortable notfirst">
            <thead>
              <th>include <i class='fas fa-sort'></i></th>
@@ -111,7 +110,7 @@
       </div>
       <div id="filter-gene-complex" class="w3-responsive" style="display:none" class="">
 	<p>You may sort the following table by clicking on the header cell.</p>
-        <p>Unselecting a gene complex will <strong>not</strong> remove the individual genes appearing in that complex! Other complexes, which are a superset of a removed complex, will be highlighted in red and italics. If you do not remove those yourself, they are assumed to be still available in the model. See also: <a href="{% url 'index:learn' %}#gene-association">How does the GEMtractor identify genes that are associated to a reaction?</a> and <a href="{% url 'index:learn' %}#gene-complex">What is a gene complex?</a> and <a href="{% url 'index:learn' %}#filter-gene-complex">What exactly happens when I remove a gene complex during filtering?</a></p>
+        <p>Unselecting an enzyme complex will <strong>not</strong> remove the individual enzymes appearing in that complex! Other complexes, which are a superset of a removed complex, will be highlighted in red and italics TODO. If you do not remove those yourself, they are assumed to be still available in the model. See also: <a href="{% url 'index:learn' %}#gene-association">How does the GEMtractor identify genes that are associated to a reaction?</a> and <a href="{% url 'index:learn' %}#enzyme-complex">What is an enzyme complex?</a> and <a href="{% url 'index:learn' %}#filter-enzyme-complex">What exactly happens when I remove an enzyme complex during filtering?</a></p>
         <table class="w3-table w3-striped sortable notfirst">
            <thead>
              <th>include <i class='fas fa-sort'></i></th>
@@ -124,7 +123,7 @@
       <div id="filter-batch" style="display:none" class="">
 	<p>
 	  Use the following text area to automatically alter the filtering.
-	  Every line begins with an entity identifier (species, reactions, genes), followed by a colon (:) and a comma seperated list of identifiers:
+	  Every line begins with an entity identifier (species, reactions, enzymes, enzyme_complexes), followed by a colon (:) and a comma seperated list of identifiers:
 	</p>
         <textarea id="batch-filter" rows="20">
         </textarea>

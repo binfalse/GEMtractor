@@ -109,8 +109,8 @@ class NetworkTests (TestCase):
     self.assertTrue (rs1["rev"], msg="reaction should be reversible by default")
     self.assertEqual (len (rs1["cons"]), 0)
     self.assertEqual (len (rs1["prod"]), 0)
-    self.assertEqual (len (rs1["genes"]), 0)
-    self.assertEqual (len (rs1["genec"]), 0)
+    self.assertEqual (len (rs1["enzs"]), 0)
+    self.assertEqual (len (rs1["enzc"]), 0)
     
     s1 = Species ("someid", "somename")
     s2 = Species ("someid2", "somename2")
@@ -126,8 +126,8 @@ class NetworkTests (TestCase):
     self.assertEqual (len (rs1["cons"]), 1)
     self.assertEqual (rs1["cons"][0], mapper[s1.identifier])
     self.assertEqual (len (rs1["prod"]), 0)
-    self.assertEqual (len (rs1["genes"]), 0)
-    self.assertEqual (len (rs1["genec"]), 0)
+    self.assertEqual (len (rs1["enzs"]), 0)
+    self.assertEqual (len (rs1["enzc"]), 0)
     
     self.assertEqual (len (s1.occurence), 1)
     self.assertEqual (len (s2.occurence), 0)
@@ -143,8 +143,8 @@ class NetworkTests (TestCase):
     self.assertEqual (rs1["cons"][0], mapper[s1.identifier])
     self.assertEqual (len (rs1["prod"]), 1)
     self.assertEqual (rs1["prod"][0], mapper[s1.identifier])
-    self.assertEqual (len (rs1["genes"]), 0)
-    self.assertEqual (len (rs1["genec"]), 0)
+    self.assertEqual (len (rs1["enzs"]), 0)
+    self.assertEqual (len (rs1["enzc"]), 0)
     
     self.assertEqual (len (s1.occurence), 2)
     self.assertEqual (len (s2.occurence), 0)
@@ -162,8 +162,8 @@ class NetworkTests (TestCase):
     self.assertEqual (len (rs1["prod"]), 2)
     self.assertEqual (rs1["prod"][0], mapper[s1.identifier])
     self.assertEqual (rs1["prod"][1], mapper[s2.identifier])
-    self.assertEqual (len (rs1["genes"]), 0)
-    self.assertEqual (len (rs1["genec"]), 0)
+    self.assertEqual (len (rs1["enzs"]), 0)
+    self.assertEqual (len (rs1["enzc"]), 0)
     
     self.assertEqual (len (s1.occurence), 2)
     self.assertEqual (len (s2.occurence), 1)
