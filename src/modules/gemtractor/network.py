@@ -662,20 +662,21 @@ class Network:
   
   
   def export_rn_csv (self, filename):
-      with open(filename, 'w') as f:
-        f.write ("source,target\n")
-        for identifier, reaction in self.reactions.items ():
-          for s in reaction.consumed:
-            f.write ('"' + rid + '","s' + s + '"\n')
-          for s in reaction.produced:
-            f.write ('"s' + s + '","' + rid + '"\n')
+    with open(filename, 'w') as f:
+      f.write ('"source","target"\n')
+      for identifier, reaction in self.reactions.items ():
+        rid = 'r' + identifier
+        for s in reaction.consumed:
+          f.write ('"' + rid + '","s' + s + '"\n')
+        for s in reaction.produced:
+          f.write ('"s' + s + '","' + rid + '"\n')
       
       
   def export_en_csv (self, filename):
     if not self.have_gene_net:
       self.calc_genenet ()
     with open(filename, 'w') as f:
-      f.write ("source,target\n")
+      f.write ('"source","target"\n')
       for gene in self.genes:
           for associated in self.genes[gene].links["g"]:
             f.write ('"' + gene + '","' + associated.identifier + '"\n')
