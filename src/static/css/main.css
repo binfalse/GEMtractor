@@ -42,6 +42,9 @@ a {
 .filter-inconsistent {
     color: red
 }
+.filter-supercomplex {
+    font-style: italic;
+}
 #batch-filter {
     width: 100%;
 }

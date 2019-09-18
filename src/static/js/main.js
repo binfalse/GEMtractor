@@ -53,6 +53,7 @@ function tab(tabid, tabbuttonid) {
 // we need to remap the id to something that is for sure valid in XML and still resolvable to the original ids..
 const idMap = {};
 const idReMap = {};
+const complexIdNumMap = {};
 
 /**
  * 
@@ -134,7 +135,7 @@ function updateNetwork () {
 	$("#species-table tr").removeClass ("filter-inconsistent").removeClass ("filter-excluded");
 	$("#reaction-table tr").removeClass ("filter-inconsistent").removeClass ("filter-excluded");
 	$("#gene-table tr").removeClass ("filter-inconsistent").removeClass ("filter-excluded");
-	$("#gene-complex-table tr").removeClass ("filter-inconsistent").removeClass ("filter-excluded");
+	$("#gene-complex-table tr").removeClass ("filter-inconsistent").removeClass ("filter-excluded").removeClass ("filter-supercomplex");
 
 	// prepare inconsistency sets
 	var inconsistent = [new Set(),new Set(),new Set(),new Set()];
@@ -178,8 +179,17 @@ function updateNetwork () {
 			$("#" + domId).addClass ("filter-excluded");
 			filter_genec.add (entId);
 			
-			// find super-complexes and highlight them
-			
+			// find super-complexes
+			const this_key = complexIdNumMap[entId];
+			const this_complex = networks.original.enzc[this_key].enzs;
+			for (var key = 0; key < networks.original.enzc.length; key++) {
+				if (key == this_key)
+					continue;
+				const other = networks.original.enzc[key].enzs;
+				if (this_complex.every (r => other.includes (r))) {
+					$("#" + idMap[networks.original.enzc[key].id]).addClass ("filter-inconsistent").addClass ("filter-supercomplex");
+				}
+			}
 	});
 
 	// check reactions for missing genes
@@ -396,6 +406,7 @@ function fill_network_table (filter) {
 		//~ if (networks.original.genenet.hasOwnProperty(key)) {
 			const item = networks.original.enzc[key];
 			item.DOM = domIdMapper (item.id);
+			complexIdNumMap[item.id] = key;
 			// is it filtered?
 			//~ console.log (filter["filter_enzyme_complexes"])
 			//~ console.log (item.id)
