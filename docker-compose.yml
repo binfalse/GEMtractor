@@ -11,7 +11,6 @@ services:
         DJANGO_DEBUG: 'False'
         DJANGO_LOG_LEVEL: INFO
         DJANGO_ALLOWED_HOSTS: gemtractor-py
-        MODEL_MAX_ENTITIES_FILTER: 10000
         STORAGE_DIR: /storage
         KEEP_UPLOADED: 5400
         KEEP_GENERATED: 600
@@ -39,9 +38,6 @@ services:
         - gemtractor-py
     ports:
         - "80:80"
-    # enable the following if using nginx-proxy (https://hub.docker.com/r/binfalse/nginx-proxy/)
-    # environment:
-        # VIRTUAL_HOST: www.url.to.this.website
     volumes:
         - ./src/static:/var/www/static
         - ./nginx.conf:/etc/nginx/nginx.conf

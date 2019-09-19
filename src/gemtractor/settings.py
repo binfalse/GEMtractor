@@ -190,20 +190,48 @@ LOGGING = {
 # where to store uploaded/downloaded/generated stuff?
 STORAGE = os.getenv('STORAGE_DIR', "/tmp/gemtractor-storage/")
 
+
+import math
+def parse_env_var (key, default):
+  """
+    parse some environment variable.
+    
+    will return the environmental value, unless its <= 0.
+    if the value is <= 0, it will return infinity
+    if the environment doesn't contain such a variable, it will return default
+    
+    Parameters
+    ----------
+    key : str
+        the os' envirenment variable to evaluate
+    default : int
+        the default to return if the variable is not set
+
+    Returns
+    -------
+    int
+        the os' environment variable, or default, or infinity (if var <= 0)
+  """
+  val = float (os.getenv('KEEP_UPLOADED', default))
+  if val <= 0:
+    return math.inf
+  return val
+
+
 # how long to keep uploaded files
-KEEP_UPLOADED = float (os.getenv('KEEP_UPLOADED', 1.5*60*60))
+KEEP_UPLOADED = parse_env_var ('KEEP_UPLOADED', 1.5*60*60)
 # how long to keep generated files (there are basically just for immediate download)
-KEEP_GENERATED = float (os.getenv('KEEP_GENERATED', 10*60))
+KEEP_GENERATED = parse_env_var ('KEEP_GENERATED', 10*60)
 
 # how long to keep the bigg model list (that is the list of available models from bigg)
-CACHE_BIGG = float (os.getenv('CACHE_BIGG', 60*60*24))
+CACHE_BIGG = parse_env_var ('CACHE_BIGG', 60*60*24)
 # how long to keep a single cached model obtained from bigg
-CACHE_BIGG_MODEL = float (os.getenv('CACHE_BIGG_MODEL', 7*60*60*24))
+CACHE_BIGG_MODEL = parse_env_var ('CACHE_BIGG_MODEL', 7*60*60*24)
 
 # how long to keep the biomodel's search result
-CACHE_BIOMODELS = float (os.getenv('CACHE_BIOMODELS', 60*60*24))
+CACHE_BIOMODELS = parse_env_var ('CACHE_BIOMODELS', 60*60*24)
 # how long to keep a single cached model from biomodels
-CACHE_BIOMODELS_MODEL = float (os.getenv('CACHE_BIOMODELS_MODEL', 5*60*60*24))
+CACHE_BIOMODELS_MODEL = parse_env_var ('CACHE_BIOMODELS_MODEL', 5*60*60*24)
 
 # urls for model retrieval
 URLS_BIGG_MODELS = "http://bigg.ucsd.edu/api/v2/models/"
@@ -213,5 +241,5 @@ URLS_BIOMODEL_INFO = lambda model_id: "https://www.ebi.ac.uk/biomodels/"+model_i
 URLS_BIOMODEL_SBML = lambda model_id, filename: "https://www.ebi.ac.uk/biomodels/model/download/"+model_id+"?filename="+filename
 
 # what's the max number of entities to allow in the browser
-MAX_ENTITIES_FILTER = int (os.getenv('MAX_ENTITIES_FILTER', 100000))
+MAX_ENTITIES_FILTER = parse_env_var ('MAX_ENTITIES_FILTER', 100000)
 

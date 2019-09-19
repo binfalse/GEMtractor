@@ -464,5 +464,56 @@ Learn
 -> easy setup with advanced privace
 we may restart the service at any time, so be quick filtering ;-)
   </p>
+  
+  
+  <div class="w3-padding w3-card w3-white w3-margin">
+	<div class=" anchor-heading">
+		<a name="own-settings" id="own-settings"></a>
+		<h3>Settings</h3>
+	</div>
+    <p>
+		There are a few environment variables that gives you a bit control about the behavior of the GEMtractor:
+		
+      <ul>
+	<li><code>DJANGO_DEBUG</code>: Boolean 'True' or 'False' &mdash; should Django run in debug mode? Do not set to 'True' in production!</li>
+	<li><code>DJANGO_LOG_LEVEL</code>: String DEBUG, INFO, WARNING, ERROR, or CRITICAL &mdash; what kind of log messages should be reported?</li>
+	<li><code>DJANGO_ALLOWED_HOSTS</code>: String &mdash; the hostname at which GEMtractor is listening.</li>
+	<li><code>MODEL_MAX_ENTITIES_FILTER</code>: Int &mdash; up to how many entities in a model it should allow for filtering in the web browser? Web browsers will die if there are too many entities...</li>
+	<li><code>STORAGE_DIR</code>: Path &mdash; where to store models and exports etc.</li>
+	<li><code>KEEP_UPLOADED</code>: Time in seconds &mdash; how long to keep uploaded files on the server?</li>
+	<li><code>KEEP_GENERATED</code>: Time in seconds &mdash; how long to keep generated files (which are basically only for immediate delivering) on the server?</li>
+	<li><code>CACHE_BIGG</code>: </li>
+	<li><code>CACHE_BIGG_MODEL</code>: </li>
+	<li><code>CACHE_BIOMODELS</code>: </li>
+	<li><code>CACHE_BIOMODELS_MODEL</code>: </li>
+	<li><code>MAX_ENTITIES_FILTER</code>: </li>
+      </ul>
+      
+      There are different ways to set the variables. If you're running the GEMtractor from a shell script, for example, you could do something like that:
+    </p>
+    <pre>
+export CACHE_BIGG=60
+export MAX_ENTITIES_FILTER=20000
+# [...]
+gunicorn --timeout 600 --bind 0.0.0.0:80 gemtractor.wsgi:applicatio
+    </pre>
+    <p>
+		Thus, the running GEMtractor process will then cache the BiGG Models list for 60 seconds and allow for filtering of models in the browser with up to 20K entities.
+	</p>
+    <p>
+		When using <a href="https://docs.docker.com/compose/">Docker Compose</a>, you would set the variables in the <a href="https://github.com/binfalse/GEMtractor/blob/master/docker-compose.yml">demo docker-compose.yml file</a>, for example:
+	</p>
+    <pre>
+version: '3'
+services:
+  gemtractor-py:
+	[...]
+    environment:
+        CACHE_BIGG: 60
+        MAX_ENTITIES_FILTER: 20000
+        [...]
+    </pre>
+	
+  </div>
 </div>
 {% endblock %}
