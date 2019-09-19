@@ -1,12 +1,12 @@
-# This file is part of the enalyzer
+# This file is part of the GEMtractor
 # Copyright (C) 2019 Martin Scharm <https://binfalse.de>
 # 
-# The enalyzer is free software: you can redistribute it and/or modify
+# The GEMtractor is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
 # 
-# The enalyzer is distributed in the hope that it will be useful,
+# The GEMtractor is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
@@ -18,7 +18,7 @@
 from modules.gemtractor.network import Species, Reaction
 from django.test import TestCase
 
-# there are also many tests in EnalyzerTests
+# there are also many tests in GemtractorTests
 
 class NetworkTests (TestCase):
   
