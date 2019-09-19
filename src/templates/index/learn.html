@@ -372,7 +372,7 @@ Learn
   <div class="w3-padding w3-card w3-white w3-margin">
     <h3>Send Job as JSON</h3>
     <p>
-      The API is listening at <code>URL/api/execute</code> &mdash; it expects a job encoded as JSON and sent via HTTP POST, such as this:
+      The API is listening at <code>DOMAIN.URL/api/execute</code> &mdash; it expects a job encoded as JSON and sent via HTTP POST, such as this:
     </p>
     
     <pre>
@@ -472,21 +472,20 @@ we may restart the service at any time, so be quick filtering ;-)
 		<h3>Settings</h3>
 	</div>
     <p>
-		There are a few environment variables that gives you a bit control about the behavior of the GEMtractor:
-		
+      There are a few environment variables that gives you some control about the behavior of the GEMtractor:
+      
       <ul>
-	<li><code>DJANGO_DEBUG</code>: Boolean 'True' or 'False' &mdash; should Django run in debug mode? Do not set to 'True' in production!</li>
-	<li><code>DJANGO_LOG_LEVEL</code>: String DEBUG, INFO, WARNING, ERROR, or CRITICAL &mdash; what kind of log messages should be reported?</li>
-	<li><code>DJANGO_ALLOWED_HOSTS</code>: String &mdash; the hostname at which GEMtractor is listening.</li>
-	<li><code>MODEL_MAX_ENTITIES_FILTER</code>: Int &mdash; up to how many entities in a model it should allow for filtering in the web browser? Web browsers will die if there are too many entities...</li>
-	<li><code>STORAGE_DIR</code>: Path &mdash; where to store models and exports etc.</li>
-	<li><code>KEEP_UPLOADED</code>: Time in seconds &mdash; how long to keep uploaded files on the server?</li>
-	<li><code>KEEP_GENERATED</code>: Time in seconds &mdash; how long to keep generated files (which are basically only for immediate delivering) on the server?</li>
-	<li><code>CACHE_BIGG</code>: </li>
-	<li><code>CACHE_BIGG_MODEL</code>: </li>
-	<li><code>CACHE_BIOMODELS</code>: </li>
-	<li><code>CACHE_BIOMODELS_MODEL</code>: </li>
-	<li><code>MAX_ENTITIES_FILTER</code>: </li>
+	<li><code>DJANGO_DEBUG</code>: Boolean <code>True</code> or <code>False</code> &mdash; should Django run in debug mode? Do not set to 'True' in production! <small>(default: <code>True</code>, currently: <code>{{DJANGO_DEBUG}}</code>)</small></li>
+	<li><code>DJANGO_LOG_LEVEL</code>: String <code>DEBUG</code>, <code>INFO</code>, <code>WARNING</code>, <code>ERROR</code>, or <code>CRITICAL</code> &mdash; what kind of log messages should be reported? <small>(default: <code>True</code>, currently: <code>{{DJANGO_LOG_LEVEL}}</code>)</small></li>
+	<li><code>DJANGO_ALLOWED_HOSTS</code>: String &mdash; additional hostname for which GEMtractor should be listening. <small>(currently: <code>{{DJANGO_ALLOWED_HOSTS}}</code>)</small></li>
+	<li><code>MAX_ENTITIES_FILTER</code>: Int &mdash; up to how many entities in a model it should allow for filtering in the web browser? Web browsers will die if there are too many entities... <small>(default: <code>100000</code>, currently: <code>{{MAX_ENTITIES_FILTER}}</code>)</small></li>
+	<li><code>STORAGE_DIR</code>: Path &mdash; where to store models and exports etc. <small>(default: <code>/tmp/gemtractor-storage/</code>, currently: <code>{{STORAGE_DIR}}</code>)</small></li>
+	<li><code>KEEP_UPLOADED</code>: Time in seconds &mdash; how long to keep uploaded files on the server? Everytime an uploaded file is used for filtering or exporting, the age of the file is reset to zero. <small>(default: <code>1.5*60*60</code> = 1.5 hours, currently: <code>{{KEEP_UPLOADED}}</code> seconds)</small></li>
+	<li><code>KEEP_GENERATED</code>: Time in seconds &mdash; how long to keep generated files on the server? Generated files are basically only for immediate delivering. <small>(default: <code>10*60</code> = 10 minutes, currently: <code>{{KEEP_GENERATED}}</code> seconds)</small></li>
+	<li><code>CACHE_BIGG</code>: Time in seconds &mdash; how long to cache the list of models available from BiGG Models? <small>(default: <code>60*60*24</code> = 24 hours, currently: <code>{{CACHE_BIGG}}</code> seconds)</small></li>
+	<li><code>CACHE_BIGG_MODEL</code>: Time in seconds &mdash; how long to cache a single model from BiGG Models? <small>(default: <code>7*60*60*24</code> = 7 days, currently: <code>{{CACHE_BIGG_MODEL}}</code> seconds)</small></li>
+	<li><code>CACHE_BIOMODELS</code>: Time in seconds &mdash; how long to cache the search results of models available from Biomodels? <small>(default: <code>60*60*24</code> = 24 hours, currently: <code>{{CACHE_BIOMODELS}}</code> seconds)</small></li>
+	<li><code>CACHE_BIOMODELS_MODEL</code>: Time in seconds &mdash; how long to cache a single model from Biomodels? <small>(default: <code>7*60*60*24</code> = 7 days, currently: <code>{{CACHE_BIOMODELS_MODEL}}</code> seconds)</small></li>
       </ul>
       
       There are different ways to set the variables. If you're running the GEMtractor from a shell script, for example, you could do something like that:
@@ -495,8 +494,7 @@ we may restart the service at any time, so be quick filtering ;-)
 export CACHE_BIGG=60
 export MAX_ENTITIES_FILTER=20000
 # [...]
-gunicorn --timeout 600 --bind 0.0.0.0:80 gemtractor.wsgi:applicatio
-    </pre>
+gunicorn --timeout 600 --bind 0.0.0.0:80 gemtractor.wsgi:applicatio</pre>
     <p>
 		Thus, the running GEMtractor process will then cache the BiGG Models list for 60 seconds and allow for filtering of models in the browser with up to 20K entities.
 	</p>
@@ -511,8 +509,7 @@ services:
     environment:
         CACHE_BIGG: 60
         MAX_ENTITIES_FILTER: 20000
-        [...]
-    </pre>
+        [...]</pre>
 	
   </div>
 </div>

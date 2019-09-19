@@ -22,4 +22,16 @@ def index(request):
 def imprint(request):
     return render(request, 'index/imprint.html', {"KEEP_UPLOADED": settings.KEEP_UPLOADED / (60*60)})
 def learn(request):
-    return render(request, 'index/learn.html', {})
+    context = {}
+    context["DJANGO_DEBUG"] = settings.DEBUG
+    context["DJANGO_LOG_LEVEL"] = settings.DJANGO_LOG_LEVEL
+    context["DJANGO_ALLOWED_HOSTS"] = settings.ALLOWED_HOSTS
+    context["STORAGE_DIR"] = settings.STORAGE
+    context["KEEP_UPLOADED"] = settings.KEEP_UPLOADED
+    context["KEEP_GENERATED"] = settings.KEEP_GENERATED
+    context["CACHE_BIGG"] = settings.CACHE_BIGG
+    context["CACHE_BIGG_MODEL"] = settings.CACHE_BIGG_MODEL
+    context["CACHE_BIOMODELS"] = settings.CACHE_BIOMODELS
+    context["CACHE_BIOMODELS_MODEL"] = settings.CACHE_BIOMODELS_MODEL
+    context["MAX_ENTITIES_FILTER"] = settings.MAX_ENTITIES_FILTER
+    return render(request, 'index/learn.html', context)

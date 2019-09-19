@@ -8,6 +8,7 @@ services:
     ports:
         - "80"
     environment:
+        # see https://gemtractor.bio.informatik.uni-rostock.de/learn#own-settings
         DJANGO_DEBUG: 'False'
         DJANGO_LOG_LEVEL: INFO
         DJANGO_ALLOWED_HOSTS: gemtractor-py

@@ -144,7 +144,7 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 # allow for models up to 30mb
 DATA_UPLOAD_MAX_MEMORY_SIZE=30*1024*1024
 
-
+DJANGO_LOG_LEVEL = os.getenv('DJANGO_LOG_LEVEL', 'INFO')
 
 LOGGING = {
     'version': 1,
@@ -157,7 +157,7 @@ LOGGING = {
     },
     'handlers': {
         'console': {
-            'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
+            'level': DJANGO_LOG_LEVEL,
             'class': 'logging.StreamHandler',
             'formatter': 'verbose'
         },
@@ -165,23 +165,23 @@ LOGGING = {
     'loggers': {
         'django': {
             'handlers': ['console'],
-            'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
+            'level': DJANGO_LOG_LEVEL,
         },
         'api': {
             'handlers': ['console'],
-            'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
+            'level': DJANGO_LOG_LEVEL,
         },
         'gemtract': {
             'handlers': ['console'],
-            'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
+            'level': DJANGO_LOG_LEVEL,
         },
         'index': {
             'handlers': ['console'],
-            'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
+            'level': DJANGO_LOG_LEVEL,
         },
         'modules.gemtractor': {
             'handlers': ['console'],
-            'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
+            'level': DJANGO_LOG_LEVEL,
         },
     },
 }
@@ -231,7 +231,7 @@ CACHE_BIGG_MODEL = parse_env_var ('CACHE_BIGG_MODEL', 7*60*60*24)
 # how long to keep the biomodel's search result
 CACHE_BIOMODELS = parse_env_var ('CACHE_BIOMODELS', 60*60*24)
 # how long to keep a single cached model from biomodels
-CACHE_BIOMODELS_MODEL = parse_env_var ('CACHE_BIOMODELS_MODEL', 5*60*60*24)
+CACHE_BIOMODELS_MODEL = parse_env_var ('CACHE_BIOMODELS_MODEL', 7*60*60*24)
 
 # urls for model retrieval
 URLS_BIGG_MODELS = "http://bigg.ucsd.edu/api/v2/models/"
