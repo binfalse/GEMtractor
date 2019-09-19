@@ -23,7 +23,7 @@ You can either choose a model from a public repository or upload your own model:
       <button id="choose-public-model-bigg-tab" class="w3-bar-item w3-button" onclick="tab('choose-bigg', 'choose-public-model-bigg-tab')">BIGG</button>
       <button id="choose-public-model-biomodels-tab" class="w3-bar-item w3-button" onclick="tab('choose-biomodels', 'choose-public-model-biomodels-tab')">Biomodels</button>
     </div>
-    <div class="w3-margin">
+    <div>
       <div id="choose-bigg" style="display:none" class="">
         <p>
           The following table lists the models from <a href="http://bigg.ucsd.edu/">BiGG Models</a> &mdash; you can use them for educational, research and non-profit purposes, without fee.
@@ -77,7 +77,7 @@ You can either choose a model from a public repository or upload your own model:
     <form method="post" enctype="multipart/form-data">
       {% csrf_token %}
       <label for="custom-model" id="upload-label" class="w3-button w3-flat-clouds">
-        <span id="upload-caption">Click to select file for Upload:</span>
+        <span id="upload-caption">Click to select a file for Upload:</span>
         <strong><span id="upload-name">none selected</span></strong>
       </label>
       <input type="file" name="custom-model" id="custom-model">

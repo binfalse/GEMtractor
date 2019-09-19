@@ -1,9 +1,9 @@
 from django import forms
 
 TYPE = (
-    ('en', 'Enzyme Network'),
-    ('rn', 'Reaction Network'),
-    ('mn', 'Metabolic Network'),
+    ('en', 'Enzyme-centric Network'),
+    ('rn', 'Reaction-centric Network'),
+    ('mn', 'Metabolite-Reaction Network'),
 )
 FORMAT = (
     ('sbml', 'SBML'),
@@ -16,6 +16,7 @@ FORMAT = (
 class ExportForm (forms.Form):
   network_type = forms.ChoiceField(choices=TYPE)
   remove_reaction_enzymes_removed = forms.BooleanField(required=False)
+  discard_fake_enzymes = forms.BooleanField(required=False)
   remove_reaction_missing_species = forms.BooleanField(required=False)
   network_format = forms.ChoiceField(choices=FORMAT)
   def clean(self):

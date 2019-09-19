@@ -328,6 +328,7 @@ def export (request):
       request.session[Constants.SESSION_FILTER_ENZYMES],
       request.session[Constants.SESSION_FILTER_ENZYME_COMPLEXES],
       form.cleaned_data['remove_reaction_enzymes_removed'],
+      form.cleaned_data['discard_fake_enzymes'],
       form.cleaned_data['remove_reaction_missing_species'])
     
     if form.cleaned_data['network_type'] == 'en':
@@ -536,9 +537,12 @@ def execute (request):
   
   remove_reaction_enzymes_removed = True
   remove_reaction_missing_species = False
+  discard_fake_enzymes = False
   
   if "remove_reaction_enzymes_removed" in export:
     remove_reaction_enzymes_removed = export["remove_reaction_enzymes_removed"]
+  if "discard_fake_enzymes" in export:
+    discard_fake_enzymes = export["discard_fake_enzymes"]
   if "remove_reaction_missing_species" in export:
     remove_reaction_missing_species = export["remove_reaction_missing_species"]
   
@@ -550,6 +554,7 @@ def execute (request):
         filter_enzymes,
         filter_enzyme_complexes,
         remove_reaction_enzymes_removed,
+        discard_fake_enzymes,
         remove_reaction_missing_species)
   except Exception as e:
     return HttpResponseBadRequest ("the model has an issue: " + getattr(e, 'message', repr(e)))

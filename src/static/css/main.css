@@ -147,3 +147,7 @@ td, th {
   max-width: 920px;
   margin: 20px auto ;
 }
+.learn-graph {
+  width:100%;
+  height:200px;
+}

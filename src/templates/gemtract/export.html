@@ -1,12 +1,12 @@
 {% extends "gemtract/skeleton.html" %}
 {% block gemtract %}
 {% load template_tags %}
-<h1>Step 3. Export Your Model</h1>
+<h1>Step 3. Export the Model</h1>
 
 
 <div id="error" class="w3-container w3-red w3-padding"></div>
 
-<form class="w3-container" id="export_form" method="POST">
+<form id="export_form" method="POST">
   
       {% csrf_token %}
     <div class="w3-red">
@@ -44,6 +44,14 @@
 </div>
     {{ form.remove_reaction_enzymes_removed|addclass:'w3-check' }}
 <label for="{{ form.remove_reaction_enzymes_removed.id_for_label }}">Remove reactions, whose enzymes were all removed</label>
+</p>
+
+  <p>    <div class="w3-red">
+
+    {{ form.discard_fake_enzymes.errors }}
+</div>
+    {{ form.discard_fake_enzymes|addclass:'w3-check' }}
+<label for="{{ form.discard_fake_enzymes.id_for_label }}">Discard fake enzymes</label>
 </p>
 
 

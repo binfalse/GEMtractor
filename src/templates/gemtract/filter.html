@@ -1,7 +1,7 @@
 {% extends "gemtract/skeleton.html" %}
 {% block gemtract %}
 
-<h1>Step 2. Filter Model Entities</h1>
+<h1>Step 2. Trim the Model</h1>
 
 <div id="loading"><i class="fa fa-spinner w3-spin"></i> loading network &mdash; this may take a few minutes for very large models</div>
 
@@ -9,10 +9,10 @@
 
 <div id="filtercontainer" style="display:none">
   <p>
-  The following table displays the number of entities in your model, which
+  The following table displays the number of entities in your model:
   <ul>
 	  <li><strong>original:</strong> number of entities in the originally selected model</li>
-	  <li><strong>filtered:</strong> number of entities in the model with applied filters</li>
+	  <li><strong>trimmed:</strong> number of entities in the model after trimming</li>
 	  <li><strong>inconsistent:</strong> entities that may need special attention when applying the current filter</li>
   </ul>
   </p>
@@ -20,7 +20,7 @@
   <tr>
     <th></th>
     <th>original</th>
-    <th>filtered</th>
+    <th>trimmed</th>
     <th>inconsistent</th>
   </tr>
   <tr>

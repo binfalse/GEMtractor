@@ -153,7 +153,7 @@ class GEMtractor:
       
      
     
-    def get_sbml (self, filter_species = [], filter_reactions = [], filter_genes = [], filter_gene_complexes = [], remove_reaction_genes_removed = True, remove_reaction_missing_species = False):
+    def get_sbml (self, filter_species = [], filter_reactions = [], filter_genes = [], filter_gene_complexes = [], remove_reaction_genes_removed = True, discard_fake_enzymes = False, remove_reaction_missing_species = False):
       """ Get a filtered SBML document from a file
       
       do not use the same GEMtractor object for two different SBML files!!
@@ -179,7 +179,7 @@ class GEMtractor:
       self.__fbc_plugin = model.getPlugin ("fbc")
       
       self.__logger.debug("append a note")
-      Utils.add_model_note (model, filter_species, filter_reactions, filter_genes, filter_gene_complexes, remove_reaction_genes_removed, remove_reaction_missing_species)
+      Utils.add_model_note (model, filter_species, filter_reactions, filter_genes, filter_gene_complexes, remove_reaction_genes_removed, discard_fake_enzymes, remove_reaction_missing_species)
       
       if filter_species is None:
         filter_species = []
@@ -192,7 +192,7 @@ class GEMtractor:
         
       
       # ~ if (filter_species is not None and len(filter_species) > 0) or (filter_reactions is not None and len(filter_reactions) > 0) or (filter_genes is not None and len(filter_genes) > 0) or (filter_gene_complexes is not None and len(filter_gene_complexes) > 0):
-      if len(filter_species) > 0 or len(filter_reactions) > 0 or len(filter_genes) > 0 or len(filter_gene_complexes) > 0:
+      if len(filter_species) > 0 or len(filter_reactions) > 0 or len(filter_genes) > 0 or len(filter_gene_complexes) > 0 or discard_fake_enzymes:
         try:
           #TODO dc modified?
           self.__logger.debug("filtering things")
@@ -235,6 +235,10 @@ class GEMtractor:
                 self.__logger.info("did not find genes in reaction " + reaction.getId ())
                 raise NotImplementedError ("did not find genes in reaction " + reaction.getId ())
               
+              self.__logger.info(discard_fake_enzymes)
+              if discard_fake_enzymes and len(current_genes) == 1 and "reaction_" in current_genes[0].get_id ():
+                model.removeReaction (n)
+                continue
               # if len(current_genes) == 1 and current_genes[0] == reaction.getId ():
               
               final_genes = []

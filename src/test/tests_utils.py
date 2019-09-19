@@ -73,8 +73,8 @@ class UtilsTests (TestCase):
     self.assertTrue (sbml.getNumErrors() == 0)
     return sbml.getModel()
     
-  def __test_model_notes (self, model, filter_species, filter_reactions, filter_enzymes, filter_enzyme_complexes, remove_reaction_enzymes_removed, remove_reaction_missing_species):
-    Utils.add_model_note (model, filter_species, filter_reactions, filter_enzymes, filter_enzyme_complexes, remove_reaction_enzymes_removed, remove_reaction_missing_species)
+  def __test_model_notes (self, model, filter_species, filter_reactions, filter_enzymes, filter_enzyme_complexes, remove_reaction_enzymes_removed, discard_fake_enzymes, remove_reaction_missing_species):
+    Utils.add_model_note (model, filter_species, filter_reactions, filter_enzymes, filter_enzyme_complexes, remove_reaction_enzymes_removed, discard_fake_enzymes, remove_reaction_missing_species)
     notes = model.getNotesString ()
     
     if filter_species is not None:
@@ -118,12 +118,13 @@ class UtilsTests (TestCase):
         self.assertTrue (n in snotes)
     
     self.assertTrue ("enzymes are removed: " + str (remove_reaction_enzymes_removed) in notes)
+    self.assertTrue ("fake enzymes: " + str (discard_fake_enzymes) in notes)
     self.assertTrue ("missing a species: " + str (remove_reaction_missing_species) in notes)
     
     
   
   def test_sbml_notes (self):
     self.__test_model_notes (self.__get_sbml_model (), ["S1", "S2"], ["R1", "R2"], ["G1, G2", "G3"], ["COMPLX1", "COMPLX2"], True, False)
-    self.__test_model_notes (self.__get_sbml_model (), ["S1", "S2"], None, None, None, True, False)
-    self.__test_model_notes (self.__get_sbml_model (), None, None, ["S1", "S2"], None, True, False)
-    self.__test_model_notes (self.__get_sbml_model (), None, None, None, ["S1", "S2"], False, True)
+    self.__test_model_notes (self.__get_sbml_model (), ["S1", "S2"], None, None, None, True, False, False)
+    self.__test_model_notes (self.__get_sbml_model (), None, None, ["S1", "S2"], None, True, True, False)
+    self.__test_model_notes (self.__get_sbml_model (), None, None, None, ["S1", "S2"], False, False, True)

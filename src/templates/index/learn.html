@@ -23,6 +23,7 @@ Learn
       <h2>Frequently asked and invented questions</h2>
     </div>
     <ul>
+      <li><a href="#enzyme-reaction-diff">What's the difference between enzyme-centric and reaction-centric?</a></li>
       <li><a href="#model-support">Which type of models does the GEMtractor support?</a></li>
       <li><a href="#gene-association">How does the GEMtractor identify enzymes that are associated to a reaction?</a></li>
       <li><a href="#gene-names">Why do enzymes have such a strange name?</a></li>
@@ -34,13 +35,14 @@ Learn
       <li><a href="#enzyme-complex">What is an enzyme complex?</a></li>
       <li><a href="#batch-filter">How does the batch filtering work?</a></li>
       <li><a href="#what-currency-metabolites"></a>What are currency metabolites?</li>
-      <li><a href="#currency-metabolites">How can i discard currency metabolites (such as H<sup>+</sup>, H<sub>2</sub>O or ATP)?</a></li>
+      <li><a href="#currency-metabolites">How can I discard currency metabolites (such as H<sup>+</sup>, H<sub>2</sub>O or ATP)?</a></li>
       <li><a href="#which-biomodels">How did the GEMtractor select the models from Biomodels?</a></li>
       <li><a href="#which-bigg">How did the GEMtractor select the models from BiGG?</a></li>
       <li><a href="#stored-data">Which data does the GEMtractor store on the server?</a></li>
       <li><a href="#cookies">Why am I always redirected back to model selection?</a></li>
       <li><a href="#ein-sense">Does it make sense to extract the enzyme interaction network?</a></li>
       <li><a href="#export-options">What are the different export options?</a></li>
+      <li><a href="#wrong-directions">Aren't the directions wrong?</a></li>
       <li><a href="#"></a></li>
       <li><a href="#"></a></li>
       <li><a href="#"></a></li>
@@ -53,29 +55,39 @@ Learn
   
 	<div class="w3-padding w3-card w3-white learn-entry">
 		<div class=" anchor-heading">
+			<a name="enzyme-reaction-diff" id="enzyme-reaction-diff"></a>
+			<h3>What's the difference between enzyme-centric and reaction-centric?</h3>
+		</div>
+		<p>
+		  see #105
+		</p>
+	</div>
+  
+	<div class="w3-padding w3-card w3-white learn-entry">
+		<div class=" anchor-heading">
 			<a name="model-support" id="model-support"></a>
 			<h3>Which type of models does the GEMtractor support?</h3>
 		</div>
 		<p>
-            The GEMtractor supports only models encoded using the <a href="https://sbml.org/">Systems Biology Markup Language (SBML) format</a>.
-            SBML is a standard format for computer models of biological processes, based on XML.
+            The GEMtractor supports models encoded using the <a href="https://sbml.org/">Systems Biology Markup Language (SBML) format</a>.
+            SBML is a standard format for computer models of biological processes.
             You can find many example models at <a href="https://www.ebi.ac.uk/biomodels/">Biomodels</a> or at <a href="http://bigg.ucsd.edu/">BiGG Models</a>.
         </p>
 	</div>
   
 	<div class="w3-padding w3-card w3-white learn-entry">
-		<div class=" anchor-heading">
-			<a name="gene-association" id="gene-association"></a>
-			<h3>How does the GEMtractor identify enzymes that are associated to a reaction?</h3>
-		</div>
-		<p>
-		  enzymes are based on genes -> gene products
-            We currently support two formats of gene associations:
+	  <div class=" anchor-heading">
+		  <a name="gene-association" id="gene-association"></a>
+		  <h3>How does the GEMtractor identify enzymes that are associated to a reaction?</h3>
+	  </div>
+	  <p>
+	    Enzymes are based on genes, they are the gene's products.
+	    The GEMtractor currently supports two formats of gene associations in SBML documents:
             The legacy SBML-notes annotations, and well-structured annotations using the
             <a href="http://sbml.org/Documents/Specifications/SBML_Level_3/Packages/fbc">FBC package</a> in SBML Level 3 documents.
         </p>
 		<p>
-            An example of legacy SBML-notes annotations from <a href="https://www.ebi.ac.uk/biomodels/MODEL1011080003">MODEL1011080003</a>, which encodes for
+            An example of legacy SBML-notes annotations from <a href="https://www.ebi.ac.uk/biomodels/MODEL1011080003">MODEL1011080003</a>, which encodes for the gene combination
             <small><code>438  or  330</code></small>:
         </p>
 <pre>
@@ -90,7 +102,7 @@ Learn
 &lt;/reaction&gt;
 </pre>
 		<p>
-            An example of a well-structured gene associations using FBC from <a href="http://bigg.ucsd.edu/models/e_coli_core">e_coli_core</a>which encodes for
+            An example of a well-structured gene associations from <a href="http://bigg.ucsd.edu/models/e_coli_core">e_coli_core</a> using FBC-annotations, which encodes for the gene combination
             <small><code>(G_b3738 and G_b3736 and G_b3737 and G_b3735 and G_b3733 and G_b3731 and G_b3732 and G_b3734) or (G_b3734 and G_b3732 and G_b3731 and G_b3733 and G_b3735 and G_b3737 and G_b3736 and G_b3738 and G_b3739)</code></small>:
         </p>
 <pre>
@@ -125,19 +137,25 @@ Learn
 	[...]
 &lt;/reaction&gt;
 </pre>
+	<p>
+            The GEMtractor then uses the identifiers of the gene-products to refer to enzymes.
+	    Gene products that are combined using a logical&nbsp;<code>or</code> are assumed to be alternatives for a catalysis.
+	    Gene products that are combined using a logical&nbsp;<code>and</code> are assumed to build an enzyme complex, in which all enzymes need to be present for a catalysis. Thus, a <code>geneProductAssociation</code> encoding for <code>a and (b or c)</code> means, that the reaction is catalysed by <code>a and b</code> or <code>a and c</code>.
+        </p>
 	</div>
   
 	<div class="w3-padding w3-card w3-white learn-entry">
-		<div class=" anchor-heading">
-			<a name="gene-names" id="gene-names"></a>
-			<h3>Why do enzymes have such a strange name?</h3>
-		</div>
-		<p>
-            The enzyme names used by the GEMtractor are actually the enzyme's identifiers, typically generated by some kind of software.
-            They are often just numbered with a optional prefix (such as g1, g2, g3 etc).
+	  <div class=" anchor-heading">
+		  <a name="gene-names" id="gene-names"></a>
+		  <h3>Why do enzymes have such a strange name?</h3>
+	  </div>
+	  <p>
+            The enzyme names used by the GEMtractor are actually the gene-products' identifiers as stated in the SBML document
+	    Those are typically generated by some kind of software and often just numbered with a optional prefix (such as <code>g1</code>, <code>g2</code>, <code>g3</code>, or <code>b0116</code> etc).
+	    To get more information about a certain enzyme, you need to look into the model's SBML code.
+	    If you're lucky, the gene product is properly annotated and you'll find links to other resources describing the enzyme.
             See also <a href="#no-gene-name">What if no enzyme is associated to a reaction?</a>
-        </p>
-		<p>TODO: add mouseover for gene ids if FBC annotations are available, ass mouseover if the gene name is actually the reaction id because we didn't find a gene name</p>
+	  </p>
 	</div>
 	
 	<div class="w3-padding w3-card w3-white learn-entry">
@@ -146,7 +164,9 @@ Learn
 			<h3>What if no enzyme is associated to a reaction?</h3>
 		</div>
 		<p>
-            If the GEMtractor cannot find a gene-association, it assumes there is only a single gene and gives it the id of the reaction prefixed with <code>"reaction_"</code>.
+            If the GEMtractor cannot find a gene-association, it assumes there is only a single gene and assigns it the identifier of the reaction prefixed with <code>"reaction_"</code>.
+	    Thus, you can easily spot <em>fake</em> enzymes.
+	    When exporting the model, you may also discard these invented enzymes.
             See also <a href="#gene-association">How does the GEMtractor identify enzymes that are associated to a reaction?</a>
         </p>
 	</div>
@@ -156,7 +176,11 @@ Learn
 			<a name="filter-species" id="filter-species"></a>
 			<h3>What exactly happens when I remove a species during filtering?</h3>
 		</div>
-		<p></p>
+		<p>
+		  Trimming the species of a model actually means <em>removing species from reactions.</em>
+		  Thus, trimmed species will not appear in any reaction anymore, but if you export the <em>Metabolite-Reaction Network</em>, they may still appear in the model, as they may still be required by other element in the model.
+		  We call these species <em>ghost species</em>.
+		</p>
 	</div>
 	
 	<div class="w3-padding w3-card w3-white learn-entry">
@@ -205,14 +229,14 @@ Learn
 			<h3>What are currency metabolites?</h3>
 		</div>
 		<p>
-		  See also <a href="#currency-metabolites">How can i discard currency metabolites (such as H<sup>+</sup>, H<sub>2</sub>O or ATP)</a>
+		  See also <a href="#currency-metabolites">How can I discard currency metabolites (such as H<sup>+</sup>, H<sub>2</sub>O or ATP)</a>
 		</p>
 	</div>
 	
 	<div class="w3-padding w3-card w3-white learn-entry">
 		<div class=" anchor-heading">
 			<a name="currency-metabolites" id="currency-metabolites"></a>
-			<h3>How can i discard currency metabolites (such as H<sup>+</sup>, H<sub>2</sub>O or ATP)?</h3>
+			<h3>How can I discard currency metabolites (such as H<sup>+</sup>, H<sub>2</sub>O or ATP)?</h3>
 		</div>
 		<p>
 		  The tables listing the enitities on the filter page are sortable.
@@ -252,7 +276,7 @@ Learn
 			<h3>Which data does the GEMtractor store on the server?</h3>
 		</div>
 		<p>
-		  If accessed through a webserver, it stores the uploaded model (or the model downloaded from bigg or biomodels) and some session related settings.
+		  If accessed through a webserver, it stores the uploaded model (or the model downloaded from BiGG or Biomodels) and some session related settings.
 		  To see what the GEMtractor stores about you and how to delete the data it stores head over to the <a href="{% url 'index:imprint' %}#privacy">privacy policy</a>.
 		</p>
 	</div>
@@ -298,17 +322,142 @@ Learn
 		</p>
 		<p>
 		  keep the following things in mind:
-		  * if you export EN as SBML, we'll implicitely create "reactions", which are not really existent... they just indicate links between genes, and thus every reactions consumes exactly one gene and produces exactly one gene.
+		  * if you export EN as SBML, the GEMtractor will implicitely create "reactions", which are not really existent... they just indicate links between genes, and thus every reactions consumes exactly one gene and produces exactly one gene.
 		  * filter for sub-complexes
 		</p>
 	</div>
 	
 	<div class="w3-padding w3-card w3-white learn-entry">
 		<div class=" anchor-heading">
-			<a name="" id=""></a>
-			<h3></h3>
+			<a name="wrong-directions" id="wrong-directions"></a>
+			<h3>Aren't the directions wrong?</h3>
 		</div>
-		<p></p>
+		<p>
+		  Maybe... And if you think we did a mistake please do not hesitate to contact us!
+		</p>
+		<p>
+		  However, there are some sommon pitfalls.
+		  Let's for example have a look at the following Metabolite-Reaction Network<div id="wrong-directions-example" class="learn-graph"></div>
+		  <script>
+		  var cy = cytoscape({
+  container: document.getElementById('wrong-directions-example'),
+  elements: [ // list of graph elements to start with
+    { data: { id: 'A' } },
+    { data: { id: 'B' } },
+    { data: { id: 'C' } },
+    { data: { id: 'r', source: 'A', target: 'B', label: 'r' } },
+    { data: { id: 's', source: 'C', target: 'B', label: 's' } }
+  ],
+
+  style: [ // the stylesheet for the graph
+    {
+      selector: 'node',
+      style: {
+        'background-color': '#666',
+        'label': 'data(id)'
+      }
+    },
+
+    {
+      selector: 'edge',
+      style: {
+	'label': 'data(label)',
+        'width': 3,
+	'text-margin-y': -10,
+        'line-color': '#ccc',
+        'target-arrow-color': '#ccc',
+	'curve-style': 'bezier',
+        'target-arrow-shape': 'triangle'
+      }
+    }
+  ],
+  layout: {
+    name: 'grid',
+    rows: 1
+  }
+});</script>
+		  which encodes for a reaction <code>r</code> that consumes <code>A</code> and produces <code>B</code>, and another reaction <code>s</code> that consumes <code>C</code> and produces <code>B</code>.
+		  Given this network, you could anticipate, that the reaction-centric network contains no edges.
+		  However, the SBML code may define <code>s</code> to be <em>reversible</em>!
+		  This may only be defined implicitely: In SBML prior to level 3 all reactions are in fact reversible, unless explicitly defined otherwise.
+		  Thus, the actual network encoded in the model will look like this:<div id="wrong-directions-example2" class="learn-graph"></div>
+		  <script>
+		  var cy = cytoscape({
+  container: document.getElementById('wrong-directions-example2'),
+  elements: [ // list of graph elements to start with
+    { data: { id: 'A' } },
+    { data: { id: 'B' } },
+    { data: { id: 'C' } },
+    { data: { id: 'r', source: 'A', target: 'B', label: 'r' } },
+    { data: { id: 's', source: 'C', target: 'B', label: 's' } },
+    { data: { id: 's2', source: 'B', target: 'C', label: 's' } }
+  ],
+
+  style: [ // the stylesheet for the graph
+    {
+      selector: 'node',
+      style: {
+        'background-color': '#666',
+        'label': 'data(id)'
+      }
+    },
+
+    {
+      selector: 'edge',
+      style: {
+	'label': 'data(label)',
+        'width': 3,
+	'text-margin-y': -10,
+        'line-color': '#ccc',
+        'target-arrow-color': '#ccc',
+	'curve-style': 'bezier',
+        'target-arrow-shape': 'triangle'
+      }
+    }
+  ],
+  layout: {
+    name: 'grid',
+    rows: 1
+  }
+});</script>
+And suddenly, there is an edge in the reaction-centric network:<div id="wrong-directions-example3" class="learn-graph"></div>
+		  <script>
+		  var cy = cytoscape({
+  container: document.getElementById('wrong-directions-example3'),
+  elements: [ // list of graph elements to start with
+    { data: { id: 'r' } },
+    { data: { id: 's' } },
+    { data: { id: 'x', source: 'r', target: 's' } }
+  ],
+
+  style: [ // the stylesheet for the graph
+    {
+      selector: 'node',
+      style: {
+        'background-color': '#666',
+        'label': 'data(id)'
+      }
+    },
+
+    {
+      selector: 'edge',
+      style: {
+        'width': 3,
+	'text-margin-y': -10,
+        'line-color': '#ccc',
+        'target-arrow-color': '#ccc',
+	'curve-style': 'bezier',
+        'target-arrow-shape': 'triangle'
+      }
+    }
+  ],
+  layout: {
+    name: 'grid',
+    rows: 1
+  }
+});</script>
+The same also applies to enzyme-centric networks.
+		</p>
 	</div>
 	
 	<div class="w3-padding w3-card w3-white learn-entry">
@@ -405,6 +554,7 @@ Learn
 	<li><code>network_type</code>: String <code>"en"</code> or <code>"mn"</code> &mdash; do you just want the filtered metabolic network (<code>"mn"</code>), or should the GEMtractor return the extracted enzyme network (<code>"en"</code>)?</li>
 	<li><code>network_format</code>: String <code>"sbml"</code>, <code>"graphml"</code>, <code>"gml"</code>, or <code>"dot"</code> &mdash; how should the returned network be encoded?</li>
 	<li><code>remove_reaction_enzymes_removed</code>: Boolean &mdash; remove reactions, whose enzymes were all removed? (Optional, defaults to <code>true</code>)</li>
+	<li><code>discard_fake_enzymes</code>: Boolean &mdash; remove invented enzymes? See <a href="#no-gene-name">What if no enzyme is associated to a reaction?</a> (Optional, defaults to <code>false</code>)</li>
 	<li><code>remove_reaction_missing_species</code>: Boolean &mdash; remove reactions, in which at least one species was removed? That is, if you remove a species from a reaction, should the GEMtractor also remove the whole reaction? (Optional, defaults to <code>false</code>)</li>
       </ul>
       Scroll up to learn more about the <a href="#export-options">export options</a>.
@@ -442,9 +592,9 @@ Learn
       <ul>
 	<li><code>400</code>: Your request was bad, for example the JSON was not well formed or is missing a required key, or the supplied model is not valid SBML.</li>
 	<li><code>302</code>: You forgot to send the job as POST data. You'll, thus, be redirected to this section to lear how to fire a job :)</li>
-	<li><code>500</code>: There was a problem on the server, eg. we could not generate the desired file.</li>
+	<li><code>500</code>: There was a problem on the server, e.g. the GEMtractor could not generate the desired file.</li>
       </ul>
-      The responded content may give you some hint on what went wrong.
+      The responded content may give you some hints on what went wrong.
     </p>
   </div>
   
