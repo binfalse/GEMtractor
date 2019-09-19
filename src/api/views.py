@@ -76,9 +76,9 @@ def get_network (request):
     return redirect('index:index')
   
   if Constants.SESSION_MODEL_ID in request.session:
-    gemtractor = GEMtractor (Utils.get_model_path (request.session[Constants.SESSION_MODEL_TYPE], request.session[Constants.SESSION_MODEL_ID], request.session.session_key))
     try:
       __logger.info ("getting sbml")
+      gemtractor = GEMtractor (Utils.get_model_path (request.session[Constants.SESSION_MODEL_TYPE], request.session[Constants.SESSION_MODEL_ID], request.session.session_key))
       network = gemtractor.extract_network_from_sbml (gemtractor.get_sbml ())
       if len (network.species) + len (network.reactions) > settings.MAX_ENTITIES_FILTER:
         raise TooBigForBrowser ("This model is probably too big for your browser... It contains "+str (len (network.species))+" species and "+str (len (network.reactions))+" reactions. We won't load it for filtering, as you're browser is very likely to die when trying to process that amount of data.. Max is currently set to "+str (settings.MAX_ENTITIES_FILTER)+" entities in total. Please export it w/o filtering or use the API instead.")
@@ -318,7 +318,10 @@ def export (request):
   if (form.is_valid()):
     file_name = request.session[Constants.SESSION_MODEL_NAME] + "-gemtracted"
     
-    gemtractor = GEMtractor (Utils.get_model_path (request.session[Constants.SESSION_MODEL_TYPE], request.session[Constants.SESSION_MODEL_ID], request.session.session_key))
+    try:
+      gemtractor = GEMtractor (Utils.get_model_path (request.session[Constants.SESSION_MODEL_TYPE], request.session[Constants.SESSION_MODEL_ID], request.session.session_key))
+    except Exception as e:
+      return JsonResponse ({"status":"failed","error":"the model has an issue: " + getattr(e, 'message', repr(e))})
     sbml = gemtractor.get_sbml (
       request.session[Constants.SESSION_FILTER_SPECIES],
       request.session[Constants.SESSION_FILTER_REACTION],
@@ -539,8 +542,8 @@ def execute (request):
   if "remove_reaction_missing_species" in export:
     remove_reaction_missing_species = export["remove_reaction_missing_species"]
   
-  gemtractor = GEMtractor (inputFile.name)
   try:
+    gemtractor = GEMtractor (inputFile.name)
     sbml = gemtractor.get_sbml (
         filter_species,
         filter_reactions,

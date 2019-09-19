@@ -582,6 +582,7 @@ function loadNetwork () {
  * 
  */
 function prepareExport () {
+	$("#error").hide ();
 	// find the "id" of the enzyme network option in the select field
 	var enzyme_option = 'en';
 	$("#" + network_type_id + " option").each (function () {
@@ -605,6 +606,7 @@ function prepareExport () {
   
   $("#export_form").submit (function (event){
     event.preventDefault();
+	$("#error").hide ();
     $("#download-error").text ("");
     var datastring = $("#export_form").serialize();
     $("#download-button").prop("disabled",true);
@@ -615,6 +617,10 @@ function prepareExport () {
       dataType: "json",
       success: function(data) {
         $("#download-button").prop("disabled",false);
+		if (data.status != 'success') {
+			$("#error").show ().text ("Failed to export model: " + data.error);
+			return;
+		}
         window.location = '/api/serve/' + data["name"] + "/" + data["mime"];
       },
       error: function (jqXHR, textStatus, errorThrown) {

@@ -49,6 +49,13 @@ class GEMtractor:
       self.__reaction_gene_map = {}
       self.__sbml_file = sbml_file
       self.__fbc_plugin = None
+      self.__logger.debug("reading sbml file " + self.__sbml_file)
+      self.sbml = SBMLReader().readSBML(self.__sbml_file)
+      if self.sbml.getNumErrors() > 0:
+        e = []
+        for i in range (0, self.sbml.getNumErrors()):
+          e.append (self.sbml.getError(i).getMessage())
+        raise IOError ("model seems to be invalid: " + str (e))
     
     def __get_expression_parser (self):
         variables = pp.Word(pp.alphanums + "_-.") 
@@ -141,6 +148,10 @@ class GEMtractor:
         if gp is not None:
           return self.__fbc_plugin.getGeneProductByLabel (gene).getAnnotationString()
       return None
+    def get_reaction_annotations (self, reactionid):
+      return self.sbml.getModel().getReaction (reactionid).getAnnotationString ()
+      
+     
     
     def get_sbml (self, filter_species = [], filter_reactions = [], filter_genes = [], filter_gene_complexes = [], remove_reaction_genes_removed = True, remove_reaction_missing_species = False):
       """ Get a filtered SBML document from a file
@@ -156,14 +167,8 @@ class GEMtractor:
       remove_reaction_genes_removed: should we remove a reaction if all it's genes were removed?
       remove_reaction_missing_species: remove a reaction if one of the participating genes was removed?
       """
-      self.__logger.debug("reading sbml file " + self.__sbml_file)
-      sbml = SBMLReader().readSBML(self.__sbml_file)
-      if sbml.getNumErrors() > 0:
-        e = []
-        for i in range (0, sbml.getNumErrors()):
-          e.append (sbml.getError(i).getMessage())
-        raise IOError ("model seems to be invalid: " + str (e))
-      model = sbml.getModel()
+      self.__logger.debug("processing sbml model from " + self.__sbml_file)
+      model = self.sbml.getModel()
       name = model.getName ()
       if name is None or len (name) < 1:
           name = model.getId()
@@ -258,7 +263,7 @@ class GEMtractor:
         except BreakLoops:
           pass
       
-      return sbml
+      return self.sbml
     
     def _set_genes_in_sbml (self, genes, reaction, model):
       rfbc = reaction.getPlugin ("fbc")

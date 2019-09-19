@@ -330,7 +330,8 @@ class GEMtractorTests (TestCase):
       
       
   def test_parse_expression (self):
-      gemtractor = GEMtractor (None)
+      f = "test/gene-filter-example-3.xml"
+      gemtractor = GEMtractor (f)
       
       expr = gemtractor._unfold_complex_expression (gemtractor._parse_expression ("something"))
       self.assertEqual (len (expr), 1)
@@ -393,7 +394,8 @@ class GEMtractorTests (TestCase):
         gemtractor._unfold_complex_expression (pr)
       
   def test_extract_from_notes (self):
-      gemtractor = GEMtractor (None)
+      f = "test/gene-filter-example-3.xml"
+      gemtractor = GEMtractor (f)
       
       note = """
       <html xmlns="http://www.w3.org/1999/xhtml"><p>GENE_ASSOCIATION: (a or (b and c) or d or (f and g and k) or (k and a))</p><p>GENE_LIST: whatever</p><p>SUBSYSTEM: Pyruvate Metabolism</p></html>
@@ -443,5 +445,6 @@ class GEMtractorTests (TestCase):
       
       genes.append (Gene ('sdkflj alskd2345 34lk5 w34knflk324'))
       
-      gemtractor = GEMtractor (None)
+      f = "test/gene-filter-example-3.xml"
+      gemtractor = GEMtractor (f)
       self.assertEqual ("((a) or (x) or (b and c) or (sdkflj alskd2345 34lk5 w34knflk324))", gemtractor._implode_genes (genes))

@@ -620,6 +620,58 @@ class Network:
     n = n + "\t\t</node>\n"
     return n
       
+  def export_rn_sbml (self, filename, gemtractor, model_id, model_name = None, filter_species = None, filter_reactions = None, filter_genes = None, filter_gene_complexes = None, remove_reaction_genes_removed = True, remove_reaction_missing_species = False):
+    if not self.have_reaction_net:
+      self.calc_reaction_net ()
+    
+    
+    sbml = SBMLDocument ()
+    model = sbml.createModel ()
+    #TODO dc modified?
+    if model is None:
+      self.__logger.error ("could not create model...")
+      return False
+    model.setId (model_id + "_GEMtracted_ReactionNetwork")
+    if model_name is None:
+      model_name = model_id
+    model.setName ("GEMtracted ReactionNetwork of " + model_name)
+    
+    Utils.add_model_note (model, filter_species, filter_reactions, filter_genes, filter_gene_complexes, remove_reaction_genes_removed, remove_reaction_missing_species)
+    
+    compartment = model.createCompartment()
+    compartment.setId('compartment')
+    compartment.setConstant(True)
+    
+    nodemap = {}
+    for identifier, reaction in self.reactions.items ():
+      nodemap[identifier] = self.__create_sbml_reaction_species (model, identifier, reaction.name, compartment, gemtractor)
+    
+    num = 0
+    for identifier, reaction in self.reactions.items ():
+      for r in reaction.links:
+        num += 1
+        Network.create_sbml_reaction (model, 'r' + str (num), nodemap[identifier], nodemap[r.identifier])
+  
+    return SBMLWriter().writeSBML (sbml, filename)
+  
+  def __create_sbml_reaction_species (self, model, identifier, name, compartment, gemtractor):
+    g = model.createSpecies ()
+    g.setId (identifier)
+    g.setMetaId (identifier)
+    g.setName (name)
+    g.setCompartment(compartment.getId())
+    g.setHasOnlySubstanceUnits(False)
+    g.setBoundaryCondition(False)
+    g.setConstant(False)
+    
+    annotations = gemtractor.get_reaction_annotations (identifier)
+    if annotations is not None:
+      annotations = self.__annotation_about_pattern.sub('<rdf:Description rdf:about="#'+identifier+'">', annotations)
+      if g.setAnnotation (annotations) != LIBSBML_OPERATION_SUCCESS:
+        self.__logger.error ("unable to add annotation to reaction " + identifier)
+        self.__logger.debug ("annotation was: " + annotations)
+    
+    return g
       
   def export_en_sbml (self, filename, gemtractor, model_id, model_name = None, filter_species = None, filter_reactions = None, filter_genes = None, filter_gene_complexes = None, remove_reaction_genes_removed = True, remove_reaction_missing_species = False):
     if not self.have_gene_net:
