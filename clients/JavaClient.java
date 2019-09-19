@@ -1,8 +1,10 @@
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+// add mvn dependency: com.googlecode.json-simple:json-simple
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+// add mvn dependency: org.apache.httpcomponents:httpclient
 import org.apache.http.HttpResponse;
 import org.apache.http.util.EntityUtils;
 import org.apache.http.client.HttpClient;
