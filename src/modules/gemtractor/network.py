@@ -25,8 +25,8 @@ class Species:
     self.__logger = logging.getLogger(__name__)
     self.name = name
     self.identifier = identifier
-    self.genes_for_consumption = {"g":set (), "gc":set()}
-    self.genes_for_production = {"g":set (), "gc":set()}
+    self._consumption = {"g":set (), "gc":set(), "r":set()}
+    self._production = {"g":set (), "gc":set(), "r":set()}
     self.occurence = []
     
   def serialize (self):
@@ -47,6 +47,7 @@ class Reaction:
     self.produced = []
     self.genes = []
     self.genec = []
+    self.links = set ()
 
 
   def add_input (self, species):
@@ -171,6 +172,7 @@ class Network:
     self.genes = {}
     self.gene_complexes = {}
     self.have_gene_net = False
+    self.have_reaction_net = False
     self.__annotation_about_pattern = re.compile (r"<rdf:Description rdf:about=['\"]#[^'\"]+['\"]>", re.IGNORECASE)
     
   def add_species (self, identifier, name):
@@ -274,7 +276,35 @@ class Network:
       g["reactions"] = o
       
     return json
+    
+    
+  def calc_reaction_net (self):
+    self.__logger.info ("calc reaction net")
+    
+    num = 0
+    for identifier, reaction in self.reactions.items ():
+      num += 1
+      if num % 100 == 0:
+        self.__logger.info ("calc reaction net " + str (num))
+      self.__logger.debug ("calc reaction net " + reaction.identifier)
+      
+      for species in reaction.consumed:
+        self.species[species]._consumption["r"].add (identifier)
+        if reaction.reversible:
+          self.species[species]._production["r"].add (identifier)
+      for species in reaction.produced:
+        self.species[species]._production["r"].add (identifier)
+        if reaction.reversible:
+          self.species[species]._consumption["r"].add (identifier)
+      
+      
+    for identifier, species in self.species.items ():
+      for consumption in species._consumption["r"]:
+        reaction = self.reactions[consumption]
+        for production in species._production["r"]:
+          reaction.links.add (self.reactions[production])
 
+    self.have_reaction_net = True
 
   def calc_genenet (self):
     self.__logger.info ("calc gene net")
@@ -290,40 +320,40 @@ class Network:
         self.__logger.debug ("processing gene " + gene)
         for species in reaction.consumed:
           s = self.species[species]
-          s.genes_for_consumption["g"].add (gene)
+          s._consumption["g"].add (gene)
           if reaction.reversible:
-            s.genes_for_production["g"].add (gene)
+            s._production["g"].add (gene)
         for species in reaction.produced:
           s = self.species[species]
-          s.genes_for_production["g"].add (gene)
+          s._production["g"].add (gene)
           if reaction.reversible:
-            s.genes_for_consumption["g"].add (gene)
+            s._consumption["g"].add (gene)
       
       for gene in reaction.genec:
         self.__logger.debug ("processing gene complex " + gene)
         for species in reaction.consumed:
           s = self.species[species]
-          s.genes_for_consumption["gc"].add (gene)
+          s._consumption["gc"].add (gene)
           if reaction.reversible:
-            s.genes_for_production["gc"].add (gene)
+            s._production["gc"].add (gene)
         for species in reaction.produced:
           s = self.species[species]
-          s.genes_for_production["gc"].add (gene)
+          s._production["gc"].add (gene)
           if reaction.reversible:
-            s.genes_for_consumption["gc"].add (gene)
+            s._consumption["gc"].add (gene)
     
     self.__logger.info ("got gene associations")
     for identifier, species in self.species.items ():
-      for consumption in species.genes_for_consumption["g"]:
-        for production in species.genes_for_production["g"]:
+      for consumption in species._consumption["g"]:
+        for production in species._production["g"]:
           self.genes[production].links["g"].add (self.genes[consumption])
-        for production in species.genes_for_production["gc"]:
+        for production in species._production["gc"]:
           self.gene_complexes[production].links["g"].add (self.genes[consumption])
       
-      for consumption in species.genes_for_consumption["gc"]:
-        for production in species.genes_for_production["g"]:
+      for consumption in species._consumption["gc"]:
+        for production in species._production["g"]:
           self.genes[production].links["gc"].add (self.gene_complexes[consumption])
-        for production in species.genes_for_production["gc"]:
+        for production in species._production["gc"]:
           self.gene_complexes[production].links["gc"].add (self.gene_complexes[consumption])
           # ~ self.genenet[production]["links"].add (consumption)
           
@@ -331,7 +361,7 @@ class Network:
     self.have_gene_net = True
     
     
-  def export_rn_dot (self, filename):
+  def export_mn_dot (self, filename):
     """ export the chemical reaction network in DOT format """
     nodemap = {}
     with open(filename, 'w') as f:
@@ -349,6 +379,21 @@ class Network:
           f.write ("\t" + rid + " -> " + nodemap[s] + ";\n")
       f.write ("}\n")
       
+  
+  
+  def export_rn_dot (self, filename):
+    if not self.have_reaction_net:
+      self.calc_reaction_net ()
+    with open(filename, 'w') as f:
+      f.write ("digraph GEMtractor {\n")
+      
+      for identifier, reaction in self.reactions.items ():
+        f.write ("\t" + identifier + " [label=\""+reaction.name+"\"];\n")
+        
+      for identifier, reaction in self.reactions.items ():
+        for r in reaction.links:
+          f.write ("\t" + identifier + " -> " + r.identifier + ";\n")
+      f.write ("}\n")
       
   def export_en_dot (self, filename):
     """ export the enzyme network in DOT format """
@@ -381,7 +426,7 @@ class Network:
       f.write ("}\n")
       
       
-  def export_rn_gml (self, filename):
+  def export_mn_gml (self, filename):
       nodemap = {}
       with open(filename, 'w') as f:
         f.write (Network.create_gml_prefix ())
@@ -403,6 +448,25 @@ class Network:
             f.write (Network.create_gml_edge (rid, nodemap[s]))
           
         f.write ("]\n")
+  
+  
+  def export_rn_gml (self, filename):
+    if not self.have_reaction_net:
+      self.calc_reaction_net ()
+    with open(filename, 'w') as f:
+      f.write (Network.create_gml_prefix ())
+      
+      nodemap = {}
+      num = 0
+      for identifier, reaction in self.reactions.items ():
+        num += 1
+        nodemap[identifier] = str (num)
+        f.write (Network.create_gml_node (nodemap[identifier], "reaction", "ellipse", identifier))
+        
+      for identifier, reaction in self.reactions.items ():
+        for r in reaction.links:
+          f.write (Network.create_gml_edge (nodemap[identifier], nodemap[r.identifier]))
+      f.write ("]\n")
       
       
   def export_en_gml (self, filename):
@@ -457,7 +521,7 @@ class Network:
     n = n + "\t]\n"
     return n
       
-  def export_rn_graphml (self, filename):
+  def export_mn_graphml (self, filename):
       nodemap = {}
       with open(filename, 'w') as f:
         f.write (Network.create_graphml_prefix ())
@@ -479,6 +543,23 @@ class Network:
             f.write ("\t\t<edge id=\"e" + str(num) + "\" source=\"" + rid + "\" target=\"" + nodemap[s] + "\"/>\n")
           
         f.write ("\t</graph>\n</graphml>\n")
+  
+  
+  def export_rn_graphml (self, filename):
+    if not self.have_reaction_net:
+      self.calc_reaction_net ()
+    with open(filename, 'w') as f:
+      f.write (Network.create_graphml_prefix ())
+      for identifier, reaction in self.reactions.items ():
+        f.write (Network.create_graphml_node (identifier, "reaction", "ellipse", identifier))
+        
+      num = 0
+      for identifier, reaction in self.reactions.items ():
+        for r in reaction.links:
+          num = num + 1
+          f.write ("\t\t<edge id=\"e" + str(num) + "\" source=\"" + identifier + "\" target=\"" + r.identifier + "\"/>\n")
+      
+      f.write ("\t</graph>\n</graphml>\n")
       
       
   def export_en_graphml (self, filename):
@@ -661,7 +742,7 @@ class Network:
     
   
   
-  def export_rn_csv (self, filename):
+  def export_mn_csv (self, filename):
     with open(filename, 'w') as f:
       f.write ('"source","target"\n')
       for identifier, reaction in self.reactions.items ():
@@ -670,6 +751,17 @@ class Network:
           f.write ('"s' + s + '","' + rid + '"\n')
         for s in reaction.produced:
           f.write ('"' + rid + '","s' + s + '"\n')
+    
+  
+  
+  def export_rn_csv (self, filename):
+    if not self.have_reaction_net:
+      self.calc_reaction_net ()
+    with open(filename, 'w') as f:
+      f.write ('"source","target"\n')
+      for identifier, reaction in self.reactions.items ():
+        for r in reaction.links:
+          f.write ('"' + identifier + '","' + r.identifier + '"\n')
       
       
   def export_en_csv (self, filename):

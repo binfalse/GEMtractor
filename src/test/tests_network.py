@@ -36,9 +36,9 @@ class NetworkTests (TestCase):
     self.assertEqual (len (ss["occ"]), 0, msg="new species already occurred somewhere?")
     
     s.name = s.name + "2"
-    s.genes_for_consumption["g"].add ("test")
-    s.genes_for_consumption["g"].add ("test")
-    s.genes_for_consumption["g"].add ("test2")
+    s._consumption["g"].add ("test")
+    s._consumption["g"].add ("test")
+    s._consumption["g"].add ("test2")
     s.occurence.append ("test2")
     
     ss2 = s.serialize ()
@@ -46,39 +46,39 @@ class NetworkTests (TestCase):
     self.assertEqual (ss["name"] + "2", ss2["name"], msg="unexpected species name")
     self.assertEqual (ss["id"], ss2["id"], msg="unexpected species id")
     self.assertEqual (len (ss2["occ"]), 1, msg="new species already occurred somewhere?")
-    self.assertEqual (len (s.genes_for_consumption["g"]), 2, msg="is consumtion a set?")
-    self.assertEqual (len (s.genes_for_production["g"]), 0, msg="production changed unexpectedly")
-    self.assertEqual (len (s.genes_for_consumption["gc"]), 0, msg="consumtion changed unexpectedly")
-    self.assertEqual (len (s.genes_for_production["gc"]), 0, msg="production changed unexpectedly")
+    self.assertEqual (len (s._consumption["g"]), 2, msg="is consumtion a set?")
+    self.assertEqual (len (s._production["g"]), 0, msg="production changed unexpectedly")
+    self.assertEqual (len (s._consumption["gc"]), 0, msg="consumtion changed unexpectedly")
+    self.assertEqual (len (s._production["gc"]), 0, msg="production changed unexpectedly")
     
-    s.genes_for_production["g"].add ("test")
-    s.genes_for_production["g"].add ("test")
-    s.genes_for_production["g"].add ("test2")
+    s._production["g"].add ("test")
+    s._production["g"].add ("test")
+    s._production["g"].add ("test2")
     
-    self.assertEqual (len (s.genes_for_consumption["g"]), 2, msg="consumption changed unexpectedly")
-    self.assertEqual (len (s.genes_for_production["g"]), 2, msg="is production a set?")
-    self.assertEqual (len (s.genes_for_consumption["gc"]), 0, msg="consumtion changed unexpectedly")
-    self.assertEqual (len (s.genes_for_production["gc"]), 0, msg="production changed unexpectedly")
+    self.assertEqual (len (s._consumption["g"]), 2, msg="consumption changed unexpectedly")
+    self.assertEqual (len (s._production["g"]), 2, msg="is production a set?")
+    self.assertEqual (len (s._consumption["gc"]), 0, msg="consumtion changed unexpectedly")
+    self.assertEqual (len (s._production["gc"]), 0, msg="production changed unexpectedly")
     
     
     
-    s.genes_for_consumption["gc"].add ("test")
-    s.genes_for_consumption["gc"].add ("test")
-    s.genes_for_consumption["gc"].add ("test2")
+    s._consumption["gc"].add ("test")
+    s._consumption["gc"].add ("test")
+    s._consumption["gc"].add ("test2")
     
-    self.assertEqual (len (s.genes_for_consumption["g"]), 2, msg="consumtion changed unexpectedly")
-    self.assertEqual (len (s.genes_for_production["g"]), 2, msg="production changed unexpectedly")
-    self.assertEqual (len (s.genes_for_consumption["gc"]), 2, msg="is consumtion a set?")
-    self.assertEqual (len (s.genes_for_production["gc"]), 0, msg="production changed unexpectedly")
+    self.assertEqual (len (s._consumption["g"]), 2, msg="consumtion changed unexpectedly")
+    self.assertEqual (len (s._production["g"]), 2, msg="production changed unexpectedly")
+    self.assertEqual (len (s._consumption["gc"]), 2, msg="is consumtion a set?")
+    self.assertEqual (len (s._production["gc"]), 0, msg="production changed unexpectedly")
     
-    s.genes_for_production["gc"].add ("test")
-    s.genes_for_production["gc"].add ("test")
-    s.genes_for_production["gc"].add ("test2")
+    s._production["gc"].add ("test")
+    s._production["gc"].add ("test")
+    s._production["gc"].add ("test2")
     
-    self.assertEqual (len (s.genes_for_consumption["g"]), 2, msg="consumption changed unexpectedly")
-    self.assertEqual (len (s.genes_for_production["g"]), 2, msg="production changed unexpectedly")
-    self.assertEqual (len (s.genes_for_consumption["gc"]), 2, msg="consumtion changed unexpectedly")
-    self.assertEqual (len (s.genes_for_production["gc"]), 2, msg="is production a set?")
+    self.assertEqual (len (s._consumption["g"]), 2, msg="consumption changed unexpectedly")
+    self.assertEqual (len (s._production["g"]), 2, msg="production changed unexpectedly")
+    self.assertEqual (len (s._consumption["gc"]), 2, msg="consumtion changed unexpectedly")
+    self.assertEqual (len (s._production["gc"]), 2, msg="is production a set?")
   
   def test_gene_serialisation (self):
     g = Gene ("testgene")

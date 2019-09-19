@@ -254,19 +254,19 @@ class GEMtractorTests (TestCase):
         tf = tempfile.NamedTemporaryFile()
         
         # test outputs
-        net.export_rn_dot (tf.name)
+        net.export_mn_dot (tf.name)
         with open (tf.name, 'r') as r:
               c = r.read().replace('\n', '')
               self.assertEqual (c.count ("label="), len (ns["species"]) + len (ns["reactions"]))
               self.assertEqual (c.count (" -> "), links_in_rn)
         
-        net.export_rn_gml (tf.name)
+        net.export_mn_gml (tf.name)
         with open (tf.name, 'r') as r:
               c = r.read().replace('\n', '')
               self.assertEqual (c.count ("node ["), len (ns["species"]) + len (ns["reactions"]))
               self.assertEqual (c.count ("edge ["), links_in_rn)
         
-        net.export_rn_graphml (tf.name)
+        net.export_mn_graphml (tf.name)
         xmldoc = minidom.parse(tf.name)
         self.assertEqual (len (xmldoc.getElementsByTagName('node')), len (ns["species"]) + len (ns["reactions"]))
         with open (tf.name, 'r') as r:

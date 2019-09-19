@@ -2,7 +2,7 @@ from django import forms
 
 TYPE = (
     ('en', 'Enzyme Network'),
-    #('rn', 'Reaction Network'),
+    ('rn', 'Reaction Network'),
     ('mn', 'Metabolic Network'),
 )
 FORMAT = (

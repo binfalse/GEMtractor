@@ -380,18 +380,25 @@ def export (request):
             return JsonResponse ({"status":"failed","error":"error generating file"})
         else:
           return JsonResponse ({"status":"failed","error":"invalid format"})
-    elif form.cleaned_data['network_type'] == 'mn':
+    elif form.cleaned_data['network_type'] == 'rn':
       file_name = file_name + "-ReactionNetwork"
+      net = gemtractor.extract_network_from_sbml (sbml)
+      net.calc_reaction_net ()
       if form.cleaned_data['network_format'] == 'sbml':
         file_name = file_name + ".sbml"
         file_path = Utils.create_generated_file_web (request.session.session_key)
-        SBMLWriter().writeSBML (sbml, file_path)
+        net.export_rn_sbml (file_path, gemtractor, request.session[Constants.SESSION_MODEL_ID], request.session[Constants.SESSION_MODEL_NAME],
+            request.session[Constants.SESSION_FILTER_SPECIES],
+            request.session[Constants.SESSION_FILTER_REACTION],
+            request.session[Constants.SESSION_FILTER_ENZYMES],
+            request.session[Constants.SESSION_FILTER_ENZYME_COMPLEXES],
+            form.cleaned_data['remove_reaction_enzymes_removed'],
+            form.cleaned_data['remove_reaction_missing_species'])
         if os.path.exists(file_path):
           return JsonResponse ({"status":"success", "name": file_name, "mime": "application/xml"})
         else:
-          return JsonResponse ({"status":"failed","error":"error generating file"})
+          return JsonResponse ({"status":"failed","error":"error generating SBML file"})
       else:
-        net = gemtractor.extract_network_from_sbml (sbml)
         if form.cleaned_data['network_format'] == 'dot':
           file_name = file_name + ".dot"
           file_path = Utils.create_generated_file_web (request.session.session_key)
@@ -420,6 +427,52 @@ def export (request):
           file_name = file_name + ".csv"
           file_path = Utils.create_generated_file_web (request.session.session_key)
           net.export_rn_csv (file_path)
+          if os.path.exists(file_path):
+            return JsonResponse ({"status":"success", "name": file_name, "mime": "text/csv"})
+          else:
+            return JsonResponse ({"status":"failed","error":"error generating file"})
+        else:
+          return JsonResponse ({"status":"failed","error":"invalid format"})
+    elif form.cleaned_data['network_type'] == 'mn':
+      file_name = file_name + "-MetabolicNetwork"
+      if form.cleaned_data['network_format'] == 'sbml':
+        file_name = file_name + ".sbml"
+        file_path = Utils.create_generated_file_web (request.session.session_key)
+        SBMLWriter().writeSBML (sbml, file_path)
+        if os.path.exists(file_path):
+          return JsonResponse ({"status":"success", "name": file_name, "mime": "application/xml"})
+        else:
+          return JsonResponse ({"status":"failed","error":"error generating file"})
+      else:
+        net = gemtractor.extract_network_from_sbml (sbml)
+        if form.cleaned_data['network_format'] == 'dot':
+          file_name = file_name + ".dot"
+          file_path = Utils.create_generated_file_web (request.session.session_key)
+          net.export_mn_dot (file_path)
+          if os.path.exists(file_path):
+            return JsonResponse ({"status":"success", "name": file_name, "mime": "application/dot"})
+          else:
+            return JsonResponse ({"status":"failed","error":"error generating file"})
+        elif form.cleaned_data['network_format'] == 'graphml':
+          file_name = file_name + ".graphml"
+          file_path = Utils.create_generated_file_web (request.session.session_key)
+          net.export_mn_graphml (file_path)
+          if os.path.exists(file_path):
+            return JsonResponse ({"status":"success", "name": file_name, "mime": "application/xml"})
+          else:
+            return JsonResponse ({"status":"failed","error":"error generating file"})
+        elif form.cleaned_data['network_format'] == 'gml':
+          file_name = file_name + ".gml"
+          file_path = Utils.create_generated_file_web (request.session.session_key)
+          net.export_mn_gml (file_path)
+          if os.path.exists(file_path):
+            return JsonResponse ({"status":"success", "name": file_name, "mime": "application/gml"})
+          else:
+            return JsonResponse ({"status":"failed","error":"error generating file"})
+        elif form.cleaned_data['network_format'] == 'csv':
+          file_name = file_name + ".csv"
+          file_path = Utils.create_generated_file_web (request.session.session_key)
+          net.export_mn_csv (file_path)
           if os.path.exists(file_path):
             return JsonResponse ({"status":"success", "name": file_name, "mime": "text/csv"})
           else:
@@ -473,7 +526,7 @@ def execute (request):
   export = data["export"]
   
   if "network_type" not in export:
-    return HttpResponseBadRequest ("job is missing the desired network_type (en|mn)")
+    return HttpResponseBadRequest ("job is missing the desired network_type (en|rn|mn)")
   if "network_format" not in export:
     return HttpResponseBadRequest ("job is missing the desired network_format (sbml|dot|graphml|gml|csv)")
     
@@ -507,7 +560,7 @@ def execute (request):
     net = gemtractor.extract_network_from_sbml (sbml)
     net.calc_genenet ()
     if export["network_format"] == "sbml":
-      net.export_en_sbml (outputFile.name, gemtractor, sbml.getModel ().getId () + "_EN", sbml.getModel ().getName () + " converted to EnzymeNetwork", filter_species, filter_reactions, filter_enzymes, filter_enzyme_complexes, remove_reaction_enzymes_removed, remove_reaction_missing_species)
+      net.export_en_sbml (outputFile.name, gemtractor, sbml.getModel ().getId (), sbml.getModel ().getName (), filter_species, filter_reactions, filter_enzymes, filter_enzyme_complexes, remove_reaction_enzymes_removed, remove_reaction_missing_species)
       if os.path.exists(outputFile.name):
         return Utils.serve_file (outputFile.name, "gemtracted-model.sbml", "application/xml")
       else:
@@ -536,6 +589,39 @@ def execute (request):
         return Utils.serve_file (outputFile.name, "gemtracted-model.csv", "text/csv")
       else:
         return HttpResponseServerError ("couldn't generate the csv file")
+  elif export["network_type"] == "rn":
+    net = gemtractor.extract_network_from_sbml (sbml)
+    net.calc_reaction_net ()
+    if export["network_format"] == "sbml":
+      net.export_rn_sbml (outputFile.name, gemtractor, sbml.getModel ().getId () + "_RN", sbml.getModel ().getName () + " converted to ReactionNetwork", filter_species, filter_reactions, filter_enzymes, filter_enzyme_complexes, remove_reaction_enzymes_removed, remove_reaction_missing_species)
+      if os.path.exists(outputFile.name):
+        return Utils.serve_file (outputFile.name, "gemtracted-model.sbml", "application/xml")
+      else:
+        return HttpResponseServerError ("couldn't generate the sbml file")
+    elif export["network_format"] == "dot":
+      net.export_rn_dot (outputFile.name)
+      if os.path.exists(outputFile.name):
+        return Utils.serve_file (outputFile.name, "gemtracted-model.dot", "application/dot")
+      else:
+        return HttpResponseServerError ("couldn't generate the dot file")
+    elif export["network_format"] == "graphml":
+      net.export_rn_graphml (outputFile.name)
+      if os.path.exists(outputFile.name):
+        return Utils.serve_file (outputFile.name, "gemtracted-model.graphml", "application/xml")
+      else:
+        return HttpResponseServerError ("couldn't generate the graphml file")
+    elif export["network_format"] == "gml":
+      net.export_rn_gml (outputFile.name)
+      if os.path.exists(outputFile.name):
+        return Utils.serve_file (outputFile.name, "gemtracted-model.gml", "application/gml")
+      else:
+        return HttpResponseServerError ("couldn't generate the gml file")
+    elif export["network_format"] == "csv":
+      net.export_rn_csv (outputFile.name)
+      if os.path.exists(outputFile.name):
+        return Utils.serve_file (outputFile.name, "gemtracted-model.csv", "text/csv")
+      else:
+        return HttpResponseServerError ("couldn't generate the csv file")
   elif export["network_type"] == "mn":
     if export["network_format"] == "sbml":
       SBMLWriter().writeSBML (sbml, outputFile.name)
@@ -546,25 +632,25 @@ def execute (request):
     else:
       net = gemtractor.extract_network_from_sbml (sbml)
       if export["network_format"] == "dot":
-        net.export_rn_dot (outputFile.name)
+        net.export_mn_dot (outputFile.name)
         if os.path.exists(outputFile.name):
           return Utils.serve_file (outputFile.name, "gemtracted-model.dot", "application/dot")
         else:
           return HttpResponseServerError ("couldn't generate the dot file")
       elif export["network_format"] == "graphml":
-        net.export_rn_graphml (outputFile.name)
+        net.export_mn_graphml (outputFile.name)
         if os.path.exists(outputFile.name):
           return Utils.serve_file (outputFile.name, "gemtracted-model.graphml", "application/xml")
         else:
           return HttpResponseServerError ("couldn't generate the graphml file")
       elif export["network_format"] == "gml":
-        net.export_rn_gml (outputFile.name)
+        net.export_mn_gml (outputFile.name)
         if os.path.exists(outputFile.name):
           return Utils.serve_file (outputFile.name, "gemtracted-model.gml", "application/gml")
         else:
           return HttpResponseServerError ("couldn't generate the gml file")
       elif export["network_format"] == "csv":
-        net.export_rn_csv (outputFile.name)
+        net.export_mn_csv (outputFile.name)
         if os.path.exists(outputFile.name):
           return Utils.serve_file (outputFile.name, "gemtracted-model.csv", "text/csv")
         else:
