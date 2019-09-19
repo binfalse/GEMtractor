@@ -667,9 +667,9 @@ class Network:
       for identifier, reaction in self.reactions.items ():
         rid = 'r' + identifier
         for s in reaction.consumed:
-          f.write ('"' + rid + '","s' + s + '"\n')
-        for s in reaction.produced:
           f.write ('"s' + s + '","' + rid + '"\n')
+        for s in reaction.produced:
+          f.write ('"' + rid + '","s' + s + '"\n')
       
       
   def export_en_csv (self, filename):
