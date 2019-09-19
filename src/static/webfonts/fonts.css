@@ -126,3 +126,18 @@
        url('sourcesanspro/source-sans-pro-v13-latin-700italic.ttf') format('truetype'), /* Safari, Android, iOS */
        url('sourcesanspro/source-sans-pro-v13-latin-700italic.svg#SourceSansPro') format('svg'); /* Legacy iOS */
 }
+
+/* cousine-regular - latin */
+@font-face {
+  font-family: 'Cousine';
+  font-style: normal;
+  font-weight: 400;
+  src: url('cousine/cousine-v14-latin-regular.eot'); /* IE9 Compat Modes */
+  src: local('Cousine Regular'), local('Cousine-Regular'),
+       url('cousine/cousine-v14-latin-regular.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+       url('cousine/cousine-v14-latin-regular.woff2') format('woff2'), /* Super Modern Browsers */
+       url('cousine/cousine-v14-latin-regular.woff') format('woff'), /* Modern Browsers */
+       url('cousine/cousine-v14-latin-regular.ttf') format('truetype'), /* Safari, Android, iOS */
+       url('cousine/cousine-v14-latin-regular.svg#Cousine') format('svg'); /* Legacy iOS */
+}
+

@@ -136,3 +136,10 @@ display:none
 .w3-top {
   z-index: 3;
 }
+code, pre, kbd, samp {
+  font-family: 'Cousine', monospace;
+  color: #6c8095;
+}
+td, th {
+  vertical-align: top;
+}
