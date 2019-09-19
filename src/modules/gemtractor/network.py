@@ -461,7 +461,7 @@ class Network:
       for identifier, reaction in self.reactions.items ():
         num += 1
         nodemap[identifier] = str (num)
-        f.write (Network.create_gml_node (nodemap[identifier], "reaction", "ellipse", identifier))
+        f.write (Network.create_gml_node (nodemap[identifier], "reaction", "ellipse", reaction.name))
         
       for identifier, reaction in self.reactions.items ():
         for r in reaction.links:
@@ -551,7 +551,7 @@ class Network:
     with open(filename, 'w') as f:
       f.write (Network.create_graphml_prefix ())
       for identifier, reaction in self.reactions.items ():
-        f.write (Network.create_graphml_node (identifier, "reaction", "ellipse", identifier))
+        f.write (Network.create_graphml_node (identifier, "reaction", "ellipse", reaction.name))
         
       num = 0
       for identifier, reaction in self.reactions.items ():
