@@ -16,13 +16,14 @@ job = {
     "filter": {
         "species": ["h2o", "atp"],
         "reactions": [],
-        "genes": ["gene_abc"],
+        "enzymes": ["gene_abc"],
+        "enzyme_complexes": ["a + b + c", "x + Y", "b_098 + r_abc"],
     },
     "file": model
 }
 
 # setup request
-req = urllib.request.Request("https://enalyzer.bio.informatik.uni-rostock.de/api/execute")
+req = urllib.request.Request("https://gemtractor.bio.informatik.uni-rostock.de/api/execute")
 req.add_header('Content-Type', 'application/json; charset=utf-8')
 job_bytes = json.dumps(job).encode('utf-8')
 req.add_header('Content-Length', len(job_bytes))
