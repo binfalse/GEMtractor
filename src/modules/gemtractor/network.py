@@ -15,36 +15,38 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import logging
-from libsbml import SBMLDocument, SBMLWriter
+from libsbml import SBMLDocument, SBMLWriter, LIBSBML_OPERATION_SUCCESS
 from .utils import Utils
+import re
 
 # TODO: logging
 class Species:
-  def __init__ (self, name, identifier):
+  def __init__ (self, identifier, name):
     self.__logger = logging.getLogger(__name__)
     self.name = name
     self.identifier = identifier
-    self.genes_for_consumption = set ()
-    self.genes_for_production = set ()
+    self.genes_for_consumption = {"g":set (), "gc":set()}
+    self.genes_for_production = {"g":set (), "gc":set()}
     self.occurence = []
     
   def serialize (self):
     return {
-      "identifier" : self.identifier,
+      "id" : self.identifier,
       "name" : self.name,
-      "occurence" : self.occurence
+      "occ" : self.occurence
       }
     
 
 class Reaction:
 
-  def __init__(self, identifier, name, reversible = False):
+  def __init__(self, identifier, name, reversible = True):
     self.identifier = identifier
     self.name = name
     self.reversible = reversible
     self.consumed = []
     self.produced = []
     self.genes = []
+    self.genec = []
 
 
   def add_input (self, species):
@@ -55,15 +57,110 @@ class Reaction:
     species.occurence.append (self.identifier)
     self.produced.append (species.identifier)
       
+  def serialize (self, species_mapper, gene_mapper, gene_complex_mapper):
+    ret =  {
+      "id" : self.identifier,
+      "name" : self.name,
+      "rev" : self.reversible,
+      "cons" : [],
+      "prod" : [],
+      "enzs" : [],
+      "enzc" : []
+      }
+    for s in self.consumed:
+      ret["cons"].append (species_mapper[s])
+    for s in self.produced:
+      ret["prod"].append (species_mapper[s])
+    for g in self.genes:
+      ret["enzs"].append (gene_mapper[g])
+    for g in self.genec:
+      ret["enzc"].append (gene_complex_mapper[g])
+    return ret
+
+class Gene:
+  def __init__(self, identifier):
+    self.identifier = identifier
+    self.reactions = []
+    self.links = {"g":set (), "gc":set()}
+      
+  def contains_one_of (self, genes = []):
+    return self.identifier in genes
+  
+  def to_sbml_string (self):
+    return "(" + self.identifier + ")"
+      
+  def to_string (self):
+    return self.identifier + "[#reactions="+str (len (self.reactions))+" #links="+str (len (self.links))+"]"
+    
   def serialize (self):
     return {
-      "identifier" : self.identifier,
-      "name" : self.name,
-      "reversible" : self.reversible,
-      "consumed" : self.consumed,
-      "produced" : self.produced,
-      "genes" : self.genes
+      "id" : self.identifier,
+      "reactions": self.reactions,
+      "cplx": []
       }
+
+class GeneComplex:
+  def __init__(self, gene = None):
+    self.genes = set ()
+    self.reactions = []
+    self.links = {"g":set (), "gc":set()}
+    self.identifier = None
+    if gene is not None:
+      self.genes.add (gene)
+    
+  def add_gene (self, gene):
+    self.genes.add (gene)
+    
+  def add_genes (self, gene_complex):
+    for g in gene_complex.genes:
+      self.genes.add (g)
+      
+  def get_id (self):
+    if self.identifier is None:
+      self.calc_id ()
+    return self.identifier
+  
+  def contains_one_of (self, genes = []):
+    for g in self.genes:
+      if g.identifier in genes:
+        return True
+    return False
+  
+  def calc_id (self):
+    if self.identifier is not None:
+      raise RuntimeError ("cannot overwrite the id of a gene complex")
+  
+    gl = []
+    for g in self.genes:
+      gl.append (g.identifier)
+    self.identifier = " + ".join (sorted (gl))
+      
+  def to_sbml_string (self):
+    gs = []
+    for g in self.genes:
+      gs.append (g.identifier)
+    return "(" + (" and ".join (sorted (gs))) + ")"
+    
+  def to_string (self):
+    gs = ""
+    for g in self.genes:
+      gs += g.identifier + "+"
+    return "GeneComplex["+gs+"]"
+    
+  def serialize (self, gene_mapper):
+    if self.identifier is None:
+      self.calc_id ()
+    
+    ret = {
+      "id": self.identifier,
+      "enzs" : [],
+      "reactions": self.reactions
+      }
+    for g in self.genes:
+      ret["enzs"].append (gene_mapper[g.identifier])
+    return ret
+    
+  
 
 class Network:
 
@@ -71,40 +168,116 @@ class Network:
     self.__logger = logging.getLogger(__name__)
     self.species = {}
     self.reactions = {}
-    self.genenet = {}
+    self.genes = {}
+    self.gene_complexes = {}
+    self.have_gene_net = False
+    self.__annotation_about_pattern = re.compile (r"<rdf:Description rdf:about=['\"]#[^'\"]+['\"]>", re.IGNORECASE)
     
-  def add_species (self, species):
-    self.species[species.identifier] = species
+  def add_species (self, identifier, name):
+    if identifier not in self.species:
+      self.species[identifier] = Species (identifier, name)
+    return self.species[identifier]
 
-  def add_reaction (self, reaction):
-    self.reactions[reaction.identifier] = reaction
+  def add_reaction (self, identifier, name):
+    if identifier not in self.reactions:
+      self.reactions[identifier] = Reaction (identifier, name)
+    return self.reactions[identifier]
+  
+  def add_gene (self, gene):
+    if gene.identifier not in self.genes:
+      self.genes[gene.identifier] = Gene (gene.identifier)
+    return self.genes[gene.identifier]
+
+  def add_genes (self, reaction, gene_complexes):
+    for gc in gene_complexes:
+      if type (gc) is Gene:
+        g = self.add_gene (gc)
+        reaction.genes.append (g.identifier)
+        g.reactions.append (reaction.identifier)
+      elif type (gc) is GeneComplex:
+        if len (gc.genes) == 1:
+          g = self.add_gene (next(iter(gc.genes)))
+          reaction.genes.append (g.identifier)
+          g.reactions.append (reaction.identifier)
+        else:
+          gcomplex = GeneComplex ()
+          for g in gc.genes:
+            gcomplex.add_gene (self.add_gene (g))
+          gcomplex.calc_id ()
+          reaction.genec.append (gcomplex.identifier)
+          gcomplex.reactions.append (reaction.identifier)
+          self.gene_complexes[gcomplex.identifier] = (gcomplex)
+      else:
+        raise RuntimeError ("unexpected gene type: " + type (gc))
 
   def serialize (self):
     self.__logger.debug ("serialising the network")
     json = {
-      "species": {},
-      "reactions": {},
-      "genenet": {}}
-    
-    for gene in self.genenet:
-      json["genenet"][gene] = {"links": [], "reactions": []}
-      for associated in self.genenet[gene]["links"]:
-        json["genenet"][gene]["links"].append (associated)
-      for reaction in self.genenet[gene]["reactions"]:
-        json["genenet"][gene]["reactions"].append (reaction)
+      "species": [],
+      "reactions": [],
+      "enzs": [],
+      "enzc": [],
+      }
+      
+    species_mapper = {}
+    reaction_mapper = {}
+    gene_mapper = {}
+    gene_complex_mapper = {}
     
     for identifier, species in self.species.items ():
       self.__logger.debug ("serialising species " + identifier)
-      json["species"][identifier] = species.serialize ()
+      s_ser = species.serialize ()
+      species_mapper[identifier] = len (json["species"])
+      json["species"].append (s_ser)
+    
+    for identifier, gene in self.genes.items ():
+      self.__logger.debug ("serialising gene " + identifier)
+      g_ser = gene.serialize ()
+      gene_mapper[identifier] = len (json["enzs"])
+      json["enzs"].append (g_ser)
+    
+    for identifier, gene_complex in self.gene_complexes.items ():
+      self.__logger.debug ("serialising gene complex " + identifier)
+      g_ser = gene_complex.serialize (gene_mapper)
+      gene_complex_mapper[identifier] = len (json["enzc"])
+      json["enzc"].append (g_ser)
+      # add gene-genecomplex information
+      for g in gene_complex.genes:
+        json["enzs"][gene_mapper[g.identifier]]["cplx"].append (gene_complex_mapper[identifier])
+    
+    
     for identifier, reaction in self.reactions.items ():
       self.__logger.debug ("serialising reaction " + identifier)
-      json["reactions"][identifier] = reaction.serialize ()
+      # json["reactions"][reaction.num] = reaction.serialize ()
+      r_ser = reaction.serialize (species_mapper, gene_mapper, gene_complex_mapper)
+      reaction_mapper[identifier] = len (json["reactions"])
+      json["reactions"].append (r_ser)
+    
+    
+    # further reduce return size: replace reaction ids in species occurrences
+    for s in json["species"]:
+      o = []
+      for occ in s["occ"]:
+        o.append (reaction_mapper[occ])
+      s["occ"] = o
+    
+    # further reduce return size: replace reaction ids in gene occurrences
+    for g in json["enzs"]:
+      o = []
+      for occ in g["reactions"]:
+        o.append (reaction_mapper[occ])
+      g["reactions"] = o
+    for g in json["enzc"]:
+      o = []
+      for occ in g["reactions"]:
+        o.append (reaction_mapper[occ])
+      g["reactions"] = o
+      
     return json
 
 
   def calc_genenet (self):
     self.__logger.info ("calc gene net")
-    self.genenet = {}
     
     num = 0
     for identifier, reaction in self.reactions.items ():
@@ -112,34 +285,50 @@ class Network:
       if num % 100 == 0:
         self.__logger.info ("calc gene associations for reaction " + str (num))
       self.__logger.debug ("calc gene associations for reaction " + reaction.identifier)
+      
       for gene in reaction.genes:
         self.__logger.debug ("processing gene " + gene)
-        if gene not in self.genenet:
-          self.genenet[gene] = {"links": set (), "reactions": [identifier]}
-        else:
-          self.genenet[gene]["reactions"].append (identifier)
-        
         for species in reaction.consumed:
           s = self.species[species]
-          #if gene not in s.genes_for_consumption:
-          s.genes_for_consumption.add (gene)
+          s.genes_for_consumption["g"].add (gene)
           if reaction.reversible:
-            # and gene not in s.genes_for_production:
-            s.genes_for_production.add (gene)
+            s.genes_for_production["g"].add (gene)
         for species in reaction.produced:
           s = self.species[species]
-          # if gene not in s.genes_for_production:
-          s.genes_for_production.add (gene)
+          s.genes_for_production["g"].add (gene)
           if reaction.reversible:
-            # and gene not in s.genes_for_consumption:
-            s.genes_for_consumption.add (gene)
+            s.genes_for_consumption["g"].add (gene)
+      
+      for gene in reaction.genec:
+        self.__logger.debug ("processing gene complex " + gene)
+        for species in reaction.consumed:
+          s = self.species[species]
+          s.genes_for_consumption["gc"].add (gene)
+          if reaction.reversible:
+            s.genes_for_production["gc"].add (gene)
+        for species in reaction.produced:
+          s = self.species[species]
+          s.genes_for_production["gc"].add (gene)
+          if reaction.reversible:
+            s.genes_for_consumption["gc"].add (gene)
     
     self.__logger.info ("got gene associations")
     for identifier, species in self.species.items ():
-      for consumption in species.genes_for_consumption:
-        for production in species.genes_for_production:
-          self.genenet[production]["links"].add (consumption)
+      for consumption in species.genes_for_consumption["g"]:
+        for production in species.genes_for_production["g"]:
+          self.genes[production].links["g"].add (self.genes[consumption])
+        for production in species.genes_for_production["gc"]:
+          self.gene_complexes[production].links["g"].add (self.genes[consumption])
+      
+      for consumption in species.genes_for_consumption["gc"]:
+        for production in species.genes_for_production["g"]:
+          self.genes[production].links["gc"].add (self.gene_complexes[consumption])
+        for production in species.genes_for_production["gc"]:
+          self.gene_complexes[production].links["gc"].add (self.gene_complexes[consumption])
+          # ~ self.genenet[production]["links"].add (consumption)
+          
     self.__logger.info ("got gene net")
+    self.have_gene_net = True
     
     
   def export_rn_dot (self, filename):
@@ -163,20 +352,32 @@ class Network:
       
   def export_en_dot (self, filename):
     """ export the enzyme network in DOT format """
-    if not self.genenet:
+    if not self.have_gene_net:
       self.calc_genenet ()
     nodemap = {}
     with open(filename, 'w') as f:
       f.write ("digraph GEMtractor {\n")
       #TODO comment incl time and version?
       num = 0
-      for gene in self.genenet:
+      for gene in self.genes:
           num = num + 1
           nodemap[gene] = 'g' + str(num)
           f.write ("\t" + nodemap[gene] + " [label=\""+gene+"\"];\n")
-      for gene in self.genenet:
-          for associated in self.genenet[gene]['links']:
-              f.write ("\t" + nodemap[gene] + " -> " + nodemap[associated] + ";\n")
+      for gene in self.gene_complexes:
+          num = num + 1
+          nodemap[gene] = 'gc' + str(num)
+          f.write ("\t" + nodemap[gene] + " [label=\""+gene+"\"];\n")
+      
+      for gene in self.genes:
+          for associated in self.genes[gene].links["g"]:
+              f.write ("\t" + nodemap[gene] + " -> " + nodemap[associated.identifier] + ";\n")
+          for associated in self.genes[gene].links["gc"]:
+              f.write ("\t" + nodemap[gene] + " -> " + nodemap[associated.identifier] + ";\n")
+      for gene in self.gene_complexes:
+          for associated in self.gene_complexes[gene].links["g"]:
+              f.write ("\t" + nodemap[gene] + " -> " + nodemap[associated.identifier] + ";\n")
+          for associated in self.gene_complexes[gene].links["gc"]:
+              f.write ("\t" + nodemap[gene] + " -> " + nodemap[associated.identifier] + ";\n")
       f.write ("}\n")
       
       
@@ -205,19 +406,34 @@ class Network:
       
       
   def export_en_gml (self, filename):
-      nodemap = {}
-      with open(filename, 'w') as f:
-        f.write (Network.create_gml_prefix ())
-        #TODO comment incl time and version?
-        num = 0
-        for gene in self.genenet:
-          num += 1
-          nodemap[gene] = str (num)
-          f.write (Network.create_gml_node (nodemap[gene], "gene", "ellipse", gene))
-        for gene in self.genenet:
-            for associated in self.genenet[gene]['links']:
-                f.write (Network.create_gml_edge (nodemap[gene], nodemap[associated]))
-        f.write ("]\n")
+    if not self.have_gene_net:
+      self.calc_genenet ()
+    nodemap = {}
+    with open(filename, 'w') as f:
+      f.write (Network.create_gml_prefix ())
+      #TODO comment incl time and version?
+      num = 0
+      for gene in self.genes:
+        num += 1
+        nodemap[gene] = str (num)
+        f.write (Network.create_gml_node (nodemap[gene], "enzyme", "ellipse", gene))
+      for gene in self.gene_complexes:
+        num += 1
+        nodemap[gene] = str (num)
+        f.write (Network.create_gml_node (nodemap[gene], "enzyme_complex", "ellipse", gene))
+        
+        
+      for gene in self.genes:
+          for associated in self.genes[gene].links["g"]:
+              f.write (Network.create_gml_edge (nodemap[gene], nodemap[associated.identifier]))
+          for associated in self.genes[gene].links["gc"]:
+              f.write (Network.create_gml_edge (nodemap[gene], nodemap[associated.identifier]))
+      for gene in self.gene_complexes:
+          for associated in self.gene_complexes[gene].links["g"]:
+              f.write (Network.create_gml_edge (nodemap[gene], nodemap[associated.identifier]))
+          for associated in self.gene_complexes[gene].links["gc"]:
+              f.write (Network.create_gml_edge (nodemap[gene], nodemap[associated.identifier]))
+      f.write ("]\n")
       
   @staticmethod
   def create_gml_prefix ():
@@ -266,21 +482,38 @@ class Network:
       
       
   def export_en_graphml (self, filename):
-      nodemap = {}
-      with open(filename, 'w') as f:
-        f.write (Network.create_graphml_prefix ())
-        #TODO comment incl time and version?
-        num = 0
-        for gene in self.genenet:
-          num += 1
-          nodemap[gene] = 'g' + str (num)
-          f.write (Network.create_graphml_node (nodemap[gene], "gene", "ellipse", gene))
-        num = 0
-        for gene in self.genenet:
-            for associated in self.genenet[gene]['links']:
-                num += 1
-                f.write ("\t\t<edge id=\"e" + str(num) + "\" source=\"" + nodemap[gene] + "\" target=\"" + nodemap[associated] + "\"/>\n")
-        f.write ("\t</graph>\n</graphml>\n")
+    if not self.have_gene_net:
+      self.calc_genenet ()
+    nodemap = {}
+    with open(filename, 'w') as f:
+      f.write (Network.create_graphml_prefix ())
+      #TODO comment incl time and version?
+      num = 0
+      for gene in self.genes:
+        num += 1
+        nodemap[gene] = 'g' + str (num)
+        f.write (Network.create_graphml_node (nodemap[gene], "enzyme", "ellipse", gene))
+      for gene in self.gene_complexes:
+        num += 1
+        nodemap[gene] = 'gc' + str (num)
+        f.write (Network.create_graphml_node (nodemap[gene], "enzyme_complex", "ellipse", gene))
+      num = 0
+      for gene in self.genes:
+          for associated in self.genes[gene].links["g"]:
+              num += 1
+              f.write ("\t\t<edge id=\"e" + str(num) + "\" source=\"" + nodemap[gene] + "\" target=\"" + nodemap[associated.identifier] + "\"/>\n")
+          for associated in self.genes[gene].links["gc"]:
+              num += 1
+              f.write ("\t\t<edge id=\"e" + str(num) + "\" source=\"" + nodemap[gene] + "\" target=\"" + nodemap[associated.identifier] + "\"/>\n")
+      for gene in self.gene_complexes:
+          for associated in self.gene_complexes[gene].links["g"]:
+              num += 1
+              f.write ("\t\t<edge id=\"e" + str(num) + "\" source=\"" + nodemap[gene] + "\" target=\"" + nodemap[associated.identifier] + "\"/>\n")
+          for associated in self.gene_complexes[gene].links["gc"]:
+              num += 1
+              f.write ("\t\t<edge id=\"e" + str(num) + "\" source=\"" + nodemap[gene] + "\" target=\"" + nodemap[associated.identifier] + "\"/>\n")
+      
+      f.write ("\t</graph>\n</graphml>\n")
   
   @staticmethod
   def create_graphml_prefix ():
@@ -307,11 +540,15 @@ class Network:
     return n
       
       
-  def export_en_sbml (self, filename, model_id, model_name = None, filter_species = None, filter_reactions = None, filter_genes = None, remove_reaction_genes_removed = True, remove_reaction_missing_species = False):
+  def export_en_sbml (self, filename, gemtractor, model_id, model_name = None, filter_species = None, filter_reactions = None, filter_genes = None, filter_gene_complexes = None, remove_reaction_genes_removed = True, remove_reaction_missing_species = False):
+    if not self.have_gene_net:
+      self.calc_genenet ()
+    
     sbml = SBMLDocument ()
     model = sbml.createModel ()
     #TODO dc modified?
     if model is None:
+      self.__logger.error ("could not create model...")
       return False
     model.setId (model_id + "_GEMtracted_EnzymeNetwork")
     if model_name is None:
@@ -319,7 +556,7 @@ class Network:
     model.setName ("GEMtracted EnzymeNetwork of " + model_name)
     
     # print ("adding note to en sbml")
-    Utils.add_model_note (model, filter_species, filter_reactions, filter_genes, remove_reaction_genes_removed, remove_reaction_missing_species)
+    Utils.add_model_note (model, filter_species, filter_reactions, filter_genes, filter_gene_complexes, remove_reaction_genes_removed, remove_reaction_missing_species)
     
     nodemap = {}
     
@@ -328,27 +565,126 @@ class Network:
     compartment.setConstant(True)
     
     num = 0
-    for gene in self.genenet:
+    for gene in self.genes:
       num += 1
-      g = model.createSpecies ()
-      g.setId ('g' + str (num))
-      g.setName (gene)
-      g.setCompartment(compartment.getId())
-      g.setHasOnlySubstanceUnits(False)
-      g.setBoundaryCondition(False)
-      g.setConstant(False)
-      nodemap[gene] = g
+      nodemap[gene] = self.__create_sbml_gene (model, 'g' + str (num), gene, compartment, gemtractor)
+      # TODO: add other information if available
+    
+    for gene in self.gene_complexes:
+      num += 1
+      nodemap[gene] = self.__create_sbml_gene_complex (model, 'gc' + str (num), gene, compartment, gemtractor, self.gene_complexes[gene].genes, nodemap)
       # TODO: add other information if available
     
     num = 0
-    for gene in self.genenet:
-      for associated in self.genenet[gene]['links']:
+    for gene in self.genes:
+      for associated in self.genes[gene].links["g"]:
         num += 1
-        r= model.createReaction ()
-        r.setId ('r' + str (num))
-        r.setFast(False)
-        r.setReversible(False)
-        r.addReactant (nodemap[gene])
-        r.addProduct (nodemap[associated])
+        Network.create_sbml_reaction (model, 'r' + str (num), nodemap[gene], nodemap[associated.identifier])
+      for associated in self.genes[gene].links["gc"]:
+        num += 1
+        Network.create_sbml_reaction (model, 'r' + str (num), nodemap[gene], nodemap[associated.identifier])
+    for gene in self.gene_complexes:
+      for associated in self.gene_complexes[gene].links["g"]:
+        num += 1
+        Network.create_sbml_reaction (model, 'r' + str (num), nodemap[gene], nodemap[associated.identifier])
+      for associated in self.gene_complexes[gene].links["gc"]:
+        num += 1
+        Network.create_sbml_reaction (model, 'r' + str (num), nodemap[gene], nodemap[associated.identifier])
     
     return SBMLWriter().writeSBML (sbml, filename)
+
+  
+  def __create_sbml_gene_complex (self, model, identifier, name, compartment, gemtractor, genes, nodemap):
+    g = model.createSpecies ()
+    g.setId (identifier)
+    g.setMetaId (identifier)
+    g.setName (name)
+    g.setCompartment(compartment.getId())
+    g.setHasOnlySubstanceUnits(False)
+    g.setBoundaryCondition(False)
+    g.setConstant(False)
+    
+    annotations = ""
+    
+    for gene in genes:
+      print (gene.identifier)
+      print (nodemap[gene.identifier])
+      annotations += '<rdf:li rdf:resource="#' + nodemap[gene.identifier].getMetaId () + '" />'
+    
+    if len (annotations) > 0:
+      annotations = """
+        <annotation>
+         <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/">
+          <rdf:Description rdf:about="#""" + identifier + """">
+            <bqbiol:hasPart>
+              <rdf:Bag>""" + annotations + """</rdf:Bag>
+            </bqbiol:hasPart>
+          </rdf:Description>
+         </rdf:RDF>
+        </annotation>"""
+      if g.setAnnotation (annotations) != LIBSBML_OPERATION_SUCCESS:
+        self.__logger.error ("unable to add annotation to gene " + identifier)
+        self.__logger.debug ("annotation was: " + annotations)
+    else:
+      self.__logger.warn ("gene complex has no genes: " + identifier)
+    
+    return g
+  
+  def __create_sbml_gene (self, model, identifier, name, compartment, gemtractor):
+    g = model.createSpecies ()
+    g.setId (identifier)
+    g.setMetaId (identifier)
+    g.setName (name)
+    g.setCompartment(compartment.getId())
+    g.setHasOnlySubstanceUnits(False)
+    g.setBoundaryCondition(False)
+    g.setConstant(False)
+    
+    annotations = gemtractor.get_gene_product_annotations (name)
+    if annotations is not None:
+      annotations = self.__annotation_about_pattern.sub('<rdf:Description rdf:about="#'+identifier+'">', annotations)
+      if g.setAnnotation (annotations) != LIBSBML_OPERATION_SUCCESS:
+        self.__logger.error ("unable to add annotation to gene " + identifier)
+        self.__logger.debug ("annotation was: " + annotations)
+    
+    return g
+
+  @staticmethod
+  def create_sbml_reaction (model, identifier, reactant, product):
+    r= model.createReaction ()
+    r.setId (identifier)
+    r.setFast(False)
+    r.setReversible(False)
+    r.addReactant (reactant)
+    r.addProduct (product)
+    return r
+    
+  
+  
+  def export_rn_csv (self, filename):
+    with open(filename, 'w') as f:
+      f.write ('"source","target"\n')
+      for identifier, reaction in self.reactions.items ():
+        rid = 'r' + identifier
+        for s in reaction.consumed:
+          f.write ('"' + rid + '","s' + s + '"\n')
+        for s in reaction.produced:
+          f.write ('"s' + s + '","' + rid + '"\n')
+      
+      
+  def export_en_csv (self, filename):
+    if not self.have_gene_net:
+      self.calc_genenet ()
+    with open(filename, 'w') as f:
+      f.write ('"source","target"\n')
+      for gene in self.genes:
+          for associated in self.genes[gene].links["g"]:
+            f.write ('"' + gene + '","' + associated.identifier + '"\n')
+          for associated in self.genes[gene].links["gc"]:
+            f.write ('"' + gene + '","' + associated.identifier + '"\n')
+      for gene in self.gene_complexes:
+          for associated in self.gene_complexes[gene].links["g"]:
+            f.write ('"' + gene + '","' + associated.identifier + '"\n')
+          for associated in self.gene_complexes[gene].links["gc"]:
+            f.write ('"' + gene + '","' + associated.identifier + '"\n')
+      

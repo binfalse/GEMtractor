@@ -18,7 +18,7 @@ from libsbml import SBMLReader, FbcAssociation_parseFbcInfixAssociation
 import re
 import pyparsing as pp
 import logging
-from .network import Network, Reaction, Species
+from .network import Network, Reaction, Species, Gene, GeneComplex
 import math
 from .utils import BreakLoops, InvalidGeneExpression, Utils
 
@@ -48,6 +48,7 @@ class GEMtractor:
       self.__logger = logging.getLogger(__name__)
       self.__reaction_gene_map = {}
       self.__sbml_file = sbml_file
+      self.__fbc_plugin = None
     
     def __get_expression_parser (self):
         variables = pp.Word(pp.alphanums + "_-.") 
@@ -94,11 +95,12 @@ class GEMtractor:
                     if logic:
                         # it's ANDed -> so every previous item needs to be connected to every next item
                         newterms = self._unfold_complex_expression (parseresult[i])
-                        tmp = []
+                        # ~ tmp = []
                         for a in term_combination:
                             for b in newterms:
-                                tmp.append (str(a)+" and "+str (b))
-                        term_combination = tmp
+                              a.add_genes (b)
+                                # ~ tmp.append (str(a)+" and "+str (b))
+                        # ~ term_combination = tmp
                     else:
                         # just add them to the list as alternatives
                         term_combination += self._unfold_complex_expression (parseresult[i])
@@ -110,7 +112,7 @@ class GEMtractor:
                 raise NotImplementedError ('unexpected expression: ' + str(parseresult))
                 
         else:
-            return [parseresult]
+            return [GeneComplex (Gene (parseresult))]
 
 
     def _extract_genes_from_sbml_notes (self, annotation, default):
@@ -132,9 +134,15 @@ class GEMtractor:
         # also update the GENE_LIST using __GENE_LIST_PATTERN
         # but for this we need the list of genes here (not only the logic expression)
         
-      
     
-    def get_sbml (self, filter_species = None, filter_reactions = None, filter_genes = None, remove_reaction_genes_removed = True, remove_reaction_missing_species = False):
+    def get_gene_product_annotations (self, gene):
+      if self.__fbc_plugin is not None:
+        gp = self.__fbc_plugin.getGeneProductByLabel (gene)
+        if gp is not None:
+          return self.__fbc_plugin.getGeneProductByLabel (gene).getAnnotationString()
+      return None
+    
+    def get_sbml (self, filter_species = [], filter_reactions = [], filter_genes = [], filter_gene_complexes = [], remove_reaction_genes_removed = True, remove_reaction_missing_species = False):
       """ Get a filtered SBML document from a file
       
       do not use the same GEMtractor object for two different SBML files!!
@@ -163,11 +171,23 @@ class GEMtractor:
       model.setName ("GEMtracted ReactionNetwork of " + name)
       self.__logger.info("got proper sbml model")
       
+      self.__fbc_plugin = model.getPlugin ("fbc")
+      
       self.__logger.debug("append a note")
-      Utils.add_model_note (model, filter_species, filter_reactions, filter_genes, remove_reaction_genes_removed, remove_reaction_missing_species)
+      Utils.add_model_note (model, filter_species, filter_reactions, filter_genes, filter_gene_complexes, remove_reaction_genes_removed, remove_reaction_missing_species)
       
+      if filter_species is None:
+        filter_species = []
+      if filter_reactions is None:
+        filter_reactions = []
+      if filter_genes is None:
+        filter_genes = []
+      if filter_gene_complexes is None:
+        filter_gene_complexes = []
+        
       
-      if filter_species is not None or filter_reactions is not None or filter_genes is not None:
+      # ~ if (filter_species is not None and len(filter_species) > 0) or (filter_reactions is not None and len(filter_reactions) > 0) or (filter_genes is not None and len(filter_genes) > 0) or (filter_gene_complexes is not None and len(filter_gene_complexes) > 0):
+      if len(filter_species) > 0 or len(filter_reactions) > 0 or len(filter_genes) > 0 or len(filter_gene_complexes) > 0:
         try:
           #TODO dc modified?
           self.__logger.debug("filtering things")
@@ -214,7 +234,10 @@ class GEMtractor:
               
               final_genes = []
               for g in current_genes:
-                if g not in filter_genes:
+                # ~ print (g.get_id())
+                # ~ print (g.genes)
+                if g.get_id () not in filter_genes and g.get_id () not in filter_gene_complexes and not g.contains_one_of (filter_genes):
+                  # ~ print (g.get_id() + " will be in model")
                   final_genes.append (g)
               
               if len (final_genes) < 1:
@@ -222,7 +245,7 @@ class GEMtractor:
                   model.removeReaction (n)
                   continue
                 else:
-                  final_genes = [reaction.getId ()]
+                  final_genes = [Gene (reaction.getId ())]
               
               # should we update the genes in the model?
               if (len (final_genes) != len (current_genes)):
@@ -243,7 +266,7 @@ class GEMtractor:
         gpa = rfbc.getGeneProductAssociation()
         if gpa is not None:
           g = self._implode_genes (genes)
-          gpa.setAssociation(FbcAssociation_parseFbcInfixAssociation (g, model.getPlugin ("fbc")))
+          gpa.setAssociation(FbcAssociation_parseFbcInfixAssociation (g, self.__fbc_plugin))
         else:
           self.__logger.debug('no fbc to update: ' + reaction.getId ())
       
@@ -268,15 +291,22 @@ class GEMtractor:
         the logical expression (genes joined using 'or')
        
       """
-      return "(" + (") or (".join (genes)) + ")"
+      r = "("
+      for g in genes:
+        r += str (g.to_sbml_string ()) + " or "
+      
+      return r[:-4] + ")"
+      # ~ return "(" + (") or (".join (genes)) + ")"
     
     
     def _get_genes (self, reaction):
       
-      if reaction.getId () in self.__reaction_gene_map:
-        return self.__reaction_gene_map[reaction.getId ()]
+      if reaction.getId () not in self.__reaction_gene_map:
+        self.__reaction_gene_map[reaction.getId ()] = self._unfold_complex_expression(self._parse_expression(self.__find_genes (reaction)))
       
-      return self._unfold_complex_expression(self._parse_expression(self.__find_genes (reaction)))
+      return self.__reaction_gene_map[reaction.getId ()]
+      
+      # ~ return self._unfold_complex_expression(self._parse_expression(self.__find_genes (reaction)))
     
     def __find_genes (self, reaction):
       rfbc = reaction.getPlugin ("fbc")
@@ -289,7 +319,7 @@ class GEMtractor:
       else:
           self.__logger.debug('no fbc: ' + reaction.getId ())
       
-      return self._extract_genes_from_sbml_notes (reaction.getNotesString(), reaction.getId ())
+      return self._extract_genes_from_sbml_notes (reaction.getNotesString(), "reaction_" + reaction.getId ())
         
         
     
@@ -311,8 +341,7 @@ class GEMtractor:
       
       for n in range (0, model.getNumSpecies()):
         s = model.getSpecies (n)
-        species[s.getId ()] = Species (s.getName (), s.getId ())
-        network.add_species (species[s.getId ()])
+        species[s.getId ()] = network.add_species (s.getId (), s.getName ())
       
       # TODO remove debugging
       max_genes = 0
@@ -321,7 +350,11 @@ class GEMtractor:
           self.__logger.info ("processing reaction " + str (n))
         reaction = model.getReaction(n)
         # TODO: reversible?
-        r = Reaction (reaction.getId (), reaction.getName ())
+        #r = Reaction (reaction.getId (), reaction.getName ())
+        r = network.add_reaction (reaction.getId (), reaction.getName ())
+        if reaction.isSetReversible ():
+          r.reversible = reaction.getReversible ()
+        
         current_genes = self._get_genes (reaction)
         self.__logger.debug("current genes: " + self._implode_genes (current_genes) + " - reaction: " + reaction.getId ())
       
@@ -329,10 +362,14 @@ class GEMtractor:
           self.__logger.debug("did not find genes in reaction " + reaction.getId ())
           raise NotImplementedError ("did not find genes in reaction " + reaction.getId ())
     
-        for g in current_genes:
-          if g not in r.genes:
-            r.genes.append (g)
-            
+        # TODO!!!
+        # ~ for g in current_genes:
+          # ~ if g not in r.genes:
+            # ~ r.genes.append (g)
+        
+        network.add_genes (r, current_genes)
+        
+        
         for sn in range (0, reaction.getNumReactants()):
           s = reaction.getReactant(sn).getSpecies()
           r.add_input (species[s])
@@ -341,12 +378,12 @@ class GEMtractor:
           s = reaction.getProduct(sn).getSpecies()
           r.add_output (species[s])
         
-        network.add_reaction (r)
+        
         
         # TODO remove debugging
-        if max_genes < len (current_genes):
+        # ~ if max_genes < len (current_genes):
           # ~ print (reaction.getId () + " -- " + str (len (current_genes)))
-          max_genes = len (current_genes)
+          # ~ max_genes = len (current_genes)
       
         
       self.__logger.info ("extracted network")

@@ -49,35 +49,35 @@ class ApiTest(TestCase):
     f = response.json()["filter"]
     self.assertEqual(len(f["filter_species"]), 1)
     self.assertEqual(len(f["filter_reactions"]), 0)
-    self.assertEqual(len(f["filter_genes"]), 0)
+    self.assertEqual(len(f["filter_enzymes"]), 0)
     
     response = self.client.post('/api/store_filter', json.dumps({'species': ["a","b"]}),content_type="application/json")
     self._expect_response (response, True)
     f = response.json()["filter"]
     self.assertEqual(len(f["filter_species"]), 2)
     self.assertEqual(len(f["filter_reactions"]), 0)
-    self.assertEqual(len(f["filter_genes"]), 0)
+    self.assertEqual(len(f["filter_enzymes"]), 0)
     
     response = self.client.post('/api/store_filter', json.dumps({'reaction': ["a"]}),content_type="application/json")
     self._expect_response (response, True)
     f = response.json()["filter"]
     self.assertEqual(len(f["filter_species"]), 2)
     self.assertEqual(len(f["filter_reactions"]), 1)
-    self.assertEqual(len(f["filter_genes"]), 0)
+    self.assertEqual(len(f["filter_enzymes"]), 0)
     
-    response = self.client.post('/api/store_filter', json.dumps({'species': ["a"], 'genes': ["x","y"]}),content_type="application/json")
+    response = self.client.post('/api/store_filter', json.dumps({'species': ["a"], 'enzymes': ["x","y"]}),content_type="application/json")
     self._expect_response (response, True)
     f = response.json()["filter"]
     self.assertEqual(len(f["filter_species"]), 1)
     self.assertEqual(len(f["filter_reactions"]), 1)
-    self.assertEqual(len(f["filter_genes"]), 2)
+    self.assertEqual(len(f["filter_enzymes"]), 2)
     
-    response = self.client.post('/api/store_filter', json.dumps({'species': ["x","y","a"], 'reaction': ["x","y","a"], 'genes': ["x","y","x","y"]}),content_type="application/json")
+    response = self.client.post('/api/store_filter', json.dumps({'species': ["x","y","a"], 'reaction': ["x","y","a"], 'enzymes': ["x","y","x","y"]}),content_type="application/json")
     self._expect_response (response, True)
     f = response.json()["filter"]
     self.assertEqual(len(f["filter_species"]), 3)
     self.assertEqual(len(f["filter_reactions"]), 3)
-    self.assertEqual(len(f["filter_genes"]), 4)
+    self.assertEqual(len(f["filter_enzymes"]), 4)
     
     
   
@@ -296,12 +296,12 @@ class ApiTest(TestCase):
       self.assertTrue(len (response.json()["network"]) > 0)
       
     
-      response = self.client.post('/api/store_filter', json.dumps({'species': ["x","y","a"], 'reaction': ["x","y","a"], 'genes': ["x","y","x","y"]}),content_type="application/json")
+      response = self.client.post('/api/store_filter', json.dumps({'species': ["x","y","a"], 'reaction': ["x","y","a"], 'enzymes': ["x","y","x","y"]}),content_type="application/json")
       self._expect_response (response, True)
       f = response.json()["filter"]
       self.assertEqual(len(f["filter_species"]), 3)
       self.assertEqual(len(f["filter_reactions"]), 3)
-      self.assertEqual(len(f["filter_genes"]), 4)
+      self.assertEqual(len(f["filter_enzymes"]), 4)
     
       
       response = self.client.get('/api/get_network')
@@ -386,7 +386,7 @@ class ApiTest(TestCase):
       self.assertTrue (self._valid_xml (response.content), msg="invalid xml of en")
       c = response.content.decode("utf-8")
       self.assertEqual (c.count ("<node "), enSpecies)
-      self.assertEqual (c.count (">gene</data"), enSpecies)
+      self.assertEqual (c.count (">enzyme</data") + c.count (">enzyme_complex</data"), enSpecies)
       self.assertEqual (c.count ("<edge"), enReactions)
       
       
@@ -452,7 +452,8 @@ class ApiTest(TestCase):
           "filter": {
             "species": ["k"],
             "reactions": ["b","x"],
-            "genes": ["a"],
+            "enzymes": ["a"],
+            "filter_enzyme_complexes": ["a + k"],
           },
           "file": model
           }),content_type="application/json")
@@ -464,7 +465,7 @@ class ApiTest(TestCase):
           "export": {
             "network_type":"en",
             "network_format":"sbml",
-            "remove_reaction_genes_removed": False,
+            "remove_reaction_enzymes_removed": False,
             "remove_reaction_missing_species": True
           },
           "file": model
@@ -524,7 +525,7 @@ class ApiTest(TestCase):
             "network_format":"sbml"
           },
           "filter": {
-            "genes": "k",
+            "enzymes": "k",
           },
           "file": model
           }),content_type="application/json")

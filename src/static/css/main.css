@@ -24,6 +24,10 @@ body {
 h1, h2, h3, h4, h5, h6 {
   font-family: 'Vesper Libre', serif;
 }
+a {
+  text-decoration: none;
+  border-bottom: 1px solid;
+}
 .w3-content,
 #navMobi {
     margin-top:46px
@@ -37,6 +41,9 @@ h1, h2, h3, h4, h5, h6 {
 }
 .filter-inconsistent {
     color: red
+}
+.filter-supercomplex {
+    font-style: italic;
 }
 #batch-filter {
     width: 100%;
@@ -120,7 +127,6 @@ transform: rotate(90deg);
 display:none
 }
 }
-#maincard {
-z-index: 2;
-  
+.w3-top {
+  z-index: 3;
 }

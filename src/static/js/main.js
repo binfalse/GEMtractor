@@ -53,6 +53,7 @@ function tab(tabid, tabbuttonid) {
 // we need to remap the id to something that is for sure valid in XML and still resolvable to the original ids..
 const idMap = {};
 const idReMap = {};
+const complexIdNumMap = {};
 
 /**
  * 
@@ -84,7 +85,7 @@ var networks = {
  * @param g list of genes' ids to discard
  * 
  */
-function storeFilters (s, r, g, successFn = undefined) {
+function storeFilters (s, r, g, gc, successFn = undefined) {
 	// send an ajax request to /api/store_filter
 	$.ajax({
 		method: "POST",
@@ -94,7 +95,8 @@ function storeFilters (s, r, g, successFn = undefined) {
 		data: JSON.stringify({
 			species: s,
 			reaction: r,
-			genes: g
+			enzymes: g,
+			enzyme_complexes: gc
 		}),
 		success: function (data) {
 		  
@@ -133,124 +135,184 @@ function updateNetwork () {
 	$("#species-table tr").removeClass ("filter-inconsistent").removeClass ("filter-excluded");
 	$("#reaction-table tr").removeClass ("filter-inconsistent").removeClass ("filter-excluded");
 	$("#gene-table tr").removeClass ("filter-inconsistent").removeClass ("filter-excluded");
+	$("#gene-complex-table tr").removeClass ("filter-inconsistent").removeClass ("filter-excluded").removeClass ("filter-supercomplex");
+	$("#gene-complex-table tr td:nth-child(2)").attr("title", "");
 
 	// prepare inconsistency sets
-	var inconsistent = [new Set(),new Set(),new Set()];
+	var inconsistent = [new Set(),new Set(),new Set(),new Set()];
 	filter_species = new Set();
 	filter_reaction = new Set();
 	filter_genes = new Set();
+	filter_genec = new Set();
 
 	// check species for deselection
-	$("#species-table input[type=checkbox]").each (function (item){
-		if (!$(this).prop("checked")) {
+	$("#species-table input[type=checkbox]:not(:checked)").each (function (item){
 			const domId=$(this).parent ().parent ().attr ("id");
 			const entId = idReMap[domId];
 			// if unchecked, fade it out
 			$("#" + domId).addClass ("filter-excluded");
 			filter_species.add (entId);
-			networks.original.species[entId].occurence.forEach (function (r) {
-				// mark reactions, in which this species appears, as inconsistent
-				$("#" + idMap[r]).addClass ("filter-inconsistent");
-				inconsistent[1].add (r);
-			});
-		}
 	});
 
 	// check reactions for deselection
-	$("#reaction-table input[type=checkbox]").each (function (item){
-		if (!$(this).prop("checked")) {
+	$("#reaction-table input[type=checkbox]:not(:checked)").each (function (item){
 			const domId=$(this).parent ().parent ().attr ("id");
 			const entId = idReMap[domId];
 			// if unchecked, fade it out
 			$("#" + domId).addClass ("filter-excluded");
 			filter_reaction.add (entId);
-		}
 	});
 
 	// check genes for deselection
-	$("#gene-table input[type=checkbox]").each (function (item){
-		if (!$(this).prop("checked")) {
+	$("#gene-table input[type=checkbox]:not(:checked)").each (function (item){
 			const domId=$(this).parent ().parent ().attr ("id");
 			const entId = idReMap[domId];
 			// if unchecked, fade it out
 			$("#" + domId).addClass ("filter-excluded");
 			filter_genes.add (entId);
-		}
+	});
+
+	// check genes for deselection
+	$("#gene-complex-table input[type=checkbox]:not(:checked)").each (function (item){
+			const domId=$(this).parent ().parent ().attr ("id");
+			const entId = idReMap[domId];
+			// if unchecked, fade it out
+			$("#" + domId).addClass ("filter-excluded");
+			filter_genec.add (entId);
+			
+			// find super-complexes
+			const this_key = complexIdNumMap[entId];
+			const this_complex = networks.original.enzc[this_key].enzs;
+			for (var key = 0; key < networks.original.enzc.length; key++) {
+				if (key == this_key)
+					continue;
+				const other = networks.original.enzc[key].enzs;
+				if (this_complex.every (r => other.includes (r))) {
+					const domid = "#" + idMap[networks.original.enzc[key].id]
+					$(domid).addClass ("filter-inconsistent").addClass ("filter-supercomplex");
+					if ($(domid +" td:nth-child(2)").attr("title").length < 1)
+						$(domid +" td:nth-child(2)").attr("title", "Subcomplexes removed: ");
+					$(domid +" td:nth-child(2)").attr("title", $(domid +" td:nth-child(2)").attr("title") + "["+entId+"] ");
+				}
+			}
 	});
 
 	// check reactions for missing genes
-	for (var key in networks.original.reactions) {
-		if (networks.original.reactions.hasOwnProperty(key)) {
+	for (var key = 0; key < networks.original.reactions.length; key++) {
+	//~ for (var key in networks.original.reactions) {
+		//~ if (networks.original.reactions.hasOwnProperty(key)) {
 			const item = networks.original.reactions[key];
 			// is there some gene left in this reaction?
-			var occ = item.genes.some (function (r) {
-				return !filter_genes.has (r);
+			var occ = item.enzs.some (function (g) {
+					return !filter_genes.has (networks.original.enzs[g].id);
 			});
-			if (!occ) {
+			var occ2 = item.enzc.some (function (g) {
+					return !filter_genec.has (networks.original.enzc[g].id);
+			});
+			// was there a species removed?
+			var occ3 = item.cons.some (function (s) {
+					return filter_species.has (networks.original.species[s].id);
+			});
+			var occ4 = item.prod.some (function (s) {
+					return filter_species.has (networks.original.species[s].id);
+			});
+			if ((!occ && !occ2) || occ3 || occ4) {
 				// otherwise highlight it as inconsistent
 				$("#" + item.DOM).addClass ("filter-inconsistent");
-				inconsistent[1].add (key);
+				inconsistent[1].add (item.id);
 			}
-		}
+		//~ }
 	};
 
 	// check for ghost species - species that do not appear in any reaction
-	for (var key in networks.original.species) {
-		if (networks.original.species.hasOwnProperty(key)) {
+	for (var key = 0; key < networks.original.species.length; key++) {
+	//~ for (var key in networks.original.species) {
+		//~ if (networks.original.species.hasOwnProperty(key)) {
 			const item = networks.original.species[key];
 			// does the species appear somewhere?
-			var occ = item.occurence.some (function (r) {
-				return !filter_reaction.has (r);
+			var occ = item.occ.some (function (r) {
+				return !filter_reaction.has (networks.original.reactions[r].id);
 			});
 			if (!occ) {
 				// otherwise highlight it as inconsistent
 				$("#" + item.DOM).addClass ("filter-inconsistent");
-				inconsistent[0].add (key);
+				inconsistent[0].add (item.id);
 			}
-		}
+		//~ }
 	};
 
 	// check for ghost genes - genes that do not appear in any reaction
-	for (var key in networks.original.genenet) {
-		if (networks.original.genenet.hasOwnProperty(key)) {
-			const item = networks.original.genenet[key];
+	for (var key = 0; key < networks.original.enzs.length; key++) {
+	//~ for (var key in networks.original.genenet) {
+		//~ if (networks.original.genenet.hasOwnProperty(key)) {
+			const item = networks.original.enzs[key];
 			var occ = item.reactions.some (function (r) {
 				// does the species appear somewhere?
-				return !filter_reaction.has (r);
+				return !filter_reaction.has (networks.original.reactions[r].id);
 			});
-			if (!occ) {
+			var occ2 = item.cplx.some (function (c) {
+				// does the species appear somewhere?
+				return !filter_genec.has (networks.original.enzc[c].id);
+			});
+			if (!occ && !occ2) {
 				// otherwise highlight it as inconsistent
 				$("#" + item.DOM).addClass ("filter-inconsistent");
-				inconsistent[2].add (key);
+				inconsistent[2].add (item.id);
 			}
-		}
+		//~ }
+	}
+
+	// check for ghost genes complexes - genes that do not appear in any reaction
+	for (var key = 0; key < networks.original.enzc.length; key++) {
+	//~ for (var key in networks.original.genenet) {
+		//~ if (networks.original.genenet.hasOwnProperty(key)) {
+			const item = networks.original.enzc[key];
+			var occ = item.reactions.some (function (r) {
+				// does the species appear somewhere?
+				return !filter_reaction.has (networks.original.reactions[r].id);
+			});
+			var occ2 = item.enzs.some (function (g) {
+				// does the species appear somewhere?
+					return filter_genes.has (networks.original.enzs[g].id);
+			});
+			if (!occ || occ2) {
+				// otherwise highlight it as inconsistent
+				$("#" + item.DOM).addClass ("filter-inconsistent");
+				inconsistent[3].add (item.id);
+			}
+		//~ }
 	}
 
 	// post-process inconsistencies
 	filter_reaction.forEach (function (item) {inconsistent[1].delete (item)});
 	filter_species.forEach (function (item) {inconsistent[0].delete (item)});
 	filter_genes.forEach (function (item) {inconsistent[2].delete (item)});
+	filter_genec.forEach (function (item) {inconsistent[3].delete (item)});
 
 	// display inconsistencies in the top table
 	$("#s_inconsistent").text (inconsistent[0].size);
 	$("#r_inconsistent").text (inconsistent[1].size);
 	$("#g_inconsistent").text (inconsistent[2].size);
+	$("#gc_inconsistent").text (inconsistent[3].size);
 
 	// display current model size in top table
 	$("#s_cur").text (Object.keys(networks.original.species).length - filter_species.size);
 	$("#r_cur").text (Object.keys(networks.original.reactions).length - filter_reaction.size);
-	$("#g_cur").text (Object.keys(networks.original.genenet).length - filter_genes.size);
+	$("#g_cur").text (Object.keys(networks.original.enzs).length - filter_genes.size);
+	$("#gc_cur").text (Object.keys(networks.original.enzc).length - filter_genec.size);
 
 	// prepare filters
 	const s = Array.from(filter_species);
 	const r = Array.from(filter_reaction);
 	const g = Array.from(filter_genes);
+	const gc = Array.from(filter_genec);
 
 	// update the batch field
-	$("#batch-filter").val ("species: " + s.join (", ") + "\nreactions: " + r.join (", ") + "\ngenes: " + g.join (", "));
+	//~ $("#batch-filter").val ("species: " + s.join (", ") + "\nreactions: " + r.join (", ") + "\ngenes: " + g.join (", "));
+	$("#batch-filter").val ("species: " + s.join (", ") + "\nreactions: " + r.join (", ") + "\nenzymes: " + g.join (", ") + "\nenzyme_complexes: " + gc.join (", "));
 
 	// and store the filter at the backend session
-	storeFilters (s, r, g);
+	storeFilters (s, r, g, gc);
 }
 
 /*
@@ -268,6 +330,31 @@ function truncate (str, length=40) {
 	return  str;
 }
 
+/* TODO DOCU*/
+function get_gene_ids (genes_num) {
+	r = [];
+	for (var i = 0; i < genes_num.length; i++)
+		r.push (networks.original.enzs[genes_num[i]].id);
+	return r;
+}
+function get_genec_ids (genec_num) {
+	r = [];
+	for (var i = 0; i < genec_num.length; i++)
+		r.push (networks.original.enzc[genec_num[i]].id);
+	return r;
+}
+function get_species_ids (s_num) {
+	r = [];
+	for (var i = 0; i < s_num.length; i++)
+		r.push (networks.original.species[s_num[i]].id);
+	return r;
+}
+function get_reaction_ids (r_num) {
+	r = [];
+	for (var i = 0; i < r_num.length; i++)
+		r.push (networks.original.reactions[r_num[i]].id);
+	return r;
+}
 /*
  * 
  * fill_network_table -- fill the network tables
@@ -280,40 +367,60 @@ function truncate (str, length=40) {
  */
 function fill_network_table (filter) {
 	// species
-	for (var key in networks.original.species) {
-		if (networks.original.species.hasOwnProperty(key)) {
+	//~ for (var key in networks.original.species) {
+	for (var key = 0; key < networks.original.species.length; key++) {
+		//~ if (networks.original.species.hasOwnProperty(key)) {
 			const item = networks.original.species[key];
-			item.DOM = domIdMapper (item.identifier);
+			item.DOM = domIdMapper (item.id);
 			// is it filtered?
-			var checked = filter["filter_species"].includes(key) ? "" : " checked";
+			var checked = filter["filter_species"].includes(item.id) ? "" : " checked";
 			// create DOM row
-			const row = $("<tr id='"+item.DOM+"'><td class='check'><input type='checkbox'"+checked+"></td><td><abbr title='"+item.identifier+"'>"+truncate (item.identifier, 20)+"</abbr></td><td><abbr title='"+item.name+"'>"+truncate (item.name)+"</abbr></td><td title='occurs in "+item.occurence.join (", ")+"'>"+item.occurence.length+"</td></tr>");
+			const row = $("<tr id='"+item.DOM+"'><td class='check'><input type='checkbox'"+checked+"></td><td><abbr title='"+item.id+"'>"+truncate (item.id, 20)+"</abbr></td><td><abbr title='"+item.name+"'>"+truncate (item.name)+"</abbr></td><td title='occurs in "+get_reaction_ids (item.occ).join (", ")+"'>"+item.occ.length+"</td></tr>");
 			$('#species-table').append(row);
-		}
+		//~ }
 	};
 	//reactions
-	for (var key in networks.original.reactions) {
-		if (networks.original.reactions.hasOwnProperty(key)) {
+	//~ for (var key in networks.original.reactions) {
+	for (var key = 0; key < networks.original.reactions.length; key++) {
+		//~ if (networks.original.reactions.hasOwnProperty(key)) {
 			const item = networks.original.reactions[key];
-			item.DOM = domIdMapper (item.identifier);
+			item.DOM = domIdMapper (item.id);
 			// is it filtered?
-			var checked = filter["filter_reactions"].includes(key) ? "" : " checked";
+			var checked = filter["filter_reactions"].includes(item.id) ? "" : " checked";
 			// create DOM row
-			const row = $("<tr id='"+item.DOM+"'><td class='check'><input type='checkbox'"+checked+"></td><td><abbr title='"+item.identifier+"'>"+truncate (item.identifier, 20)+"</abbr></td><td><abbr title='"+item.name+"'>"+truncate (item.name)+"</abbr></td><td><small>"+item.consumed.join (" + ") + "</small> <i class='fas fa-arrow-right'></i> <small>" + item.produced.join (" + ") +"</small></td><td><small>"+item.genes.join ("</small> [OR] <small>") +"</small></td></tr>");
+			const row = $("<tr id='"+item.DOM+"'><td class='check'><input type='checkbox'"+checked+"></td><td><abbr title='"+item.id+"'>"+truncate (item.id, 20)+"</abbr></td><td><abbr title='"+item.name+"'>"+truncate (item.name)+"</abbr></td><td><small>"+get_species_ids (item.cons).join (" + ") + "</small> <i class='fas fa-arrow-right'></i> <small>" + get_species_ids (item.prod).join (" + ") +"</small></td><td><small>"+get_gene_ids (item.enzs).concat (get_genec_ids(item.enzc)).join ("</small> [OR] <small>") +"</small></td></tr>");
 			$('#reaction-table').append(row);
-		}
+		//~ }
 	};
 	// genes
-	for (var key in networks.original.genenet) {
-		if (networks.original.genenet.hasOwnProperty(key)) {
-			const item = networks.original.genenet[key];
-			item.DOM = domIdMapper (key);
+	//~ for (var key in networks.original.enzs) {
+	for (var key = 0; key < networks.original.enzs.length; key++) {
+		//~ if (networks.original.genenet.hasOwnProperty(key)) {
+			const item = networks.original.enzs[key];
+			item.DOM = domIdMapper (item.id);
 			// is it filtered?
-			var checked = filter["filter_genes"].includes(key) ? "" : " checked";
+			var checked = filter["filter_enzymes"].includes(item.id) ? "" : " checked";
 			// create DOM row
-			const row = $("<tr id='"+item.DOM+"'><td class='check'><input type='checkbox'"+checked+"></td><td title='occurs in "+networks.original.genenet[key].reactions.join (", ")+"'>"+key+"</td></tr>");
+			const row = $("<tr id='"+item.DOM+"'><td class='check'><input type='checkbox'"+checked+"></td><td>"+item.id+"</td><td title='occurs in "+get_reaction_ids (networks.original.enzs[key].reactions).join (", ")+"'>"+networks.original.enzs[key].reactions.length+"</td><td title='occurs in "+get_genec_ids (networks.original.enzs[key].cplx).join (", ")+"'>"+networks.original.enzs[key].cplx.length+"</td></tr>");
 			$('#gene-table').append(row);
-		}
+		//~ }
+	};
+	// genes complexes
+	//~ for (var key in networks.original.enzc) {
+	for (var key = 0; key < networks.original.enzc.length; key++) {
+		//~ if (networks.original.genenet.hasOwnProperty(key)) {
+			const item = networks.original.enzc[key];
+			item.DOM = domIdMapper (item.id);
+			complexIdNumMap[item.id] = key;
+			// is it filtered?
+			//~ console.log (filter["filter_enzyme_complexes"])
+			//~ console.log (item.id)
+			var checked = filter["filter_enzyme_complexes"].includes(item.id) ? "" : " checked";
+			//~ console.log (checked)
+			// create DOM row
+			const row = $("<tr id='"+item.DOM+"'><td class='check'><input type='checkbox'"+checked+"></td><td>"+item.id+"</td><td title='occurs in "+get_reaction_ids (networks.original.enzc[key].reactions).join (", ")+"'>"+networks.original.enzc[key].reactions.length+"</td></tr>");
+			$('#gene-complex-table').append(row);
+		//~ }
 	};
 
 	// if a checkbox is clicked: update the network and store the filters
@@ -414,7 +521,8 @@ function loadNetwork () {
 			// fill the table with original values
 			$("#s_org").text (Object.keys(data.network.species).length);
 			$("#r_org").text (Object.keys(data.network.reactions).length);
-			$("#g_org").text (Object.keys(data.network.genenet).length);
+			$("#g_org").text (Object.keys(data.network.enzs).length);
+			$("#gc_org").text (Object.keys(data.network.enzc).length);
 			networks.original = data.network;
 		  
 			// display the necessary things..
@@ -438,6 +546,7 @@ function loadNetwork () {
 		var s = [];
 		var r = [];
 		var g = [];
+		var gc = [];
 		for(var n = 0; n < filters.length; n++) {
 			var l = filters[n].split(":");
 			if (l.length != 2)
@@ -453,11 +562,13 @@ function loadNetwork () {
 				s = cleanids;
 			if (l[0].trim () === "reactions")
 				r = cleanids;
-			if (l[0].trim () === "genes")
+			if (l[0].trim () === "enzymes")
 				g = cleanids;
+			if (l[0].trim () === "enzyme_complexes")
+				gc = cleanids;
 		}
 	
-		storeFilters (s, r, g, function () {location.reload();});
+		storeFilters (s, r, g, gc, function () {location.reload();});
 		
 		
 	});
@@ -479,13 +590,13 @@ function prepareExport () {
 		}
 	});
   
-	// enable/disable remove_reaction_genes_removed_id radio button, depending on the choice of the network type...
+	// enable/disable remove_reaction_enzymes_removed_id radio button, depending on the choice of the network type...
 	$("#" + network_type_id).change (function () {
 		if ($("#" + network_type_id).val () == enzyme_option) {
-			$("#" + remove_reaction_genes_removed_id).prop ("checked", true);
-			$("#" + remove_reaction_genes_removed_id).prop ("disabled", true);
+			$("#" + remove_reaction_enzymes_removed_id).prop ("checked", true);
+			$("#" + remove_reaction_enzymes_removed_id).prop ("disabled", true);
 		} else {
-			$("#" + remove_reaction_genes_removed_id).prop ("disabled", false);
+			$("#" + remove_reaction_enzymes_removed_id).prop ("disabled", false);
 		}
 	});
 	
@@ -625,7 +736,7 @@ function prepareIndex () {
       
       
   // select a specific biomodel
-  $('#specific-biomodel').click (function () {
+  function select_specific_biomodel () {
 		const modelid = $("#biomodelsid").val ().trim ();
 		if (!modelid.match (/^(BIOMD|MODEL)[0-9]{10}$/)) {
 			$("#error").show ().text ("Invalid model id. Please go to Biomodels to copy a valid model id, such as MODEL1212060001 or BIOMD0000000469.");
@@ -635,7 +746,10 @@ function prepareIndex () {
 		$("#specific-biomodel-loading").show ();
 		// select the model
 		select_biomodel (modelid);
-	});
+	}
+  $('#specific-biomodel').click (select_specific_biomodel);
+	$("#biomodelsid").keyup(function(e){if(e.keyCode == 13) select_specific_biomodel ()});
+	
   
 	// download the biomodels list  
 	$.ajax({

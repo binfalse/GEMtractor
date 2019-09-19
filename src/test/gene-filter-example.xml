@@ -2,7 +2,38 @@
 <sbml xmlns="http://www.sbml.org/sbml/level3/version1/core" level="3" version="1" fbc:required="false"  xmlns:fbc="http://www.sbml.org/sbml/level3/version1/fbc/version2">
   <model id="modelid" name="modelname" fbc:strict="true">
     <fbc:listOfGeneProducts xmlns:fbc="http://www.sbml.org/sbml/level3/version1/fbc/version2">
-        <fbc:geneProduct fbc:id="x" fbc:label="x" metaid="x"/>
+        <fbc:geneProduct fbc:id="x" fbc:label="x" metaid="x">
+          <annotation xmlns:sbml="http://www.sbml.org/sbml/level3/version1/core">
+            <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/">
+              <rdf:Description rdf:about="#x">
+                <bqbiol:is>
+                  <rdf:Bag>
+                    <rdf:li rdf:resource="http://identifiers.org/asap/ABE-0004164" />
+                    <rdf:li rdf:resource="http://identifiers.org/ecogene/EG10031" />
+                    <rdf:li rdf:resource="http://identifiers.org/ncbigene/945837" />
+                    <rdf:li rdf:resource="http://identifiers.org/ncbigi/16129202" />
+                    <rdf:li rdf:resource="http://identifiers.org/refseq_locus_tag/b1241" />
+                    <rdf:li rdf:resource="http://identifiers.org/refseq_name/adhE" />
+                    <rdf:li rdf:resource="http://identifiers.org/refseq_synonym/ECK1235" />
+                    <rdf:li rdf:resource="http://identifiers.org/refseq_synonym/JW1228" />
+                    <rdf:li rdf:resource="http://identifiers.org/refseq_synonym/adhC" />
+                    <rdf:li rdf:resource="http://identifiers.org/refseq_synonym/ana" />
+                    <rdf:li rdf:resource="http://identifiers.org/sbo/SBO:0000243" />
+                    <rdf:li rdf:resource="http://identifiers.org/uniprot/P0A9Q7" />
+                  </rdf:Bag>
+                </bqbiol:is>
+                <bqbiol:isEncodedBy>
+                  <rdf:Bag>
+                    <rdf:li rdf:resource="http://identifiers.org/asap/ABE-0004164" />
+                    <rdf:li rdf:resource="http://identifiers.org/ecogene/EG10031" />
+                    <rdf:li rdf:resource="http://identifiers.org/ncbigene/945837" />
+                    <rdf:li rdf:resource="http://identifiers.org/ncbigi/gi:16129202" />
+                  </rdf:Bag>
+                </bqbiol:isEncodedBy>
+              </rdf:Description>
+            </rdf:RDF>
+          </annotation>
+        </fbc:geneProduct>
         <fbc:geneProduct fbc:id="y" fbc:label="y" metaid="y"/>
         <fbc:geneProduct fbc:id="z" fbc:label="z" metaid="z"/>
     </fbc:listOfGeneProducts>

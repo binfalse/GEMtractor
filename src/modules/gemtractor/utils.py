@@ -32,6 +32,7 @@ class UnableToRetrieveBiomodel (Exception): pass
 class BreakLoops (Exception): pass
 class NotYetImplemented (Exception): pass
 class InvalidGeneExpression (Exception): pass
+class InvalidGeneComplexExpression (Exception): pass
 class TooBigForBrowser (Exception): pass
 
 class Utils:
@@ -60,7 +61,7 @@ class Utils:
   
   
   @staticmethod
-  def add_model_note (model, filter_species, filter_reactions, filter_genes, remove_reaction_genes_removed, remove_reaction_missing_species):
+  def add_model_note (model, filter_species, filter_reactions, filter_enzymes, filter_enzyme_complexes, remove_reaction_enzymes_removed, remove_reaction_missing_species):
     # TODO can we do better? eg. annotate with proper structure?
     note = model.getNotesString ()
     # print (note)
@@ -78,12 +79,17 @@ class Utils:
       for s in filter_reactions:
         additional_note = additional_note + "<li>"+s+"</li>"
       additional_note = additional_note + "</ul>"
-    if filter_genes is not None and len (filter_genes) > 0:
-      additional_note = additional_note + "<p>Filter Genes:</p><ul>"
-      for s in filter_genes:
+    if filter_enzymes is not None and len (filter_enzymes) > 0:
+      additional_note = additional_note + "<p>Filter Enzymes:</p><ul>"
+      for s in filter_enzymes:
         additional_note = additional_note + "<li>"+s+"</li>"
       additional_note = additional_note + "</ul>"
-    additional_note = additional_note + "<p>Remove reactions who's genes are removed: " +str(remove_reaction_genes_removed)+ "</p>"
+    if filter_enzyme_complexes is not None and len (filter_enzyme_complexes) > 0:
+      additional_note = additional_note + "<p>Filter Enzyme Complexes:</p><ul>"
+      for s in filter_enzyme_complexes:
+        additional_note = additional_note + "<li>"+s+"</li>"
+      additional_note = additional_note + "</ul>"
+    additional_note = additional_note + "<p>Remove reactions which's enzymes are removed: " +str(remove_reaction_enzymes_removed)+ "</p>"
     additional_note = additional_note + "<p>Remove reactions that are missing a species: " +str(remove_reaction_missing_species)+ "</p>"
     
     model.setNotes (note.replace ("</body>", additional_note + "</body>"))

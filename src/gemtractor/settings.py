@@ -213,5 +213,5 @@ URLS_BIOMODEL_INFO = lambda model_id: "https://www.ebi.ac.uk/biomodels/"+model_i
 URLS_BIOMODEL_SBML = lambda model_id, filename: "https://www.ebi.ac.uk/biomodels/model/download/"+model_id+"?filename="+filename
 
 # what's the max number of entities to allow in the browser
-MAX_ENTITIES_FILTER = int (os.getenv('MAX_ENTITIES_FILTER', 10000))
+MAX_ENTITIES_FILTER = int (os.getenv('MAX_ENTITIES_FILTER', 100000))
 

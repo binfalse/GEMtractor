@@ -28,8 +28,10 @@ def __prepare_context (request):
     context[Constants.SESSION_FILTER_SPECIES] = request.session[Constants.SESSION_FILTER_SPECIES]
   if Constants.SESSION_FILTER_REACTION in request.session:
     context[Constants.SESSION_FILTER_REACTION] = request.session[Constants.SESSION_FILTER_REACTION]
-  if Constants.SESSION_FILTER_GENES in request.session:
-    context[Constants.SESSION_FILTER_GENES] = request.session[Constants.SESSION_FILTER_GENES]
+  if Constants.SESSION_FILTER_ENZYMES in request.session:
+    context[Constants.SESSION_FILTER_ENZYMES] = request.session[Constants.SESSION_FILTER_ENZYMES]
+  if Constants.SESSION_FILTER_ENZYME_COMPLEXES in request.session:
+    context[Constants.SESSION_FILTER_ENZYME_COMPLEXES] = request.session[Constants.SESSION_FILTER_ENZYME_COMPLEXES]
   context['current_url'] = request.resolver_match.route
   return context
 
@@ -56,25 +58,26 @@ def index(request):
     request.session[Constants.SESSION_HAS_SESSION] = Constants.SESSION_HAS_SESSION_VALUE
     request.session.save()
   
-  # ~ if request.method == 'POST' and 'custom-model' in request.FILES and request.FILES['custom-model']:
-    # ~ model = request.FILES['custom-model']
+  if request.method == 'POST' and 'custom-model' in request.FILES and request.FILES['custom-model']:
+    model = request.FILES['custom-model']
     
-    # ~ filename = Utils.get_upload_path (request.session.session_key)
-    # ~ with open(filename, 'wb+') as destination:
-      # ~ for chunk in model.chunks():
-        # ~ destination.write(chunk)
+    filename = Utils.get_upload_path (request.session.session_key)
+    with open(filename, 'wb+') as destination:
+      for chunk in model.chunks():
+        destination.write(chunk)
     
-    # ~ request.session[Constants.SESSION_MODEL_ID] = os.path.basename(filename)
-    # ~ request.session[Constants.SESSION_MODEL_NAME] = model.name
-    # ~ request.session[Constants.SESSION_MODEL_TYPE] = Constants.SESSION_MODEL_TYPE_UPLOAD
-    # ~ Utils.del_session_key (request, None, Constants.SESSION_FILTER_SPECIES)
-    # ~ Utils.del_session_key (request, None, Constants.SESSION_FILTER_REACTION)
-    # ~ Utils.del_session_key (request, None, Constants.SESSION_FILTER_GENES)
+    request.session[Constants.SESSION_MODEL_ID] = os.path.basename(filename)
+    request.session[Constants.SESSION_MODEL_NAME] = model.name
+    request.session[Constants.SESSION_MODEL_TYPE] = Constants.SESSION_MODEL_TYPE_UPLOAD
+    Utils.del_session_key (request, None, Constants.SESSION_FILTER_SPECIES)
+    Utils.del_session_key (request, None, Constants.SESSION_FILTER_REACTION)
+    Utils.del_session_key (request, None, Constants.SESSION_FILTER_ENZYMES)
+    Utils.del_session_key (request, None, Constants.SESSION_FILTER_ENZYME_COMPLEXES)
     
-    # ~ return redirect('gemtract:filter')
-    # ~ # filterModel (request)
-    # ~ # #return HttpResponseRedirect (reverse ('gemtract:filter'))
-    # ~ # #render(request, 'gemtract/index.html', {'model': request.session['model']})
+    return redirect('gemtract:filter')
+    # filterModel (request)
+    # #return HttpResponseRedirect (reverse ('gemtract:filter'))
+    # #render(request, 'gemtract/index.html', {'model': request.session['model']})
     
   
   
@@ -87,7 +90,8 @@ def index(request):
     Utils.del_session_key (request, context, Constants.SESSION_MODEL_TYPE)
     Utils.del_session_key (request, context, Constants.SESSION_FILTER_SPECIES)
     Utils.del_session_key (request, context, Constants.SESSION_FILTER_REACTION)
-    Utils.del_session_key (request, context, Constants.SESSION_FILTER_GENES)
+    Utils.del_session_key (request, context, Constants.SESSION_FILTER_ENZYMES)
+    Utils.del_session_key (request, context, Constants.SESSION_FILTER_ENZYME_COMPLEXES)
   else:
     context["NEXT_s"] = "Step 2"
     context["NEXT_t"] = "Filter Model Entities"

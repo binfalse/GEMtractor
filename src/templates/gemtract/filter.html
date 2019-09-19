@@ -36,27 +36,33 @@
     <td id="r_inconsistent"></td>
   </tr>
   <tr>
-    <th>genes</th>
+    <th>enzymes</th>
     <td id="g_org"></td>
     <td id="g_cur"></td>
     <td id="g_inconsistent"></td>
+  </tr>
+  <tr>
+    <th>enzyme complexes</th>
+    <td id="gc_org"></td>
+    <td id="gc_cur"></td>
+    <td id="gc_inconsistent"></td>
   </tr>
   </table>
 
   <h2>Reduce Model Size</h2>
 
   <p>
-    You can now discard a subset of the model's entities (species, reactions, or genes) to reduce the model size.
-    With the reduced model you can for example concentrate on FBA results or simulate knock out experiments.
-    Filtering a model may decrease subsequent computations dramatically.
+    You can now discard a subset of the model's entities (species, reactions, enzymes, or enzyme complexes) to reduce the model size.
+    A concentrated model may improve subsequent computations dramatically.
   </p>
 
 
   <div class="w3-bar  w3-white w3-border">
     <div class="w3-bar-item w3-hide-small">Filter:</div>
     <button id="filter-species-tab" class="w3-bar-item w3-button" onclick="tab('filter-species', 'filter-species-tab')">Species</button>
-    <button id="filter-reaction-tab" class="w3-bar-item w3-button" onclick="tab('filter-reaction', 'filter-reaction-tab')">Reaction</button>
-    <button id="filter-gene-tab" class="w3-bar-item w3-button" onclick="tab('filter-gene', 'filter-gene-tab')">Gene</button>
+    <button id="filter-reaction-tab" class="w3-bar-item w3-button" onclick="tab('filter-reaction', 'filter-reaction-tab')">Reactions</button>
+    <button id="filter-gene-tab" class="w3-bar-item w3-button" onclick="tab('filter-gene', 'filter-gene-tab')">Enzymes</button>
+    <button id="filter-gene-complex-tab" class="w3-bar-item w3-button" onclick="tab('filter-gene-complex', 'filter-gene-complex-tab')">Enzyme Complexes</button>
     <button id="filter-batch-tab" class="w3-bar-item w3-button" onclick="tab('filter-batch', 'filter-batch-tab')">Batch</button>
   </div>
 
@@ -64,20 +70,20 @@
     <div id="filter-tables" class="w3-margin">
       <div id="filter-species" class="w3-responsive" style="display:none">
 		<p>You may sort the following table by clicking on the header cell.</p>
-        <p>A red row indicates, that the corresponding species does not participate in any reaction anymore, so you may want to exclude it as well? If uncheck a species, it will not be removed from the entire model, but it will be removed from all reactions (it may still be used in other entities, such as functions or triggers). However, there may be ghost species afterwards, not participating in any reaction.</p>
+        <p>A red row indicates, that the corresponding species does not participate in any reaction anymore, so you may want to exclude it as well? If uncheck a species, it will not be removed from the entire model, but it will be removed from all reactions (it may still be used in other entities, such as functions or triggers). However, there may be ghost species afterwards, not participating in any reaction. See also: <a href="{% url 'index:learn' %}#filter-species">What exactly happens when I remove a species during filtering?</a></p>
         <table class="w3-table w3-striped sortable notfirst">
            <thead>
              <th>include <i class='fas fa-sort'></i></th>
              <th>ID <i class='fas fa-sort'></i></th>
              <th>Name <i class='fas fa-sort'></i></th>
-             <th>Occurences <i class='fas fa-sort'></i></th>
+             <th title="Occurences in Reactions">#Reactions <i class='fas fa-sort'></i></th>
            </thead>
            <tbody id="species-table"></tbody>
         </table>
       </div>
       <div id="filter-reaction" class="w3-responsive" style="display:none" class="">
 		<p>You may sort the following table by clicking on the header cell.</p>
-        <p>A red row indicates, that your filter would keep the reaction in the model, but some (or all) of it's species and/or all associated genes were removed. So the reaction may be wrong afterwards, and you may want to exclude the reaction as well? If you export the <em>reaction network</em> and you removed all it's species, the reaction will be removed as well. If you export the <em>enzyme network,</em> the reaction will be removed if all it's species are removed or all it's genes are removed.</p>
+        <p>A red row indicates, that your filter would keep the reaction in the model, but some (or all) of it's species and/or all associated genes were removed. So the reaction may be wrong afterwards, and you may want to exclude the reaction as well? If you export the <em>reaction network</em> and you removed all it's species, the reaction will be removed as well. If you export the <em>enzyme network,</em> the reaction will be removed if all it's species are removed or all it's genes are removed. See also: <a href="{% url 'index:learn' %}#filter-reaction">What exactly happens when I remove a reaction during filtering?</a></p>
         <table class="w3-table w3-striped sortable notfirst">
            <thead>
              <th>include <i class='fas fa-sort'></i></th>
@@ -90,24 +96,41 @@
         </table>
       </div>
       <div id="filter-gene" class="w3-responsive" style="display:none" class="">
-		<p>You may sort the following table by clicking on the header cell.</p>
-        <p>A red gene indicates, that the gene is not used in any reaction anymore. Thus, it will be excluded even if you keep it selected here!</p>
+	<p>You may sort the following table by clicking on the header cell.</p>
+        <p>Unselecting an enzyme will also remove all complexes in which it appears (they will be highlighted in read under the <em>Enzyme Complex</em> tab). A red enzyme indicates, that the enzyme is not used in any reaction anymore. Thus, it will be excluded even if you keep it selected here. See also: <a href="{% url 'index:learn' %}#gene-association">How does the GEMtractor identify genes that are associated to a reaction?</a> and <a href="{% url 'index:learn' %}#filter-gene">What exactly happens when I remove an enzyme during filtering?</a></p>
         <table class="w3-table w3-striped sortable notfirst">
            <thead>
              <th>include <i class='fas fa-sort'></i></th>
              <th>ID <i class='fas fa-sort'></i></th>
+             <th title="Occurences in Reactions">#Reactions <i class='fas fa-sort'></i></th>
+             <th title="Occurences in Gene Complexes">#Complexes <i class='fas fa-sort'></i></th>
            </thead>
            <tbody id="gene-table"></tbody>
+        </table>
+      </div>
+      <div id="filter-gene-complex" class="w3-responsive" style="display:none" class="">
+	<p>You may sort the following table by clicking on the header cell.</p>
+        <p>Unselecting an enzyme complex will <strong>not</strong> remove the individual enzymes appearing in that complex! Other complexes, which are a superset of a removed complex, will be highlighted in red-italics &mdash; move your mouse over the complex' id to learn which sub-complexes are to be removed. If you do not remove those yourself, they are assumed to be still available in the model. See also: <a href="{% url 'index:learn' %}#gene-association">How does the GEMtractor identify genes that are associated to a reaction?</a> and <a href="{% url 'index:learn' %}#enzyme-complex">What is an enzyme complex?</a> and <a href="{% url 'index:learn' %}#filter-enzyme-complex">What exactly happens when I remove an enzyme complex during filtering?</a></p>
+        <table class="w3-table w3-striped sortable notfirst">
+           <thead>
+             <th>include <i class='fas fa-sort'></i></th>
+             <th>ID <i class='fas fa-sort'></i></th>
+             <th title="Occurences in Reactions">#Reactions <i class='fas fa-sort'></i></th>
+           </thead>
+           <tbody id="gene-complex-table"></tbody>
         </table>
       </div>
       <div id="filter-batch" style="display:none" class="">
 	<p>
 	  Use the following text area to automatically alter the filtering.
-	  Every line begins with an entity identifier (species, reactions, genes), followed by a colon (:) and a comma seperated list of identifiers:
+	  Every line begins with an entity identifier (species, reactions, enzymes, enzyme_complexes), followed by a colon (:) and a comma seperated list of identifiers:
 	</p>
         <textarea id="batch-filter" rows="20">
         </textarea>
 	<button id="batch-button" class="w3-btn w3-flat-silver">apply batch</button>
+	<p>
+	  For more information, see <a href="{% url 'index:learn' %}#batch-filter">How does the batch filtering work?</a>
+	</p>
       </div>
     </div>
 
