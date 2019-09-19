@@ -380,7 +380,7 @@ def export (request):
             return JsonResponse ({"status":"failed","error":"error generating file"})
         else:
           return JsonResponse ({"status":"failed","error":"invalid format"})
-    elif form.cleaned_data['network_type'] == 'rn':
+    elif form.cleaned_data['network_type'] == 'mn':
       file_name = file_name + "-ReactionNetwork"
       if form.cleaned_data['network_format'] == 'sbml':
         file_name = file_name + ".sbml"
@@ -473,7 +473,7 @@ def execute (request):
   export = data["export"]
   
   if "network_type" not in export:
-    return HttpResponseBadRequest ("job is missing the desired network_type (en|rn)")
+    return HttpResponseBadRequest ("job is missing the desired network_type (en|mn)")
   if "network_format" not in export:
     return HttpResponseBadRequest ("job is missing the desired network_format (sbml|dot|graphml|gml|csv)")
     
@@ -536,7 +536,7 @@ def execute (request):
         return Utils.serve_file (outputFile.name, "gemtracted-model.csv", "text/csv")
       else:
         return HttpResponseServerError ("couldn't generate the csv file")
-  elif export["network_type"] == "rn":
+  elif export["network_type"] == "mn":
     if export["network_format"] == "sbml":
       SBMLWriter().writeSBML (sbml, outputFile.name)
       if os.path.exists(outputFile.name):

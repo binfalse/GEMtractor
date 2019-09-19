@@ -166,7 +166,7 @@ class GemtractTest(TestCase):
         self.assertTrue (b"Export Your Model" in response.content)
         
         
-        form = self._create_export ('rn', 'sbml', False, True)
+        form = self._create_export ('mn', 'sbml', False, True)
         self.assertTrue (form.is_valid())
         response = self.client.post('/api/export', form.cleaned_data)
         self.assertEqual(response.status_code, 200)
@@ -206,7 +206,7 @@ class GemtractTest(TestCase):
         
         
         
-        form = self._create_export ('rn', 'graphml', False, True)
+        form = self._create_export ('mn', 'graphml', False, True)
         self.assertTrue (form.is_valid())
         response = self.client.post('/api/export', form.cleaned_data)
         self.assertEqual(response.status_code, 200)
@@ -239,7 +239,7 @@ class GemtractTest(TestCase):
         
         
         
-        form = self._create_export ('rn', 'gml', False, True)
+        form = self._create_export ('mn', 'gml', False, True)
         self.assertTrue (form.is_valid())
         response = self.client.post('/api/export', form.cleaned_data)
         self.assertEqual(response.status_code, 200)
@@ -267,7 +267,7 @@ class GemtractTest(TestCase):
         
         
         
-        form = self._create_export ('rn', 'dot', False, True)
+        form = self._create_export ('mn', 'dot', False, True)
         self.assertTrue (form.is_valid())
         response = self.client.post('/api/export', form.cleaned_data)
         self.assertEqual(response.status_code, 200)
@@ -332,8 +332,8 @@ class GemtractTest(TestCase):
     form = self._create_export ('blah', 'sbml', False, True)
     self.assertFalse (form.is_valid())
     
-    form = self._create_export ('rn', 'gml', False, True)
+    form = self._create_export ('mn', 'gml', False, True)
     self.assertTrue (form.is_valid())
     
-    form = self._create_export ('rn', 'gasdfml', False, True)
+    form = self._create_export ('mn', 'gasdfml', False, True)
     self.assertFalse (form.is_valid())

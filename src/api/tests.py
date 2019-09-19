@@ -320,7 +320,7 @@ class ApiTest(TestCase):
       
       response = self.client.post('/api/execute', json.dumps({
           "export": {
-            "network_type":"rn",
+            "network_type":"mn",
             "network_format":"sbml"
           },
           "file": model
@@ -362,7 +362,7 @@ class ApiTest(TestCase):
       
       response = self.client.post('/api/execute', json.dumps({
           "export": {
-            "network_type":"rn",
+            "network_type":"mn",
             "network_format":"graphml"
           },
           "file": model
@@ -392,7 +392,7 @@ class ApiTest(TestCase):
       
       response = self.client.post('/api/execute', json.dumps({
           "export": {
-            "network_type":"rn",
+            "network_type":"mn",
             "network_format":"gml"
           },
           "file": model
@@ -416,7 +416,7 @@ class ApiTest(TestCase):
       
       response = self.client.post('/api/execute', json.dumps({
           "export": {
-            "network_type":"rn",
+            "network_type":"mn",
             "network_format":"dot"
           },
           "file": model
@@ -446,7 +446,7 @@ class ApiTest(TestCase):
       # test filters and other options
       response = self.client.post('/api/execute', json.dumps({
           "export": {
-            "network_type":"rn",
+            "network_type":"mn",
             "network_format":"sbml"
           },
           "filter": {
@@ -480,7 +480,7 @@ class ApiTest(TestCase):
       # trigger some errors
       response = self.client.post('/api/execute', json.dumps({
           "export": {
-            "network_type":"rn",
+            "network_type":"mn",
             "network_format":"gm;"
           },
           "file": model
@@ -499,7 +499,7 @@ class ApiTest(TestCase):
       
       response = self.client.post('/api/execute', json.dumps({
           "export": {
-            "network_type":"rn",
+            "network_type":"mn",
             "network_format":"sbml"
           },
           "filter": {
@@ -510,7 +510,7 @@ class ApiTest(TestCase):
       self.assertEqual(response.status_code, 400)
       response = self.client.post('/api/execute', json.dumps({
           "export": {
-            "network_type":"rn",
+            "network_type":"mn",
             "network_format":"sbml"
           },
           "filter": {
@@ -521,7 +521,7 @@ class ApiTest(TestCase):
       self.assertEqual(response.status_code, 400)
       response = self.client.post('/api/execute', json.dumps({
           "export": {
-            "network_type":"rn",
+            "network_type":"mn",
             "network_format":"sbml"
           },
           "filter": {
@@ -532,7 +532,7 @@ class ApiTest(TestCase):
       self.assertEqual(response.status_code, 400)
       response = self.client.post('/api/execute', json.dumps({
           "export": {
-            "network_type":"rn",
+            "network_type":"mn",
             "network_format":"sbml"
           },
           }),content_type="application/json")
@@ -550,14 +550,14 @@ class ApiTest(TestCase):
       self.assertEqual(response.status_code, 400)
       response = self.client.post('/api/execute', json.dumps({
           "export": {
-            "network_type":"rn"
+            "network_type":"mn"
           },
           "file": model
           }),content_type="application/json")
       self.assertEqual(response.status_code, 400)
       response = self.client.post('/api/execute', json.dumps({
           "export": {
-            "network_type":"rn",
+            "network_type":"mn",
             "network_format":"sbml"
           },
           "file": "not a model!"

@@ -378,7 +378,7 @@ Learn
     <pre>
   {
     "export": {
-      "network_type":"rn",
+      "network_type":"mn",
       "network_format":"sbml",
       "remove_reaction_enzymes_removed": False,
       "remove_reaction_missing_species": True
@@ -398,7 +398,7 @@ Learn
     <p>
       The key <code>export</code> is required, and it must encode for a JSON object containing the following keys:
       <ul>
-	<li><code>network_type</code>: String <code>"en"</code> or <code>"rn"</code> &mdash; do you just want the filtered reaction network (<code>"rn"</code>), or should the GEMtractor return the extracted the enzyme network (<code>"en"</code>)?</li>
+	<li><code>network_type</code>: String <code>"en"</code> or <code>"mn"</code> &mdash; do you just want the filtered metabolic network (<code>"mn"</code>), or should the GEMtractor return the extracted enzyme network (<code>"en"</code>)?</li>
 	<li><code>network_format</code>: String <code>"sbml"</code>, <code>"graphml"</code>, <code>"gml"</code>, or <code>"dot"</code> &mdash; how should the returned network be encoded?</li>
 	<li><code>remove_reaction_enzymes_removed</code>: Boolean &mdash; remove reactions, whose enzymes were all removed? (Optional, defaults to <code>true</code>)</li>
 	<li><code>remove_reaction_missing_species</code>: Boolean &mdash; remove reactions, in which at least one species was removed? That is, if you remove a species from a reaction, should the GEMtractor also remove the whole reaction? (Optional, defaults to <code>false</code>)</li>
