@@ -143,3 +143,7 @@ code, pre, kbd, samp {
 td, th {
   vertical-align: top;
 }
+.learn-entry {
+  max-width: 920px;
+  margin: 20px auto ;
+}
