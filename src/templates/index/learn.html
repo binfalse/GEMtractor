@@ -29,9 +29,13 @@ Learn
       <li><a href="#gene-names">Why do enzymes have such a strange name?</a></li>
       <li><a href="#no-gene-name">What if no enzyme is associated to a reaction?</a></li>
       <li><a href="#filter-species">What exactly happens when I remove a species during filtering?</a></li>
+      <li><a href="#red-species">Why is a certain species red?</a></li>
       <li><a href="#filter-reaction">What exactly happens when I remove a reaction during filtering?</a></li>
+      <li><a href="#red-reaction">Why is a certain reaction red?</a></li>
       <li><a href="#filter-gene">What exactly happens when I remove an enzyme during filtering?</a></li>
+      <li><a href="#red-gene">Why is a certain enzyme red?</a></li>
       <li><a href="#filter-enzyme-complex">What exactly happens when I remove an enzyme complex during filtering?</a></li>
+      <li><a href="#red-enzyme-complex">Why is a certain enzyme complex red?</a></li>
       <li><a href="#enzyme-complex">What is an enzyme complex?</a></li>
       <li><a href="#batch-filter">How does the batch filtering work?</a></li>
       <li><a href="#what-currency-metabolites"></a>What are currency metabolites?</li>
@@ -178,8 +182,23 @@ Learn
 		</div>
 		<p>
 		  Trimming the species of a model actually means <em>removing species from reactions.</em>
-		  Thus, trimmed species will not appear in any reaction anymore, but if you export the <em>Metabolite-Reaction Network</em>, they may still appear in the model, as they may still be required by other element in the model.
+		  That is, trimmed species will not appear in any reaction anymore, but if you export the <em>Metabolite-Reaction Network</em>, they may still appear in the model (as they may still be required by other elements in the model).
 		  We call these species <em>ghost species</em>.
+		</p>
+		<p>
+		  If you remove a species from a network, all the reactions that consume or produce this species may now be invalid.
+		  Thus, the reactions relying on a removed species will be highlighted in red in the <em>Reactions</em> tab, as you may want to re-evaluate these reactions.
+		</p>
+	</div>
+	
+	<div class="w3-padding w3-card w3-white learn-entry">
+		<div class=" anchor-heading">
+			<a name="red-species" id="red-species"></a>
+			<h3>Why is a certain species red?</h3>
+		</div>
+		<p>
+		  A species is highlighted in red if you trimmed all reaction in which it appeared.
+		  So you may want to re-evaluate your filters or trim that species as well.
 		</p>
 	</div>
 	
@@ -187,6 +206,16 @@ Learn
 		<div class=" anchor-heading">
 			<a name="filter-reaction" id="filter-reaction"></a>
 			<h3>What exactly happens when I remove a reaction during filtering?</h3>
+		</div>
+		<p>
+		  
+		</p>
+	</div>
+	
+	<div class="w3-padding w3-card w3-white learn-entry">
+		<div class=" anchor-heading">
+			<a name="red-reaction" id="red-reaction"></a>
+			<h3>Why is a certain reaction red?</h3>
 		</div>
 		<p></p>
 	</div>
@@ -201,8 +230,24 @@ Learn
 	
 	<div class="w3-padding w3-card w3-white learn-entry">
 		<div class=" anchor-heading">
+			<a name="red-enzyme" id="red-enzyme"></a>
+			<h3>Why is a certain enzyme red?</h3>
+		</div>
+		<p></p>
+	</div>
+	
+	<div class="w3-padding w3-card w3-white learn-entry">
+		<div class=" anchor-heading">
 			<a name="filter-enzyme-complex" id="filter-enzyme-complex"></a>
 			<h3>What exactly happens when I remove an enzyme complex during filtering?</h3>
+		</div>
+		<p></p>
+	</div>
+	
+	<div class="w3-padding w3-card w3-white learn-entry">
+		<div class=" anchor-heading">
+			<a name="red-enzyme-complex" id="red-enzyme-complex"></a>
+			<h3>Why is a certain enzyme complex red?</h3>
 		</div>
 		<p></p>
 	</div>
