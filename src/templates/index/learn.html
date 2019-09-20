@@ -30,13 +30,13 @@ Learn
       <li><a href="#gene-names">Why do enzymes have such a strange name?</a></li>
       <li><a href="#no-gene-name">What if no enzyme is associated to a reaction?</a></li>
       <li><a href="#filter-species">What exactly happens when I remove a species during filtering?</a></li>
-      <li><a href="#red-species">Why is a certain species red?</a></li>
+      <li><a href="#red-species">Why is a certain species highlighted in red?</a></li>
       <li><a href="#filter-reaction">What exactly happens when I remove a reaction during filtering?</a></li>
-      <li><a href="#red-reaction">Why is a certain reaction red?</a></li>
+      <li><a href="#red-reaction">Why is a certain reaction highlighted in red?</a></li>
       <li><a href="#filter-gene">What exactly happens when I remove an enzyme during filtering?</a></li>
-      <li><a href="#red-gene">Why is a certain enzyme red?</a></li>
+      <li><a href="#red-gene">Why is a certain enzyme highlighted in red?</a></li>
       <li><a href="#filter-enzyme-complex">What exactly happens when I remove an enzyme complex during filtering?</a></li>
-      <li><a href="#red-enzyme-complex">Why is a certain enzyme complex red?</a></li>
+      <li><a href="#red-enzyme-complex">Why is a certain enzyme complex highlighted in red?</a></li>
       <li><a href="#enzyme-complex">What is an enzyme complex?</a></li>
       <li><a href="#batch-filter">How does the batch filtering work?</a></li>
       <li><a href="#what-currency-metabolites"></a>What are currency metabolites?</li>
@@ -202,7 +202,7 @@ Learn
 	<div class="w3-padding w3-card w3-white learn-entry">
 		<div class=" anchor-heading">
 			<a name="red-species" id="red-species"></a>
-			<h3>Why is a certain species red?</h3>
+			<h3>Why is a certain species highlighted in red?</h3>
 		</div>
 		<p>
 		  A species is highlighted in red if you trimmed all reaction in which it appeared.
@@ -216,16 +216,26 @@ Learn
 			<h3>What exactly happens when I remove a reaction during filtering?</h3>
 		</div>
 		<p>
-		  
+		  A trimmed reaction will disappear from the original model prior to subsequent conversions.
+		  All species and enzymes linked to that reaction (as reactants, products, or gene-association) will be unlinked.
+		  Thus, there may be species, enzymes and enzyme complexes, which do not appear in the model anymore.
+		  Those left-overs will be hightlighted in red in the Species, Enzyme or Enzyme Complex tab to raise your attention, as you may want to re-evaluate your filters.
 		</p>
 	</div>
 	
 	<div class="w3-padding w3-card w3-white learn-entry">
 		<div class=" anchor-heading">
 			<a name="red-reaction" id="red-reaction"></a>
-			<h3>Why is a certain reaction red?</h3>
+			<h3>Why is a certain reaction highlighted in red?</h3>
 		</div>
-		<p></p>
+		<p>
+		  There are two reasons why a reaction will be highlighted in red:
+		  <ul>
+		    <li>One of the species it consumes or produced is trimmed from the model &mdash; so the reaction may be invalid now.</li>
+		    <li>All the enzymes or enzyme complexes required to catalyse this reactions are trimmed from the model, thus the reaction probably cannot take place anymore.</li>
+		  </ul>
+		  In both cases you should double check whether the reaction should still be included in the model.
+		</p>
 	</div>
 	
 	<div class="w3-padding w3-card w3-white learn-entry">
@@ -239,7 +249,7 @@ Learn
 	<div class="w3-padding w3-card w3-white learn-entry">
 		<div class=" anchor-heading">
 			<a name="red-enzyme" id="red-enzyme"></a>
-			<h3>Why is a certain enzyme red?</h3>
+			<h3>Why is a certain enzyme highlighted in red?</h3>
 		</div>
 		<p></p>
 	</div>
@@ -255,7 +265,7 @@ Learn
 	<div class="w3-padding w3-card w3-white learn-entry">
 		<div class=" anchor-heading">
 			<a name="red-enzyme-complex" id="red-enzyme-complex"></a>
-			<h3>Why is a certain enzyme complex red?</h3>
+			<h3>Why is a certain enzyme complex highlighted in red?</h3>
 		</div>
 		<p></p>
 	</div>
