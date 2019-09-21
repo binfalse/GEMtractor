@@ -47,7 +47,7 @@ Learn
       <li><a href="#cookies">Why am I always redirected back to model selection?</a></li>
       <li><a href="#export-options">What are the different export options?</a></li>
       <li><a href="#wrong-directions">Aren't the directions wrong?</a></li>
-      <li><a href="#"></a></li>
+      <li><a href="#wording">Enzyme or Gene? Species or Metabolite?</a></li>
       <li><a href="#"></a></li>
       <li><a href="#"></a></li>
       <li><a href="#"></a></li>
@@ -207,7 +207,7 @@ Learn
 			<h3>Why is a certain species highlighted in red?</h3>
 		</div>
 		<p>
-		  A species is highlighted in red if you trimmed all reaction in which it appeared.
+		  A species is highlighted in <span class="filter-inconsistent">red</span> if you trimmed all reaction in which it appeared.
 		  So you may want to re-evaluate your filters or trim that species as well.
       In that case, a small info-icon  <i class='fas fa-info-circle' title='demo reason...'></i> will appear behind the species' identifier and you can move your mouse over that icon to get more information.
 		</p>
@@ -222,7 +222,7 @@ Learn
 		  A trimmed reaction will disappear from the original model prior to subsequent conversions.
 		  All species and enzymes linked to that reaction (as reactants, products, or gene-association) will be unlinked.
 		  Thus, there may be species, enzymes and enzyme complexes, which do not appear in the model anymore.
-		  Those left-overs will be hightlighted in red to raise your attention, as you may want to re-evaluate your filters.
+		  Those left-overs will be highlighted in <span class="filter-inconsistent">red</span> to raise your attention, as you may want to re-evaluate your filters.
 		</p>
 	</div>
 	
@@ -232,10 +232,10 @@ Learn
 			<h3>Why is a certain reaction highlighted in red?</h3>
 		</div>
 		<p>
-		  There are two reasons why a reaction will be highlighted in red:
+		  There are two reasons why a reaction will be highlighted in <span class="filter-inconsistent">red</span>:
 		  <ul>
 		    <li>One of the species it consumes or produced is trimmed from the model &mdash; so the reaction may be invalid now.</li>
-		    <li>All the enzymes or enzyme complexes required to catalyse this reactions are trimmed from the model, thus the reaction probably cannot take place anymore.</li>
+		    <li>All the enzymes or enzyme complexes required to catalyze this reactions are trimmed from the model, thus the reaction probably cannot take place anymore.</li>
 		  </ul>
 		  In both cases you should double check whether the reaction should still be included in the model.
       A small info-icon  <i class='fas fa-info-circle' title='demo reason...'></i> will appear behind the reaction's identifier and you can move your mouse over that icon to get more information about the reason for the inconsistency.
@@ -251,10 +251,10 @@ Learn
 		  If you trim an enzyme from your model, this enzyme will be removed from all reactions that it catalyzes.
 		  This may result in the following inconsistencies:
 		  <ul>
-		    <li>A reaction looses all its enzyme (and probably won't take place anymore).</li>
+		    <li>A reaction looses all its enzymes and enzyme complexes (and probably won't take place anymore).</li>
 		    <li>The enzyme is part of an enzyme complex &mdash; thus, you may also need to remove the complex.</li>
 		  </ul>
-		  The inconsitent reactions or enzyme complexes will be highlighted in red and you should re-evaluate your filters.
+		  The inconsistent reactions or enzyme complexes will be highlighted in <span class="filter-inconsistent">red</span> and you should re-evaluate your filters.
 		</p>
 		<p>
 		  When exporting the model, you have the option to remove all reactions without enzymes and to remove complexes that lack an enzyme.
@@ -268,8 +268,9 @@ Learn
 			<h3>Why is a certain enzyme highlighted in red?</h3>
 		</div>
 		<p>
-		  An enzyme is highlighted in red, if your filters removed all reactions and enzyme complexes in which this enzyme participates.
+		  An enzyme is highlighted in <span class="filter-inconsistent">red</span>, if your filters removed all reactions and enzyme complexes in which this enzyme participates.
 		  Thus, it is not appearing in the model anymore and you may want to trim it as well.
+		  A small info-icon  <i class='fas fa-info-circle' title='demo reason...'></i> will appear behind the enzyme's identifier and you can move your mouse over that icon to get more information about the reason for the inconsistency.
 		</p>
 	</div>
 	
@@ -279,6 +280,29 @@ Learn
 			<h3>What exactly happens when I remove an enzyme complex during filtering?</h3>
 		</div>
 		<p>
+		  If you trim an enzyme complex, it will be removed from all reactions that it catalyzes.
+		  This may result in the following inconsistencies:
+		  <ul>
+		    <li>A reaction looses all its enzymes and enzyme complexes (and probably won't take place anymore).</li>
+		    <li>An enzyme does not participate in any reaction or enzyme-complex anymore.</li>
+		  </ul>
+		</p>
+		<p>
+		  The inconsistent reactions or enzymes will be highlighted in <span class="filter-inconsistent">red</span>.
+		</p>
+		<p>
+		  In addition, there may be an enzyme-complex superior to a trimmed complex &mdash; the trimmed enzyme complex consists of a set of enzymes, which is a subset of another enzyme complex.
+		  Let's for example say you remove the enzyme complex <code>A&nbsp;+&nbsp;B</code> and there is another enzyme complex <code>A&nbsp;+&nbsp;B&nbsp;+&nbsp;C</code>.
+		  It is very likely, that <code>A&nbsp;+&nbsp;B&nbsp;+&nbsp;C</code> is not possible if <code>A&nbsp;+&nbsp;B</code> is not possible.
+		  However, we can think of inverse situations.
+		  Thus, enzyme complexes are highlighted in <span class="filter-inconsistent filter-supercomplex">red-italics</span>, if any sub-complexes are trimmed.
+		  So, if you remove <code>A&nbsp;+&nbsp;B</code>, then <code>A&nbsp;+&nbsp;B&nbsp;+&nbsp;C</code> will become red-italics.
+		</p>
+		<p>
+		  When exporting the model, you have the option to remove all reactions without enzymes and to remove complexes that lack an enzyme.
+		  See also <a href="#export-options">What are the different export options?</a>
+		</p>
+		  
 		</p>
 	</div>
 	
@@ -287,7 +311,12 @@ Learn
 			<a name="red-enzyme-complex" id="red-enzyme-complex"></a>
 			<h3>Why is a certain enzyme complex highlighted in red?</h3>
 		</div>
-		<p></p>
+		<p>
+		  An enzyme complex will be highlighted in <span class="filter-inconsistent">red</span>, if it doesn't appear in any reaction anymore, or if one of it's enzymes was trimmed.
+		  The enzyme complex will be highlighted in <span class="filter-inconsistent filter-supercomplex">red-italics</span>, if an sub-complex was trimmed.
+		  For example, if you remove <code>A&nbsp;+&nbsp;B</code>, then <code>A&nbsp;+&nbsp;B&nbsp;+&nbsp;C</code> will become <span class="filter-inconsistent filter-supercomplex">red-italics</span>.
+		  A small info-icon  <i class='fas fa-info-circle' title='demo reason...'></i> will appear behind the enzyme's identifier and you can move your mouse over that icon to get more information about the reason for the inconsistency.
+		</p>
 	</div>
 	
 	<div class="w3-padding w3-card w3-white learn-entry">
@@ -295,7 +324,8 @@ Learn
 			<a name="enzyme-complex" id="enzyme-complex"></a>
 			<h3>What is an enzyme complex?</h3>
 		</div>
-		<p></p>
+		<p>
+		</p>
 	</div>
 	
 	<div class="w3-padding w3-card w3-white learn-entry">
@@ -537,10 +567,36 @@ The same also applies to enzyme-centric networks.
 	
 	<div class="w3-padding w3-card w3-white learn-entry">
 		<div class=" anchor-heading">
-			<a name="" id=""></a>
-			<h3></h3>
+			<a name="wording" id="wording"></a>
+			<h3>Enzyme or Gene? Species or Metabolite?</h3>
 		</div>
-		<p></p>
+		<p>
+		  Yes, the wording is sometimes difficult. We tried to homogenize everything, but at some points it's inconsistent. For example:
+		  <ul>
+		    <li>
+		      A reaction is basically catalyzed by an <em>enzyme.</em>
+		      In SBML, however, those enzymes are called <em>gene-products.</em>
+		      And gene-products are direct results from <em>genes.</em>
+		      Depending on the context, we use these terms as synonyms, but try to stick with <em>enzyme.</em>
+		    </li>
+		    <li>
+		      While GEMs are typically about <em>metabolites</em> interacting in reactions, in SBML they are more generically referred to as <em>species.</em>
+		      Even though, the GEMtractor is focused on GEMs, we basically also support all kinds of models, as long as they are implementable in SBML.
+		      For example, you can also trim tiny kinetic models!
+		      Thus, we prefer to use the term <em>species.</em>
+		    </li>
+		    <li>
+		      Is it an <em>Enzyme-Centric Network</em> or an <em>Enzyme-Enzyme Network</em> or and <em>Enzyme-Interaction Network?</em>
+		      People use seem to use different terms to refer to the same thing: The network of enzymes and their phenotypical interactions.
+		      We decided to call it <em>Enzyme-Centric Network</em> (for the enzyme interactions) and <em>Reaction-Centric Network</em> (for reaction interactions).
+		    </li>
+		    <li>
+		      Do you <em>trim a model?</em> Or <em>reduce</em> it? Or <em>cut</em> it? Or <em>filter</em> entities?
+		      All these phrases are synonyms to us.
+		      However, for the GEMtractor we prefer to talk about <em>trimming of models</em> :)
+		    </li>
+		  </ul>
+		</p>
 	</div>
 	
 	<div class="w3-padding w3-card w3-white learn-entry">
