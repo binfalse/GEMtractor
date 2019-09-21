@@ -292,11 +292,11 @@ Learn
 		</p>
 		<p>
 		  In addition, there may be an enzyme-complex superior to a trimmed complex &mdash; the trimmed enzyme complex consists of a set of enzymes, which is a subset of another enzyme complex.
-		  Let's for example say you remove the enzyme complex <code>A&nbsp;+&nbsp;B</code> and there is another enzyme complex <code>A&nbsp;+&nbsp;B&nbsp;+&nbsp;C</code>.
-		  It is very likely, that <code>A&nbsp;+&nbsp;B&nbsp;+&nbsp;C</code> is not possible if <code>A&nbsp;+&nbsp;B</code> is not possible.
+		  Let's for example say you remove the enzyme complex <code>A+B</code> and there is another enzyme complex <code>A+B+C</code>.
+		  It is very likely, that <code>A+B+C</code> is not possible if <code>A+B</code> is not possible.
 		  However, we can think of inverse situations.
 		  Thus, enzyme complexes are highlighted in <span class="filter-inconsistent filter-supercomplex">red-italics</span>, if any sub-complexes are trimmed.
-		  So, if you remove <code>A&nbsp;+&nbsp;B</code>, then <code>A&nbsp;+&nbsp;B&nbsp;+&nbsp;C</code> will become red-italics.
+		  So, if you remove <code>A+B</code>, then <code>A+B+C</code> will become red-italics.
 		</p>
 		<p>
 		  When exporting the model, you have the option to remove all reactions without enzymes and to remove complexes that lack an enzyme.
@@ -314,7 +314,7 @@ Learn
 		<p>
 		  An enzyme complex will be highlighted in <span class="filter-inconsistent">red</span>, if it doesn't appear in any reaction anymore, or if one of it's enzymes was trimmed.
 		  The enzyme complex will be highlighted in <span class="filter-inconsistent filter-supercomplex">red-italics</span>, if an sub-complex was trimmed.
-		  For example, if you remove <code>A&nbsp;+&nbsp;B</code>, then <code>A&nbsp;+&nbsp;B&nbsp;+&nbsp;C</code> will become <span class="filter-inconsistent filter-supercomplex">red-italics</span>.
+		  For example, if you remove <code>A+B</code>, then <code>A+B+C</code> will become <span class="filter-inconsistent filter-supercomplex">red-italics</span>.
 		  A small info-icon  <i class='fas fa-info-circle' title='demo reason...'></i> will appear behind the enzyme's identifier and you can move your mouse over that icon to get more information about the reason for the inconsistency.
 		</p>
 	</div>
@@ -325,6 +325,9 @@ Learn
 			<h3>What is an enzyme complex?</h3>
 		</div>
 		<p>
+		  An enzyme complex is an enzyme, which consists of a complex of gene products.
+		  So there may be two gene products <code>A</code> and <code>B</code> forming an enzyme complex <code>A+B</code>.
+		  Nevertheless, <code>A</code> and <code>B</code> may as well catalyze reactions as individual enzymes.
 		</p>
 	</div>
 	
@@ -333,7 +336,15 @@ Learn
 			<a name="batch-filter" id="batch-filter"></a>
 			<h3>How does the batch filtering work?</h3>
 		</div>
-		<p></p>
+		<p>
+		  We implemented batch filtering to support you in automatic filtering without implementing an API client.
+		  If you for example have a list of species, that you want to exclude according to your FBA results in Matlab, you can just dump this list as comma-separated values and copy it to the batch text-field.
+		  Thus, you may save a lot of clicks compared to deselecting every species individually.
+		</p>
+		<p>
+		  The textfield expects four lines, each starting with either <code>species</code>, <code>reactions</code>, <code>enzymes</code>, or <code>enzyme_complexes</code>, followed by a color (<code>:</code>) and the list of comma-separated entity-identifiers.
+		  Applying the batch-filter will send the lists to the backend, where they will stored in your session, and reload the page to update the trimming selection.
+		</p>
 	</div>
 	
 	<div class="w3-padding w3-card w3-white learn-entry">
