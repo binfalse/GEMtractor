@@ -79,7 +79,7 @@ a.bigg_id:hover {
 }
 
 
-.fa-sort, .fa-info-circle {
+.fa-sort, #export-form .fa-info-circle {
   vertical-align: middle;
 }
 .fa-sort {

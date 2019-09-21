@@ -137,6 +137,7 @@ function updateNetwork () {
 	$("#gene-table tr").removeClass ("filter-inconsistent").removeClass ("filter-excluded");
 	$("#gene-complex-table tr").removeClass ("filter-inconsistent").removeClass ("filter-excluded").removeClass ("filter-supercomplex");
 	$("#gene-complex-table tr td:nth-child(2)").attr("title", "");
+	$(".fa-info-circle").hide().attr("title", "");
 
 	// prepare inconsistency sets
 	var inconsistent = [new Set(),new Set(),new Set(),new Set()];
@@ -236,6 +237,7 @@ function updateNetwork () {
 			if (!occ) {
 				// otherwise highlight it as inconsistent
 				$("#" + item.DOM).addClass ("filter-inconsistent");
+				$("#" + item.DOM + " .fa-info-circle").show ().attr ('title', "ghost species -> doesn't appear in any reaction anymore");
 				inconsistent[0].add (item.id);
 			}
 		//~ }
@@ -257,6 +259,7 @@ function updateNetwork () {
 			if (!occ && !occ2) {
 				// otherwise highlight it as inconsistent
 				$("#" + item.DOM).addClass ("filter-inconsistent");
+				$("#" + item.DOM + " .fa-info-circle").show ().attr ('title', "enzyme is not used in any reaction or enzyme complex anymore");
 				inconsistent[2].add (item.id);
 			}
 		//~ }
@@ -278,6 +281,12 @@ function updateNetwork () {
 			if (!occ || occ2) {
 				// otherwise highlight it as inconsistent
 				$("#" + item.DOM).addClass ("filter-inconsistent");
+        var info = "";
+        if (!occ)
+          info += "enzyme complex is not used in any reaction anymore... "
+        if (occ2)
+          info += " some enzymes required by this complex are not available anymore..."
+				$("#" + item.DOM + " .fa-info-circle").show ().attr ('title', info.trim ());
 				inconsistent[3].add (item.id);
 			}
 		//~ }
@@ -375,7 +384,7 @@ function fill_network_table (filter) {
 			// is it filtered?
 			var checked = filter["filter_species"].includes(item.id) ? "" : " checked";
 			// create DOM row
-			const row = $("<tr id='"+item.DOM+"'><td class='check'><input type='checkbox'"+checked+"></td><td><abbr title='"+item.id+"'>"+truncate (item.id, 20)+"</abbr></td><td><abbr title='"+item.name+"'>"+truncate (item.name)+"</abbr></td><td title='occurs in "+get_reaction_ids (item.occ).join (", ")+"'>"+item.occ.length+"</td></tr>");
+			const row = $("<tr id='"+item.DOM+"'><td class='check'><input type='checkbox'"+checked+"></td><td><abbr title='"+item.id+"'>"+truncate (item.id, 20)+"</abbr> <i class='fas fa-info-circle '></i></td><td><abbr title='"+item.name+"'>"+truncate (item.name)+"</abbr></td><td title='occurs in "+get_reaction_ids (item.occ).join (", ")+"'>"+item.occ.length+"</td></tr>");
 			$('#species-table').append(row);
 		//~ }
 	};
@@ -388,7 +397,7 @@ function fill_network_table (filter) {
 			// is it filtered?
 			var checked = filter["filter_reactions"].includes(item.id) ? "" : " checked";
 			// create DOM row
-			const row = $("<tr id='"+item.DOM+"'><td class='check'><input type='checkbox'"+checked+"></td><td><abbr title='"+item.id+"'>"+truncate (item.id, 20)+"</abbr></td><td><abbr title='"+item.name+"'>"+truncate (item.name)+"</abbr></td><td><small>"+get_species_ids (item.cons).join (" + ") + "</small> <i class='fas fa-arrow-right'></i> <small>" + get_species_ids (item.prod).join (" + ") +"</small></td><td><small>"+get_gene_ids (item.enzs).concat (get_genec_ids(item.enzc)).join ("</small> [OR] <small>") +"</small></td></tr>");
+			const row = $("<tr id='"+item.DOM+"'><td class='check'><input type='checkbox'"+checked+"></td><td><abbr title='"+item.id+"'>"+truncate (item.id, 20)+"</abbr> <i class='fas fa-info-circle '></i></td><td><abbr title='"+item.name+"'>"+truncate (item.name)+"</abbr></td><td><small>"+get_species_ids (item.cons).join (" + ") + "</small> <i class='fas fa-arrow-right'></i> <small>" + get_species_ids (item.prod).join (" + ") +"</small></td><td><small>"+get_gene_ids (item.enzs).concat (get_genec_ids(item.enzc)).join ("</small> [OR] <small>") +"</small></td></tr>");
 			$('#reaction-table').append(row);
 		//~ }
 	};
@@ -401,7 +410,7 @@ function fill_network_table (filter) {
 			// is it filtered?
 			var checked = filter["filter_enzymes"].includes(item.id) ? "" : " checked";
 			// create DOM row
-			const row = $("<tr id='"+item.DOM+"'><td class='check'><input type='checkbox'"+checked+"></td><td>"+item.id+"</td><td title='occurs in "+get_reaction_ids (networks.original.enzs[key].reactions).join (", ")+"'>"+networks.original.enzs[key].reactions.length+"</td><td title='occurs in "+get_genec_ids (networks.original.enzs[key].cplx).join (", ")+"'>"+networks.original.enzs[key].cplx.length+"</td></tr>");
+			const row = $("<tr id='"+item.DOM+"'><td class='check'><input type='checkbox'"+checked+"></td><td>"+item.id+" <i class='fas fa-info-circle '></i></td><td title='occurs in "+get_reaction_ids (networks.original.enzs[key].reactions).join (", ")+"'>"+networks.original.enzs[key].reactions.length+"</td><td title='occurs in "+get_genec_ids (networks.original.enzs[key].cplx).join (", ")+"'>"+networks.original.enzs[key].cplx.length+"</td></tr>");
 			$('#gene-table').append(row);
 		//~ }
 	};
@@ -418,7 +427,7 @@ function fill_network_table (filter) {
 			var checked = filter["filter_enzyme_complexes"].includes(item.id) ? "" : " checked";
 			//~ console.log (checked)
 			// create DOM row
-			const row = $("<tr id='"+item.DOM+"'><td class='check'><input type='checkbox'"+checked+"></td><td>"+item.id+"</td><td title='occurs in "+get_reaction_ids (networks.original.enzc[key].reactions).join (", ")+"'>"+networks.original.enzc[key].reactions.length+"</td></tr>");
+			const row = $("<tr id='"+item.DOM+"'><td class='check'><input type='checkbox'"+checked+"></td><td>"+item.id+" <i class='fas fa-info-circle '></i></td><td title='occurs in "+get_reaction_ids (networks.original.enzc[key].reactions).join (", ")+"'>"+networks.original.enzc[key].reactions.length+"</td></tr>");
 			$('#gene-complex-table').append(row);
 		//~ }
 	};
