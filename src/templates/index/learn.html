@@ -48,12 +48,14 @@ Learn
       <li><a href="#export-options">What are the different export options?</a></li>
       <li><a href="#wrong-directions">Aren't the directions wrong?</a></li>
       <li><a href="#wording">Enzyme or Gene? Species or Metabolite?</a></li>
-      <li><a href="#"></a></li>
-      <li><a href="#"></a></li>
-      <li><a href="#"></a></li>
       <li><a href="#clear-data">How can I clear my data?</a></li>
       <li><a href="#source">Can I look inside the GEMtractor?</a></li>
       <li><a href="#modify-settings">How can I modify the default settings?</a></li>
+<!--
+      <li><a href="#"></a></li>
+      <li><a href="#"></a></li>
+      <li><a href="#"></a></li>
+-->
     </ul>
   </div>
   
@@ -338,11 +340,11 @@ Learn
 		</div>
 		<p>
 		  We implemented batch filtering to support you in automatic filtering without implementing an API client.
-		  If you for example have a list of species, that you want to exclude according to your FBA results in Matlab, you can just dump this list as comma-separated values and copy it to the batch text-field.
+		  If you for example have a list of species, that you want to exclude according to your FBA result, you can just dump this list as comma-separated values and copy it to the batch text-field.
 		  Thus, you may save a lot of clicks compared to deselecting every species individually.
 		</p>
 		<p>
-		  The textfield expects four lines, each starting with either <code>species</code>, <code>reactions</code>, <code>enzymes</code>, or <code>enzyme_complexes</code>, followed by a color (<code>:</code>) and the list of comma-separated entity-identifiers.
+		  The text-field expects four lines, each starting with either <code>species</code>, <code>reactions</code>, <code>enzymes</code>, or <code>enzyme_complexes</code>, followed by a color (<code>:</code>) and the list of comma-separated entity-identifiers.
 		  Applying the batch-filter will send the lists to the backend, where they will stored in your session, and reload the page to update the trimming selection.
 		</p>
 	</div>
@@ -362,15 +364,15 @@ Learn
 	</div>
 	
 	<div class="w3-padding w3-card w3-white learn-entry">
-		<div class=" anchor-heading">
-			<a name="currency-metabolites" id="currency-metabolites"></a>
-			<h3>How can I discard currency metabolites (such as H<sup>+</sup>, H<sub>2</sub>O or ATP)?</h3>
-		</div>
-		<p>
-		  The tables listing the enitities on the filter page are sortable.
-		  Thus, you can click the header cell of a column to sort it ascending &mdash; if you click it again, the column will be sorted descending.
-		</p>
-		<p>
+	  <div class=" anchor-heading">
+		  <a name="currency-metabolites" id="currency-metabolites"></a>
+		  <h3>How can I discard currency metabolites (such as H<sup>+</sup>, H<sub>2</sub>O or ATP)?</h3>
+	  </div>
+	  <p>
+	    The tables listing the entities at the trimming page are sortable.
+	    Thus, you can click the header cell of a column to sort it ascending &mdash; if you click it again, the column will be sorted descending.
+	  </p>
+	  <p>
             If you want to discard currency metabolites, you can sort the species table by the occurences.
             This will bring the currency metabolites to the top of the page, making it easy to get rid of them, as shown in this screen shot:
             <img src="{% static 'pics/screenshot-currency-metabolites-annotated.png' %}" class="w3-image w3-padding" alt="image of a sorted species table">
@@ -383,9 +385,21 @@ Learn
 			<a name="which-biomodels" id="which-biomodels"></a>
 			<h3>How did the GEMtractor select the models from Biomodels?</h3>
 		</div>
-		<p>subset of the search for "genome scale metabolic model" (with approximately 7000 results!)</p>
-		<p>however, you can choose basically any model from biomodels by pasting the model id in the input field</p>
-		<p>some models do not work, as the gene associations prior to SBML level 3 was just encoding in free text, which is error-prone and often went wrong</p>
+		<p>
+		  <a href="https://www.ebi.ac.uk/biomodels/">Biomodels</a> is a high-quality resource for GEMs encoded in SBML.
+		  They actually feature <a href="https://www.ebi.ac.uk/biomodels/search?query=genome scale metabolic model AND modelformat%3A%22SBML%22">thousands of genome-scale metabolic models!</a>
+		  However, the GEMtractor just lists the first 100 of these search results.
+		  This is just to give you a quick-start.
+		  We won't implement yet another search interface for Biomodels.
+		  To filter for organisms or annotations please go to the Biomodels website, find your model and copy the model's identifier to paste it in the GEMtractor's download field.
+		</p>
+		<p>
+		  Please note: Many models from Biomodels are encoded in <a href="http://sbml.org/Main_Page">SBML</a> prior to level 3.
+		  Thus, they do not support the <a href="http://sbml.org/Documents/Specifications/SBML_Level_3/Packages/fbc">FBC package</a> (see <a href="#gene-association">How does the GEMtractor identify enzymes that are associated to a reaction?</a>) and gene associations are annotated in free text.
+		  This is of course error-prone and often went wrong.
+		  Consequently, the GEMtractor will throw an error if it doesn't understand the gene associations.
+		  If you find such a case, please tell us or the <a href="https://www.ebi.ac.uk/biomodels/contact">Biomodels curation team</a>.
+		</p>
 	</div>
 	
 	<div class="w3-padding w3-card w3-white learn-entry">
@@ -394,7 +408,9 @@ Learn
 			<h3>How did the GEMtractor select the models from BiGG?</h3>
 		</div>
 		<p>
-		  The table at the model-selection tab basically lists all available models from <a href="http://bigg.ucsd.edu/models">BiGG Models</a>.
+		  <a href="http://bigg.ucsd.edu/models">BiGG Models</a> is a high-quality resource for GEMs encoded in SBML.
+		  They currently provide more than hundred SBML models including <a href="http://sbml.org/Documents/Specifications/SBML_Level_3/Packages/fbc">FBC annotations</a> (see <a href="#gene-association">How does the GEMtractor identify enzymes that are associated to a reaction?</a>).
+		  The table at the model-selection tab basically lists all available models from BiGG Models.
 		</p>
 	</div>
 	
@@ -405,7 +421,7 @@ Learn
 		</div>
 		<p>
 		  If accessed through a webserver, it stores the uploaded model (or the model downloaded from BiGG or Biomodels) and some session related settings.
-		  To see what the GEMtractor stores about you and how to delete the data it stores head over to the <a href="{% url 'index:imprint' %}#privacy">privacy policy</a>.
+		  To see what the GEMtractor stores about you and how to delete the data it stores, head over to the <a href="{% url 'index:imprint' %}#privacy">privacy policy</a>.
 		</p>
 	</div>
 	
@@ -616,14 +632,6 @@ The same also applies to enzyme-centric networks.
 	
 	<div class="w3-padding w3-card w3-white learn-entry">
 		<div class=" anchor-heading">
-			<a name="" id=""></a>
-			<h3></h3>
-		</div>
-		<p></p>
-	</div>
-	
-	<div class="w3-padding w3-card w3-white learn-entry">
-		<div class=" anchor-heading">
 			<a name="clear-data" id="clear-data"></a>
 			<h3>How can I clear my data?</h3>
 		</div>
@@ -657,8 +665,45 @@ The same also applies to enzyme-centric networks.
 		  Just scroll down to learn how to <a href="#own-gemtractor">run your own GEMtractor</a> &mdash; it's pretty easy.
 		</p>
 	</div>
+	
+	
+	
+	
+<!--
+	<div class="w3-padding w3-card w3-white learn-entry">
+		<div class=" anchor-heading">
+			<a name="" id=""></a>
+			<h3></h3>
+		</div>
+		<p></p>
+	</div>
+-->
 
 </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 <div class="w3-card w3-flat-clouds w3-margin-top">
   <div class="w3-padding">
@@ -756,6 +801,30 @@ The same also applies to enzyme-centric networks.
     </p>
   </div>
 </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 <div class="w3-card w3-flat-clouds w3-margin-top">
   <div class="w3-padding">

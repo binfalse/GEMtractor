@@ -236,7 +236,7 @@ CACHE_BIOMODELS_MODEL = parse_env_var ('CACHE_BIOMODELS_MODEL', 7*60*60*24)
 # urls for model retrieval
 URLS_BIGG_MODELS = "http://bigg.ucsd.edu/api/v2/models/"
 URLS_BIGG_MODEL = lambda model_id: "http://bigg.ucsd.edu/static/models/"+model_id+".xml"
-URLS_BIOMODELS = "https://www.ebi.ac.uk/biomodels/search?format=json&query=genome+scale+metabolic+model+modelformat%3A%22SBML%22+NOT+%22nicolas+le%22&numResults=100&sort=id-asc"
+URLS_BIOMODELS = "https://www.ebi.ac.uk/biomodels/search?format=json&query=genome+scale+metabolic+model+AND+modelformat:%22SBML%22+NOT+%22nicolas+le%22&numResults=100&sort=id-asc"
 URLS_BIOMODEL_INFO = lambda model_id: "https://www.ebi.ac.uk/biomodels/"+model_id+"?format=json"
 URLS_BIOMODEL_SBML = lambda model_id, filename: "https://www.ebi.ac.uk/biomodels/model/download/"+model_id+"?filename="+filename
 
