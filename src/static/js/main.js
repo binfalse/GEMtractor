@@ -191,9 +191,11 @@ function updateNetwork () {
 				if (this_complex.every (r => other.includes (r))) {
 					const domid = "#" + idMap[networks.original.enzc[key].id]
 					$(domid).addClass ("filter-inconsistent").addClass ("filter-supercomplex");
-					if ($(domid +" td:nth-child(2)").attr("title").length < 1)
-						$(domid +" td:nth-child(2)").attr("title", "Subcomplexes removed: ");
-					$(domid +" td:nth-child(2)").attr("title", $(domid +" td:nth-child(2)").attr("title") + "["+entId+"] ");
+          var info = $(domid + " .fa-info-circle").attr ('title');
+					if (info.length < 1)
+						info = "Subcomplexes removed: ";
+					info += "["+entId+"] ";
+          $(domid + " .fa-info-circle").show ().attr ('title', info.trim ());
 				}
 			}
 	});
@@ -220,6 +222,14 @@ function updateNetwork () {
 			if ((!occ && !occ2) || occ3 || occ4) {
 				// otherwise highlight it as inconsistent
 				$("#" + item.DOM).addClass ("filter-inconsistent");
+        var info = "";
+        if (!occ && !occ2)
+          info += " this reaction is not catalysed anymore... "
+        if (occ3)
+          info += " some species consumed by this reaction were removed... "
+        if (occ3)
+          info += " some species produced by this reaction were removed... "
+				$("#" + item.DOM + " .fa-info-circle").show ().attr ('title', info.trim ());
 				inconsistent[1].add (item.id);
 			}
 		//~ }
@@ -281,9 +291,11 @@ function updateNetwork () {
 			if (!occ || occ2) {
 				// otherwise highlight it as inconsistent
 				$("#" + item.DOM).addClass ("filter-inconsistent");
-        var info = "";
+        var info = $("#" + item.DOM + " .fa-info-circle").attr ('title');
+        if (info.length > 0)
+          info += "; ";
         if (!occ)
-          info += "enzyme complex is not used in any reaction anymore... "
+          info += " enzyme complex is not used in any reaction anymore... "
         if (occ2)
           info += " some enzymes required by this complex are not available anymore..."
 				$("#" + item.DOM + " .fa-info-circle").show ().attr ('title', info.trim ());
