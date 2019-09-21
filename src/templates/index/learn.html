@@ -192,6 +192,8 @@ Learn
 		  Trimming the species of a model actually means <em>removing species from reactions.</em>
 		  That is, trimmed species will not appear in any reaction anymore, but if you export the <em>Metabolite-Reaction Network</em>, they may still appear in the model (as they may still be required by other elements in the model).
 		  We call these species <em>ghost species</em>.
+		  When exporting your model, you will find an option to entirely remove such ghost species from the model.
+		  See also <a href="#export-options">What are the different export options?</a>
 		</p>
 		<p>
 		  If you remove a species from a network, all the reactions that consume or produce this species may now be invalid.
@@ -220,7 +222,7 @@ Learn
 		  A trimmed reaction will disappear from the original model prior to subsequent conversions.
 		  All species and enzymes linked to that reaction (as reactants, products, or gene-association) will be unlinked.
 		  Thus, there may be species, enzymes and enzyme complexes, which do not appear in the model anymore.
-		  Those left-overs will be hightlighted in red in the Species, Enzyme or Enzyme Complex tab to raise your attention, as you may want to re-evaluate your filters.
+		  Those left-overs will be hightlighted in red to raise your attention, as you may want to re-evaluate your filters.
 		</p>
 	</div>
 	
@@ -247,6 +249,16 @@ Learn
 		</div>
 		<p>
 		  If you trim an enzyme from your model, this enzyme will be removed from all reactions that it catalyzes.
+		  This may result in the following inconsistencies:
+		  <ul>
+		    <li>A reaction looses all its enzyme (and probably won't take place anymore).</li>
+		    <li>The enzyme is part of an enzyme complex &mdash; thus, you may also need to remove the complex.</li>
+		  </ul>
+		  The inconsitent reactions or enzyme complexes will be highlighted in red and you should re-evaluate your filters.
+		</p>
+		<p>
+		  When exporting the model, you have the option to remove all reactions without enzymes and to remove complexes that lack an enzyme.
+		  See also <a href="#export-options">What are the different export options?</a>
 		</p>
 	</div>
 	
@@ -255,7 +267,10 @@ Learn
 			<a name="red-enzyme" id="red-enzyme"></a>
 			<h3>Why is a certain enzyme highlighted in red?</h3>
 		</div>
-		<p></p>
+		<p>
+		  An enzyme is highlighted in red, if your filters removed all reactions and enzyme complexes in which this enzyme participates.
+		  Thus, it is not appearing in the model anymore and you may want to trim it as well.
+		</p>
 	</div>
 	
 	<div class="w3-padding w3-card w3-white learn-entry">
@@ -263,7 +278,8 @@ Learn
 			<a name="filter-enzyme-complex" id="filter-enzyme-complex"></a>
 			<h3>What exactly happens when I remove an enzyme complex during filtering?</h3>
 		</div>
-		<p></p>
+		<p>
+		</p>
 	</div>
 	
 	<div class="w3-padding w3-card w3-white learn-entry">
