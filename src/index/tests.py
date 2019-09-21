@@ -24,7 +24,7 @@ class IndexTest(TestCase):
   def test_index (self):
     response = self.client.get('/')
     self.assertEqual(response.status_code, 200)
-    self.assertTrue (b"Choose an SBML model" in response.content)
+    self.assertTrue (b"Select an SBML model" in response.content)
   
   def test_imprint (self):
     response = self.client.get('/imprint')

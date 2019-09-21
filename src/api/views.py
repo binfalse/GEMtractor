@@ -323,14 +323,15 @@ def export (request):
     except Exception as e:
       return JsonResponse ({"status":"failed","error":"the model has an issue: " + getattr(e, 'message', repr(e))})
     sbml = gemtractor.get_sbml (
-      request.session[Constants.SESSION_FILTER_SPECIES],
-      request.session[Constants.SESSION_FILTER_REACTION],
-      request.session[Constants.SESSION_FILTER_ENZYMES],
-      request.session[Constants.SESSION_FILTER_ENZYME_COMPLEXES],
-      form.cleaned_data['remove_reaction_enzymes_removed'],
-      form.cleaned_data['discard_fake_enzymes'],
-      form.cleaned_data['remove_reaction_missing_species'],
-      form.cleaned_data['removing_enzyme_removes_complex'])
+      filter_species = request.session[Constants.SESSION_FILTER_SPECIES],
+      filter_reactions = request.session[Constants.SESSION_FILTER_REACTION],
+      filter_genes = request.session[Constants.SESSION_FILTER_ENZYMES],
+      filter_gene_complexes = request.session[Constants.SESSION_FILTER_ENZYME_COMPLEXES],
+      remove_reaction_enzymes_removed = form.cleaned_data['remove_reaction_enzymes_removed'],
+      remove_ghost_species = form.cleaned_data['remove_ghost_species'],
+      discard_fake_enzymes = form.cleaned_data['discard_fake_enzymes'],
+      remove_reaction_missing_species = form.cleaned_data['remove_reaction_missing_species'],
+      removing_enzyme_removes_complex = form.cleaned_data['removing_enzyme_removes_complex'])
     
     if form.cleaned_data['network_type'] == 'en':
       file_name = file_name + "-EnzymeNetwork"
@@ -340,13 +341,15 @@ def export (request):
         file_name = file_name + ".sbml"
         file_path = Utils.create_generated_file_web (request.session.session_key)
         net.export_en_sbml (file_path, gemtractor, request.session[Constants.SESSION_MODEL_ID], request.session[Constants.SESSION_MODEL_NAME],
-            request.session[Constants.SESSION_FILTER_SPECIES],
-            request.session[Constants.SESSION_FILTER_REACTION],
-            request.session[Constants.SESSION_FILTER_ENZYMES],
-            request.session[Constants.SESSION_FILTER_ENZYME_COMPLEXES],
-            form.cleaned_data['remove_reaction_enzymes_removed'],
-            form.cleaned_data['remove_reaction_missing_species'],
-            form.cleaned_data['removing_enzyme_removes_complex'])
+            filter_species = request.session[Constants.SESSION_FILTER_SPECIES],
+            filter_reactions = request.session[Constants.SESSION_FILTER_REACTION],
+            filter_genes = request.session[Constants.SESSION_FILTER_ENZYMES],
+            filter_gene_complexes = request.session[Constants.SESSION_FILTER_ENZYME_COMPLEXES],
+            remove_reaction_enzymes_removed = form.cleaned_data['remove_reaction_enzymes_removed'],
+            remove_ghost_species = form.cleaned_data['remove_ghost_species'],
+            discard_fake_enzymes = form.cleaned_data['discard_fake_enzymes'],
+            remove_reaction_missing_species = form.cleaned_data['remove_reaction_missing_species'],
+            removing_enzyme_removes_complex = form.cleaned_data['removing_enzyme_removes_complex'])
         if os.path.exists(file_path):
           return JsonResponse ({"status":"success", "name": file_name, "mime": "application/xml"})
         else:
@@ -394,13 +397,15 @@ def export (request):
         file_name = file_name + ".sbml"
         file_path = Utils.create_generated_file_web (request.session.session_key)
         net.export_rn_sbml (file_path, gemtractor, request.session[Constants.SESSION_MODEL_ID], request.session[Constants.SESSION_MODEL_NAME],
-            request.session[Constants.SESSION_FILTER_SPECIES],
-            request.session[Constants.SESSION_FILTER_REACTION],
-            request.session[Constants.SESSION_FILTER_ENZYMES],
-            request.session[Constants.SESSION_FILTER_ENZYME_COMPLEXES],
-            form.cleaned_data['remove_reaction_enzymes_removed'],
-            form.cleaned_data['remove_reaction_missing_species'],
-            form.cleaned_data['removing_enzyme_removes_complex'])
+            filter_species = request.session[Constants.SESSION_FILTER_SPECIES],
+            filter_reactions = request.session[Constants.SESSION_FILTER_REACTION],
+            filter_genes = request.session[Constants.SESSION_FILTER_ENZYMES],
+            filter_gene_complexes = request.session[Constants.SESSION_FILTER_ENZYME_COMPLEXES],
+            remove_reaction_enzymes_removed = form.cleaned_data['remove_reaction_enzymes_removed'],
+            remove_ghost_species = form.cleaned_data['remove_ghost_species'],
+            discard_fake_enzymes = form.cleaned_data['discard_fake_enzymes'],
+            remove_reaction_missing_species = form.cleaned_data['remove_reaction_missing_species'],
+            removing_enzyme_removes_complex = form.cleaned_data['removing_enzyme_removes_complex'])
         if os.path.exists(file_path):
           return JsonResponse ({"status":"success", "name": file_name, "mime": "application/xml"})
         else:
@@ -540,11 +545,14 @@ def execute (request):
   
   remove_reaction_enzymes_removed = True
   remove_reaction_missing_species = False
+  remove_ghost_species = False
   discard_fake_enzymes = False
   removing_enzyme_removes_complex = True
   
   if "remove_reaction_enzymes_removed" in export:
     remove_reaction_enzymes_removed = export["remove_reaction_enzymes_removed"]
+  if "remove_ghost_species" in export:
+    remove_ghost_species = export["remove_ghost_species"]
   if "discard_fake_enzymes" in export:
     discard_fake_enzymes = export["discard_fake_enzymes"]
   if "remove_reaction_missing_species" in export:
@@ -554,14 +562,15 @@ def execute (request):
   try:
     gemtractor = GEMtractor (inputFile.name)
     sbml = gemtractor.get_sbml (
-        filter_species,
-        filter_reactions,
-        filter_enzymes,
-        filter_enzyme_complexes,
-        remove_reaction_enzymes_removed,
-        discard_fake_enzymes,
-        remove_reaction_missing_species,
-        removing_enzyme_removes_complex)
+        filter_species = filter_species,
+        filter_reactions = filter_reactions,
+        filter_genes = filter_enzymes,
+        filter_gene_complexes = filter_enzyme_complexes,
+        remove_reaction_enzymes_removed = remove_reaction_enzymes_removed,
+        remove_ghost_species = remove_ghost_species,
+        discard_fake_enzymes = discard_fake_enzymes,
+        remove_reaction_missing_species = remove_reaction_missing_species,
+        removing_enzyme_removes_complex = removing_enzyme_removes_complex)
   except Exception as e:
     return HttpResponseBadRequest ("the model has an issue: " + getattr(e, 'message', repr(e)))
   
@@ -574,7 +583,16 @@ def execute (request):
     net = gemtractor.extract_network_from_sbml (sbml)
     net.calc_genenet ()
     if export["network_format"] == "sbml":
-      net.export_en_sbml (outputFile.name, gemtractor, sbml.getModel ().getId (), sbml.getModel ().getName (), filter_species, filter_reactions, filter_enzymes, filter_enzyme_complexes, remove_reaction_enzymes_removed, discard_fake_enzymes, remove_reaction_missing_species, removing_enzyme_removes_complex)
+      net.export_en_sbml (outputFile.name, gemtractor, sbml.getModel ().getId (), sbml.getModel ().getName (), 
+          filter_species = filter_species, 
+          filter_reactions = filter_reactions,
+          filter_genes = filter_enzymes,
+          filter_gene_complexes = filter_enzyme_complexes,
+          remove_reaction_enzymes_removed = remove_reaction_enzymes_removed,
+          remove_ghost_species = remove_ghost_species,
+          discard_fake_enzymes = discard_fake_enzymes,
+          remove_reaction_missing_species = remove_reaction_missing_species,
+          removing_enzyme_removes_complex = removing_enzyme_removes_complex)
       if os.path.exists(outputFile.name):
         return Utils.serve_file (outputFile.name, "gemtracted-model.sbml", "application/xml")
       else:
@@ -607,7 +625,16 @@ def execute (request):
     net = gemtractor.extract_network_from_sbml (sbml)
     net.calc_reaction_net ()
     if export["network_format"] == "sbml":
-      net.export_rn_sbml (outputFile.name, gemtractor, sbml.getModel ().getId () + "_RN", sbml.getModel ().getName () + " converted to ReactionNetwork", filter_species, filter_reactions, filter_enzymes, filter_enzyme_complexes, remove_reaction_enzymes_removed, discard_fake_enzymes, remove_reaction_missing_species, removing_enzyme_removes_complex)
+      net.export_rn_sbml (outputFile.name, gemtractor, sbml.getModel ().getId () + "_RN", sbml.getModel ().getName () + " converted to ReactionNetwork",
+          filter_species = filter_species, 
+          filter_reactions = filter_reactions,
+          filter_genes = filter_enzymes,
+          filter_gene_complexes = filter_enzyme_complexes,
+          remove_reaction_enzymes_removed = remove_reaction_enzymes_removed,
+          remove_ghost_species = remove_ghost_species,
+          discard_fake_enzymes = discard_fake_enzymes,
+          remove_reaction_missing_species = remove_reaction_missing_species,
+          removing_enzyme_removes_complex = removing_enzyme_removes_complex)
       if os.path.exists(outputFile.name):
         return Utils.serve_file (outputFile.name, "gemtracted-model.sbml", "application/xml")
       else:

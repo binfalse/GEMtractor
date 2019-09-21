@@ -153,7 +153,7 @@ class GEMtractor:
       
      
     
-    def get_sbml (self, filter_species = [], filter_reactions = [], filter_genes = [], filter_gene_complexes = [], remove_reaction_genes_removed = True, discard_fake_enzymes = False, remove_reaction_missing_species = False, removing_enzyme_removes_complex = True):
+    def get_sbml (self, filter_species = [], filter_reactions = [], filter_genes = [], filter_gene_complexes = [], remove_reaction_enzymes_removed = True, remove_ghost_species = False, discard_fake_enzymes = False, remove_reaction_missing_species = False, removing_enzyme_removes_complex = True):
       """ Get a filtered SBML document from a file
       
       do not use the same GEMtractor object for two different SBML files!!
@@ -164,7 +164,7 @@ class GEMtractor:
       filter_species:
       filter_reactions:
       filter_genes:
-      remove_reaction_genes_removed: should we remove a reaction if all it's genes were removed?
+      remove_reaction_enzymes_removed: should we remove a reaction if all it's genes were removed?
       remove_reaction_missing_species: remove a reaction if one of the participating genes was removed?
       """
       self.__logger.debug("processing sbml model from " + self.__sbml_file)
@@ -179,7 +179,7 @@ class GEMtractor:
       self.__fbc_plugin = model.getPlugin ("fbc")
       
       self.__logger.debug("append a note")
-      Utils.add_model_note (model, filter_species, filter_reactions, filter_genes, filter_gene_complexes, remove_reaction_genes_removed, discard_fake_enzymes, remove_reaction_missing_species, removing_enzyme_removes_complex)
+      Utils.add_model_note (model, filter_species, filter_reactions, filter_genes, filter_gene_complexes, remove_reaction_enzymes_removed, remove_ghost_species, discard_fake_enzymes, remove_reaction_missing_species, removing_enzyme_removes_complex)
       
       if filter_species is None:
         filter_species = []
@@ -250,7 +250,7 @@ class GEMtractor:
                   final_genes.append (g)
               
               if len (final_genes) < 1:
-                if remove_reaction_genes_removed:
+                if remove_reaction_enzymes_removed:
                   model.removeReaction (n)
                   continue
                 else:
@@ -264,6 +264,12 @@ class GEMtractor:
             
             if reaction.getNumReactants() + reaction.getNumModifiers() + reaction.getNumProducts() == 0:
               model.removeReaction (n)
+          
+          if len(filter_species) > 0 and remove_ghost_species:
+            for n in range (model.getNumSpecies () - 1, -1, -1):
+              species = model.getSpecies (n)
+              if species.getId () in filter_species:
+                model.removeSpecies (n)
         except BreakLoops:
           pass
       

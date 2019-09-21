@@ -61,7 +61,7 @@ class Utils:
   
   
   @staticmethod
-  def add_model_note (model, filter_species, filter_reactions, filter_enzymes, filter_enzyme_complexes, remove_reaction_enzymes_removed, discard_fake_enzymes, remove_reaction_missing_species, removing_enzyme_removes_complex):
+  def add_model_note (model, filter_species, filter_reactions, filter_enzymes, filter_enzyme_complexes, remove_reaction_enzymes_removed, remove_ghost_species, discard_fake_enzymes, remove_reaction_missing_species, removing_enzyme_removes_complex):
     # TODO can we do better? eg. annotate with proper structure?
     note = model.getNotesString ()
     # print (note)
@@ -90,6 +90,7 @@ class Utils:
         additional_note = additional_note + "<li>"+s+"</li>"
       additional_note = additional_note + "</ul>"
     additional_note = additional_note + "<p>Remove reactions which's enzymes are removed: " +str(remove_reaction_enzymes_removed)+ "</p>"
+    additional_note = additional_note + "<p>Remove ghost species: " +str(remove_ghost_species)+ "</p>"
     additional_note = additional_note + "<p>Discard fake enzymes: " +str(discard_fake_enzymes)+ "</p>"
     additional_note = additional_note + "<p>Remove reactions that are missing a species: " +str(remove_reaction_missing_species)+ "</p>"
     additional_note = additional_note + "<p>Remove enzyme complexes which are missing an enzyme: " +str(removing_enzyme_removes_complex)+ "</p>"

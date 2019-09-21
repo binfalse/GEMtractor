@@ -620,7 +620,7 @@ class Network:
     n = n + "\t\t</node>\n"
     return n
       
-  def export_rn_sbml (self, filename, gemtractor, model_id, model_name = None, filter_species = None, filter_reactions = None, filter_genes = None, filter_gene_complexes = None, remove_reaction_genes_removed = True, discard_fake_enzymes = False, remove_reaction_missing_species = False, removing_enzyme_removes_complex = True):
+  def export_rn_sbml (self, filename, gemtractor, model_id, model_name = None, filter_species = None, filter_reactions = None, filter_genes = None, filter_gene_complexes = None, remove_reaction_enzymes_removed = True, remove_ghost_species = False, discard_fake_enzymes = False, remove_reaction_missing_species = False, removing_enzyme_removes_complex = True):
     if not self.have_reaction_net:
       self.calc_reaction_net ()
     
@@ -636,7 +636,7 @@ class Network:
       model_name = model_id
     model.setName ("GEMtracted ReactionNetwork of " + model_name)
     
-    Utils.add_model_note (model, filter_species, filter_reactions, filter_genes, filter_gene_complexes, remove_reaction_genes_removed, discard_fake_enzymes, remove_reaction_missing_species, removing_enzyme_removes_complex)
+    Utils.add_model_note (model, filter_species, filter_reactions, filter_genes, filter_gene_complexes, remove_reaction_enzymes_removed, remove_ghost_species, discard_fake_enzymes, remove_reaction_missing_species, removing_enzyme_removes_complex)
     
     compartment = model.createCompartment()
     compartment.setId('compartment')
@@ -673,7 +673,7 @@ class Network:
     
     return g
       
-  def export_en_sbml (self, filename, gemtractor, model_id, model_name = None, filter_species = None, filter_reactions = None, filter_genes = None, filter_gene_complexes = None, remove_reaction_genes_removed = True, discard_fake_enzymes = False, remove_reaction_missing_species = False, removing_enzyme_removes_complex = True):
+  def export_en_sbml (self, filename, gemtractor, model_id, model_name = None, filter_species = None, filter_reactions = None, filter_genes = None, filter_gene_complexes = None, remove_reaction_enzymes_removed = True, remove_ghost_species = False, discard_fake_enzymes = False, remove_reaction_missing_species = False, removing_enzyme_removes_complex = True):
     if not self.have_gene_net:
       self.calc_genenet ()
     
@@ -689,7 +689,7 @@ class Network:
     model.setName ("GEMtracted EnzymeNetwork of " + model_name)
     
     # print ("adding note to en sbml")
-    Utils.add_model_note (model, filter_species, filter_reactions, filter_genes, filter_gene_complexes, remove_reaction_genes_removed, discard_fake_enzymes, remove_reaction_missing_species, removing_enzyme_removes_complex)
+    Utils.add_model_note (model, filter_species, filter_reactions, filter_genes, filter_gene_complexes, remove_reaction_enzymes_removed, remove_ghost_species, discard_fake_enzymes, remove_reaction_missing_species, removing_enzyme_removes_complex)
     
     nodemap = {}
     

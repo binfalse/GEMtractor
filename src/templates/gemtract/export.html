@@ -48,6 +48,14 @@
 
   <p>    <div class="w3-red">
 
+    {{ form.remove_ghost_species.errors }}
+</div>
+    {{ form.remove_ghost_species|addclass:'w3-check' }}
+<label for="{{ form.remove_ghost_species.id_for_label }}">Remove ghost species</label>
+</p>
+
+  <p>    <div class="w3-red">
+
     {{ form.discard_fake_enzymes.errors }}
 </div>
     {{ form.discard_fake_enzymes|addclass:'w3-check' }}

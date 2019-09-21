@@ -16,6 +16,7 @@ FORMAT = (
 class ExportForm (forms.Form):
   network_type = forms.ChoiceField(choices=TYPE)
   remove_reaction_enzymes_removed = forms.BooleanField(required=False)
+  remove_ghost_species = forms.BooleanField(required=False)
   discard_fake_enzymes = forms.BooleanField(required=False)
   remove_reaction_missing_species = forms.BooleanField(required=False)
   removing_enzyme_removes_complex = forms.BooleanField(required=False)

@@ -200,7 +200,7 @@ class GEMtractorTests (TestCase):
         
         
         gemtractor = GEMtractor (f)
-        sbml = gemtractor.get_sbml (filter_genes = ["x", "y"], remove_reaction_genes_removed = False)
+        sbml = gemtractor.get_sbml (filter_genes = ["x", "y"], remove_reaction_enzymes_removed = False)
         self.assertEqual (sbml.getNumErrors(), 0)
         
         net = gemtractor.extract_network_from_sbml (sbml)
