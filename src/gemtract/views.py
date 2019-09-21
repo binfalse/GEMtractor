@@ -94,7 +94,7 @@ def index(request):
     Utils.del_session_key (request, context, Constants.SESSION_FILTER_ENZYME_COMPLEXES)
   else:
     context["NEXT_s"] = "Step 2"
-    context["NEXT_t"] = "Filter Model Entities"
+    context["NEXT_t"] = "Trim the Model"
     context["NEXT_l"] = reverse ('gemtract:filter')
     
   return render(request, 'gemtract/index.html', context)
@@ -110,10 +110,10 @@ def filter(request):
     return redirect('gemtract:index')
   
   context["PREV_s"] = "Step 1"
-  context["PREV_t"] = "Select other model"
+  context["PREV_t"] = "Select other Model"
   context["PREV_l"] = reverse ('gemtract:index')
   context["NEXT_s"] = "Step 3"
-  context["NEXT_t"] = "Export restults"
+  context["NEXT_t"] = "Export the Results"
   context["NEXT_l"] = reverse ('gemtract:export')
   return render(request, 'gemtract/filter.html', context)
 
@@ -130,7 +130,7 @@ def export(request):
   
   context['form'] = ExportForm(initial={'network_type':'en','remove_reaction_genes_removed': True, 'remove_reaction_missing_species': False,'network_format': 'sbml'})
   context["PREV_s"] = "Step 2"
-  context["PREV_t"] = "Filter Model Entities"
+  context["PREV_t"] = "Trim the Model"
   context["PREV_l"] = reverse ('gemtract:filter')
   return render(request, 'gemtract/export.html', context)
   
