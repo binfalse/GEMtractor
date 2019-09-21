@@ -18,11 +18,20 @@ from django.shortcuts import render
 from django.conf import settings
 
 def index(request):
-    return render(request, 'index/index.html', {})
+    context = {}
+    context["NEXT_l"] = False
+    context["PREV_l"] = False
+    return render(request, 'index/index.html', context)
 def imprint(request):
-    return render(request, 'index/imprint.html', {"KEEP_UPLOADED": settings.KEEP_UPLOADED / (60*60)})
+    context = {}
+    context["NEXT_l"] = False
+    context["PREV_l"] = False
+    context["KEEP_UPLOADED"] = settings.KEEP_UPLOADED / (60*60)
+    return render(request, 'index/imprint.html', context)
 def learn(request):
     context = {}
+    context["NEXT_l"] = False
+    context["PREV_l"] = False
     context["DJANGO_DEBUG"] = settings.DEBUG
     context["DJANGO_LOG_LEVEL"] = settings.DJANGO_LOG_LEVEL
     context["DJANGO_ALLOWED_HOSTS"] = settings.ALLOWED_HOSTS

@@ -82,6 +82,9 @@ def index(request):
   
   
   context = __prepare_context (request)
+  context["NEXT_l"] = False
+  context["PREV_l"] = False
+  context['error'] = False
   if not model_exists (request, context):
     if Constants.SESSION_MODEL_ID in request.session:
       context['error'] = "did not find model on the server... either your session expired or our storage needed to be cleaned for some reason."
@@ -106,6 +109,7 @@ def filter(request):
   
   
   context = __prepare_context (request)
+  context['error'] = False
   if not model_exists (request, context):
     return redirect('gemtract:index')
   
@@ -127,8 +131,10 @@ def export(request):
     return redirect('gemtract:index')
   
   context = __prepare_context (request)
+  context['error'] = False
   
   context['form'] = ExportForm(initial={'network_type':'en','remove_reaction_genes_removed': True, 'remove_reaction_missing_species': False,'network_format': 'sbml'})
+  context["NEXT_l"] = False
   context["PREV_s"] = "Step 2"
   context["PREV_t"] = "Trim the Model"
   context["PREV_l"] = reverse ('gemtract:filter')
