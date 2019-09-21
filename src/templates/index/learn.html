@@ -245,7 +245,9 @@ Learn
 			<a name="filter-gene" id="filter-gene"></a>
 			<h3>What exactly happens when I remove an enzyme during filtering?</h3>
 		</div>
-		<p></p>
+		<p>
+		  If you trim an enzyme from your model, this enzyme will be removed from all reactions that it catalyzes.
+		</p>
 	</div>
 	
 	<div class="w3-padding w3-card w3-white learn-entry">
@@ -591,7 +593,8 @@ The same also applies to enzyme-centric networks.
       "network_type":"mn",
       "network_format":"sbml",
       "remove_reaction_enzymes_removed": False,
-      "remove_reaction_missing_species": True
+      "remove_reaction_missing_species": True,
+      "removing_enzyme_removes_complex": True
     },
     "filter": {
       "species": ["h2o", "atp"],
@@ -613,6 +616,7 @@ The same also applies to enzyme-centric networks.
 	<li><code>remove_reaction_enzymes_removed</code>: Boolean &mdash; remove reactions, whose enzymes were all removed? (Optional, defaults to <code>true</code>)</li>
 	<li><code>discard_fake_enzymes</code>: Boolean &mdash; remove invented enzymes? See <a href="#no-gene-name">What if no enzyme is associated to a reaction?</a> (Optional, defaults to <code>false</code>)</li>
 	<li><code>remove_reaction_missing_species</code>: Boolean &mdash; remove reactions, in which at least one species was removed? That is, if you remove a species from a reaction, should the GEMtractor also remove the whole reaction? (Optional, defaults to <code>false</code>)</li>
+	<li><code>removing_enzyme_removes_complex</code>: Boolean &mdash; remove enzyme complex, if one of its enzymes was removed? In other words: If you remove an enzyme, should all the complexes in which it participates also been removed? (Optional, defaults to <code>true</code>)</li>
       </ul>
       Scroll up to learn more about the <a href="#export-options">export options</a>.
     </p>

@@ -18,6 +18,7 @@ class ExportForm (forms.Form):
   remove_reaction_enzymes_removed = forms.BooleanField(required=False)
   discard_fake_enzymes = forms.BooleanField(required=False)
   remove_reaction_missing_species = forms.BooleanField(required=False)
+  removing_enzyme_removes_complex = forms.BooleanField(required=False)
   network_format = forms.ChoiceField(choices=FORMAT)
   def clean(self):
       cleaned_data = super().clean()

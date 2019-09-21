@@ -157,13 +157,13 @@ class GemtractTest(TestCase):
         
         response = self.client.get('/gemtract/filter')
         self.assertEqual(response.status_code, 200)
-        self.assertTrue (b"Filter Model Entities" in response.content)
+        self.assertTrue (b"Trim the Model" in response.content)
         
         
         
         response = self.client.get('/gemtract/export')
         self.assertEqual(response.status_code, 200)
-        self.assertTrue (b"Export Your Model" in response.content)
+        self.assertTrue (b"Export the Model" in response.content)
         
         
         form = self._create_export ('mn', 'sbml', False, True)
@@ -296,13 +296,58 @@ class GemtractTest(TestCase):
         
         
         
+        
+        response = self.client.post('/api/store_filter', json.dumps({'species': [], 'reaction': [], 'enzymes': ["b"]}),content_type="application/json")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual("success", response.json()["status"], msg = "response was: " + str(response.json()))
+        f = response.json()["filter"]
+        self.assertEqual(len(f["filter_species"]), 0)
+        self.assertEqual(len(f["filter_reactions"]), 0)
+        self.assertEqual(len(f["filter_enzymes"]), 1)
+        self.assertEqual(len(f["filter_enzyme_complexes"]), 0)
+        
+        
+        response = self.client.get('/gemtract/filter')
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue (b"Trim the Model" in response.content)
+        
+        
+        
+        form = self._create_export ('en', 'dot', False, True, False)
+        self.assertTrue (form.is_valid())
+        response = self.client.post('/api/export', form.cleaned_data)
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertTrue(len(data["name"]) > 0)
+        self.assertTrue(len(data["mime"]) > 0)
+        response = self.client.post('/api/serve/' + data["name"] + "/" + data["mime"])
+        c = response.content.decode("utf-8")
+        self.assertEqual (c.count ("label="), 12)
+        self.assertEqual (c.count (" -> "), enReactions)
+        
+        form = self._create_export ('en', 'dot', False, True, True)
+        self.assertTrue (form.is_valid())
+        response = self.client.post('/api/export', form.cleaned_data)
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertTrue(len(data["name"]) > 0)
+        self.assertTrue(len(data["mime"]) > 0)
+        response = self.client.post('/api/serve/' + data["name"] + "/" + data["mime"])
+        c = response.content.decode("utf-8")
+        # b, c, and b+c should now be removed:
+        self.assertEqual (c.count ("label="), 9)
+        
+        
+        
+        
     
-  def _create_export (self, network_type, network_format, remove_reaction_enzymes_removed, remove_reaction_missing_species):
+  def _create_export (self, network_type, network_format, remove_reaction_enzymes_removed, remove_reaction_missing_species, removing_enzyme_removes_complex = True):
     return ExportForm(data={
       'network_type': network_type,
       'remove_reaction_enzymes_removed': remove_reaction_enzymes_removed,
       'remove_reaction_missing_species': remove_reaction_missing_species,
       'network_format': network_format,
+      'removing_enzyme_removes_complex': removing_enzyme_removes_complex
       })
   
   def _valid_xml (self, xml):

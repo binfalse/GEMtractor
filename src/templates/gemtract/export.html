@@ -63,16 +63,28 @@
     {{ form.remove_reaction_missing_species|addclass:'w3-check' }}
 <label for="{{ form.remove_reaction_missing_species.id_for_label }}">Remove reactions, in which at least one species was removed</label>
 </p>
+
+
+
+  <p>    <div class="w3-red">
+
+    {{ form.removing_enzyme_removes_complex.errors }}
+</div>
+    {{ form.removing_enzyme_removes_complex|addclass:'w3-check' }}
+<label for="{{ form.removing_enzyme_removes_complex.id_for_label }}">Removing an enzyme removes all complexes in which it participates</label>
+</p>
   
   
 
+  </div>
+  <div class="w3-half w3-container"> 
+    <p>
+    Not sure what to select? See:<br><i class="fas fa-info-circle "></i> <a href="{% url 'index:learn' %}#export-options" class="learnlink">What are the different export options?</a>
+</p>
   <p><div class="w3-red" id="download-error">
 </div>
     <button id="download-button" class="w3-btn w3-flat-nephritis">Download</button>
 </p>
-  </div>
-  <div class="w3-half w3-container">
-    Not sure what to select? See:<br><i class="fas fa-info-circle "></i> <a href="{% url 'index:learn' %}#export-options" class="learnlink">What are the different export options?</a>
 
   </div>
   </div>

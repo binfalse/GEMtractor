@@ -153,7 +153,7 @@ class GEMtractor:
       
      
     
-    def get_sbml (self, filter_species = [], filter_reactions = [], filter_genes = [], filter_gene_complexes = [], remove_reaction_genes_removed = True, discard_fake_enzymes = False, remove_reaction_missing_species = False):
+    def get_sbml (self, filter_species = [], filter_reactions = [], filter_genes = [], filter_gene_complexes = [], remove_reaction_genes_removed = True, discard_fake_enzymes = False, remove_reaction_missing_species = False, removing_enzyme_removes_complex = True):
       """ Get a filtered SBML document from a file
       
       do not use the same GEMtractor object for two different SBML files!!
@@ -179,7 +179,7 @@ class GEMtractor:
       self.__fbc_plugin = model.getPlugin ("fbc")
       
       self.__logger.debug("append a note")
-      Utils.add_model_note (model, filter_species, filter_reactions, filter_genes, filter_gene_complexes, remove_reaction_genes_removed, discard_fake_enzymes, remove_reaction_missing_species)
+      Utils.add_model_note (model, filter_species, filter_reactions, filter_genes, filter_gene_complexes, remove_reaction_genes_removed, discard_fake_enzymes, remove_reaction_missing_species, removing_enzyme_removes_complex)
       
       if filter_species is None:
         filter_species = []
@@ -245,7 +245,7 @@ class GEMtractor:
               for g in current_genes:
                 # ~ print (g.get_id())
                 # ~ print (g.genes)
-                if g.get_id () not in filter_genes and g.get_id () not in filter_gene_complexes and not g.contains_one_of (filter_genes):
+                if g.get_id () not in filter_genes and g.get_id () not in filter_gene_complexes and not (removing_enzyme_removes_complex and g.contains_one_of (filter_genes)):
                   # ~ print (g.get_id() + " will be in model")
                   final_genes.append (g)
               

@@ -566,6 +566,35 @@ class ApiTest(TestCase):
       
       
       
+      response = self.client.post('/api/execute', json.dumps({
+          "export": {
+            "network_type":"en",
+            "network_format":"dot",
+            "removing_enzyme_removes_complex": False
+          },
+          "filter": {
+            "enzymes": ["a"],
+          },
+          "file": model
+          }),content_type="application/json")
+      self.assertEqual(response.status_code, 200)
+      c = response.content.decode("utf-8")
+      self.assertEqual (c.count ("label="), 12)
+      
+      response = self.client.post('/api/execute', json.dumps({
+          "export": {
+            "network_type":"en",
+            "network_format":"dot",
+            "removing_enzyme_removes_complex": True
+          },
+          "filter": {
+            "enzymes": ["a"],
+          },
+          "file": model
+          }),content_type="application/json")
+      self.assertEqual(response.status_code, 200)
+      c = response.content.decode("utf-8")
+      self.assertEqual (c.count ("label="), 10)
       
     
   

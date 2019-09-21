@@ -133,7 +133,7 @@ def export(request):
   context = __prepare_context (request)
   context['error'] = False
   
-  context['form'] = ExportForm(initial={'network_type':'en','remove_reaction_genes_removed': True, 'remove_reaction_missing_species': False,'network_format': 'sbml'})
+  context['form'] = ExportForm(initial={'network_type':'en','remove_reaction_genes_removed': True, 'remove_reaction_missing_species': False,'discard_fake_enzymes': False, 'removing_enzyme_removes_complex': True, 'network_format': 'sbml'})
   context["NEXT_l"] = False
   context["PREV_s"] = "Step 2"
   context["PREV_t"] = "Trim the Model"
