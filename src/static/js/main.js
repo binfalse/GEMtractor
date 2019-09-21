@@ -224,7 +224,7 @@ function updateNetwork () {
 				$("#" + item.DOM).addClass ("filter-inconsistent");
         var info = "";
         if (!occ && !occ2)
-          info += " this reaction is not catalysed anymore... "
+          info += " this reaction is not catalyzed anymore... "
         if (occ3)
           info += " some species consumed by this reaction were removed... "
         if (occ3)
