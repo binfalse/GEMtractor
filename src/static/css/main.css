@@ -151,3 +151,10 @@ td, th {
   width:100%;
   height:200px;
 }
+.learn-image {
+  width: 100%;
+  text-align: center;
+}
+.learn-image-network {
+  max-width: 400px;
+}

@@ -60,13 +60,45 @@ Learn
   </div>
   
 	<div class="w3-padding w3-card w3-white learn-entry">
-		<div class=" anchor-heading">
-			<a name="enzyme-reaction-diff" id="enzyme-reaction-diff"></a>
-			<h3>What's the difference between enzyme-centric and reaction-centric?</h3>
-		</div>
-		<p>
-		  see #105
-		</p>
+	  <div class=" anchor-heading">
+		  <a name="enzyme-reaction-diff" id="enzyme-reaction-diff"></a>
+		  <h3>What's the difference between an Enzyme-centric and a Reaction-centric Network?</h3>
+	  </div>
+	  <p>
+	    Let's have a look at the following <em>Metabolite-Reaction Network,</em> which is a <em><a href="https://en.wikipedia.org/wiki/Multipartite_graph">tripartite graph</a></em> consisting of tree types of nodes: Six metabolites (<code>A</code>, <code>B</code>, <code>C</code>, <code>D</code>, <code>E</code>, and <code>F</code>) interact in four reactions (<code>r</code>, <code>s</code>, <code>t</code>, and <code>u</code>) that are catalyzed by six enzymes or enzyme complexes (<code>L</code>, <code>M</code>, <code>N</code>, <code>P+O</code>, <code>Q</code>, and <code>Q+R</code>):  
+	  </p>
+	  <div class="learn-image">
+            <img src="{% static 'pics/sbgn/mr-network-example.png' %}" class="w3-image w3-padding learn-image-network" alt="Example of a Metabolite-Reaction Network">
+	  </div>
+	  <p>
+	    Here for example, the reaction <code>r</code> transforms <code>A</code> into <code>B</code> and this process is catalyzed by the enzyme <code>L</code>.
+	    Similarly, <code>s</code> consumes <code>A</code> and <code>B</code> to produce <code>C</code>.
+	    This reaction <code>s</code> is catalyzed by <code>L</code> or <code>M</code> or <code>Q+R</code>.
+	  </p>
+	  <p>From this <em>Metabolite-Reaction Network</em> we can extract the <em>Reaction-centric Network</em>, which is a <em>unipartite graph</em> &mdash; all its nodes are of the same type:</p>
+	  <div class="learn-image">
+            <img src="{% static 'pics/sbgn/rc-network-example.png' %}" class="w3-image w3-padding learn-image-network" alt="Example of a Reaction-centric Network">
+	  </div>
+	  <p>
+	    Here, an arrow between two reactions indicates, that there is at least one species which is produced by the source of the arrow and consumed by the target of the arrow.	    
+	    For example, <code>s</code> is linked to <code>t</code>, because <code>s</code> produces a metabolite (<code>C</code>) that is consumed by <code>t</code>.
+	    And similarly, every reaction that produces <code>D</code> (<code>r</code> and <code>u</code>) is linked to every reaction that consumes <code>D</code> (<code>t</code>), resulting in the two edges <code>r&#8594;t</code> and <code>u&#8594;t</code>.
+	  </p>
+	  <p>Furthermore, we can extract the <em>Enzyme-centric Network</em>, which is again a <em>unipartite graph</em> as its nodes represent enzymes:</p>
+	  <div class="learn-image">
+            <img src="{% static 'pics/sbgn/ec-network-example.png' %}" class="w3-image w3-padding learn-image-network" alt="Example of an Enzyme-centric Network">
+	  </div>
+	  <p>
+	    Based on the <em>Reaction-centric Network</em> every node and its edges is cloned according to the alternative enzymes that catalyze the corresponding reaction.
+	    For example, <code>s</code> is linked from <code>u</code> and is linked to <code>t</code>.
+	    As <code>s</code> is catalyzed by <code>L</code> or <code>M</code> or <code>Q+R</code>, it is unfolded into three nodes, each receiving a link from <code>u</code> and a link to <code>t</code>.
+	    The reaction <code>t</code> is catalyzed by <code>N</code> exclusively, so it's basically just replaced.
+	    Eventually, we'll find a link from each of <code>L</code>, <code>M</code>, and <code>Q+R</code> to <code>N</code>.
+	  </p>
+	  <p>
+	    Did you notice, that the topology of the <em>Enzyme-centric Network</em> differs a lot from the topology of the <em>Reaction-centric Network</em>?
+	    We think it's worth analyzing that :)
+	  </p>
 	</div>
 	
 	<div class="w3-padding w3-card w3-white learn-entry">
@@ -474,126 +506,131 @@ Learn
 		</p>
 		<p>
 		  However, there are some sommon pitfalls.
-		  Let's for example have a look at the following Metabolite-Reaction Network<div id="wrong-directions-example" class="learn-graph"></div>
+		  Let's for example have a look at the following Metabolite-Reaction Network
+		  <div id="wrong-directions-example" class="learn-graph"></div>
 		  <script>
-		  var cy = cytoscape({
-  container: document.getElementById('wrong-directions-example'),
-  elements: [ // list of graph elements to start with
-    { data: { id: 'A' } },
-    { data: { id: 'B' } },
-    { data: { id: 'C' } },
-    { data: { id: 'r', source: 'A', target: 'B', label: 'r' } },
-    { data: { id: 's', source: 'C', target: 'B', label: 's' } }
-  ],
+		    var cy = cytoscape({
+		      container: document.getElementById('wrong-directions-example'),
+		      elements: [ // list of graph elements to start with
+			{ data: { id: 'A' } },
+			{ data: { id: 'B' } },
+			{ data: { id: 'C' } },
+			{ data: { id: 'r', source: 'A', target: 'B', label: 'r' } },
+			{ data: { id: 's', source: 'C', target: 'B', label: 's' } }
+		      ],
 
-  style: [ // the stylesheet for the graph
-    {
-      selector: 'node',
-      style: {
-        'background-color': '#666',
-        'label': 'data(id)'
-      }
-    },
-
-    {
-      selector: 'edge',
-      style: {
-	'label': 'data(label)',
-        'width': 3,
-	'text-margin-y': -10,
-        'line-color': '#ccc',
-        'target-arrow-color': '#ccc',
-	'curve-style': 'bezier',
-        'target-arrow-shape': 'triangle'
-      }
-    }
-  ],
-  layout: {
-    name: 'grid',
-    rows: 1
-  }
-});</script>
+		      style: [
+			{
+			  selector: 'node',
+			  style: {
+			    'background-color': '#666',
+			    'label': 'data(id)'
+			  }
+			},
+			{
+			  selector: 'edge',
+			  style: {
+			    'label': 'data(label)',
+			    'width': 3,
+			    'text-margin-y': -10,
+			    'line-color': '#ccc',
+			    'target-arrow-color': '#ccc',
+			    'curve-style': 'bezier',
+			    'target-arrow-shape': 'triangle'
+			  }
+			}
+		      ],
+		      layout: {
+			name: 'grid',
+			rows: 1
+		      }
+		    });
+		  </script>
 		  which encodes for a reaction <code>r</code> that consumes <code>A</code> and produces <code>B</code>, and another reaction <code>s</code> that consumes <code>C</code> and produces <code>B</code>.
 		  Given this network, you could anticipate, that the reaction-centric network contains no edges.
 		  However, the SBML code may define <code>s</code> to be <em>reversible</em>!
 		  This may only be defined implicitely: In SBML prior to level 3 all reactions are in fact reversible, unless explicitly defined otherwise.
-		  Thus, the actual network encoded in the model will look like this:<div id="wrong-directions-example2" class="learn-graph"></div>
+		  Thus, the actual network encoded in the model will look like this:
+		  <div id="wrong-directions-example2" class="learn-graph"></div>
 		  <script>
-		  var cy = cytoscape({
-  container: document.getElementById('wrong-directions-example2'),
-  elements: [ // list of graph elements to start with
-    { data: { id: 'A' } },
-    { data: { id: 'B' } },
-    { data: { id: 'C' } },
-    { data: { id: 'r', source: 'A', target: 'B', label: 'r' } },
-    { data: { id: 's', source: 'C', target: 'B', label: 's' } },
-    { data: { id: 's2', source: 'B', target: 'C', label: 's' } }
-  ],
+		    var cy = cytoscape({
+		      container: document.getElementById('wrong-directions-example2'),
+		      elements: [ // list of graph elements to start with
+			{ data: { id: 'A' } },
+			{ data: { id: 'B' } },
+			{ data: { id: 'C' } },
+			{ data: { id: 'r', source: 'A', target: 'B', label: 'r' } },
+			{ data: { id: 's', source: 'C', target: 'B', label: 's' } },
+			{ data: { id: 's2', source: 'B', target: 'C', label: 's' } }
+		      ],
 
-  style: [ // the stylesheet for the graph
-    {
-      selector: 'node',
-      style: {
-        'background-color': '#666',
-        'label': 'data(id)'
-      }
-    },
+		      style: [ // the stylesheet for the graph
+			{
+			  selector: 'node',
+			  style: {
+			    'background-color': '#666',
+			    'label': 'data(id)'
+			  }
+			},
 
-    {
-      selector: 'edge',
-      style: {
-	'label': 'data(label)',
-        'width': 3,
-	'text-margin-y': -10,
-        'line-color': '#ccc',
-        'target-arrow-color': '#ccc',
-	'curve-style': 'bezier',
-        'target-arrow-shape': 'triangle'
-      }
-    }
-  ],
-  layout: {
-    name: 'grid',
-    rows: 1
-  }
-});</script>
-And suddenly, there is an edge in the reaction-centric network:<div id="wrong-directions-example3" class="learn-graph"></div>
+			{
+			  selector: 'edge',
+			  style: {
+			    'label': 'data(label)',
+			    'width': 3,
+			    'text-margin-y': -10,
+			    'line-color': '#ccc',
+			    'target-arrow-color': '#ccc',
+			    'curve-style': 'bezier',
+			    'target-arrow-shape': 'triangle'
+			  }
+			}
+		      ],
+		      layout: {
+			name: 'grid',
+			rows: 1
+		      }
+		    });
+		  </script>
+		  And suddenly, there is an edge in the reaction-centric network:
+		  <div id="wrong-directions-example3" class="learn-graph"></div>
 		  <script>
-		  var cy = cytoscape({
-  container: document.getElementById('wrong-directions-example3'),
-  elements: [ // list of graph elements to start with
-    { data: { id: 'r' } },
-    { data: { id: 's' } },
-    { data: { id: 'x', source: 'r', target: 's' } }
-  ],
+		    var cy = cytoscape({
+		      container: document.getElementById('wrong-directions-example3'),
+		      elements: [ // list of graph elements to start with
+			{ data: { id: 'r' } },
+			{ data: { id: 's' } },
+			{ data: { id: 'x', source: 'r', target: 's' } }
+		      ],
 
-  style: [ // the stylesheet for the graph
-    {
-      selector: 'node',
-      style: {
-        'background-color': '#666',
-        'label': 'data(id)'
-      }
-    },
+		      style: [ // the stylesheet for the graph
+			{
+			  selector: 'node',
+			  style: {
+			    'background-color': '#666',
+			    'label': 'data(id)'
+			  }
+			},
 
-    {
-      selector: 'edge',
-      style: {
-        'width': 3,
-	'text-margin-y': -10,
-        'line-color': '#ccc',
-        'target-arrow-color': '#ccc',
-	'curve-style': 'bezier',
-        'target-arrow-shape': 'triangle'
-      }
-    }
-  ],
-  layout: {
-    name: 'grid',
-    rows: 1
-  }
-});</script>
-The same also applies to enzyme-centric networks.
+			{
+			  selector: 'edge',
+			  style: {
+			    'width': 3,
+			    'text-margin-y': -10,
+			    'line-color': '#ccc',
+			    'target-arrow-color': '#ccc',
+			    'curve-style': 'bezier',
+			    'target-arrow-shape': 'triangle'
+			  }
+			}
+		      ],
+		      layout: {
+			name: 'grid',
+			rows: 1
+		      }
+		    });
+		  </script>
+		  The same also applies to enzyme-centric networks.
 		</p>
 	</div>
 	
