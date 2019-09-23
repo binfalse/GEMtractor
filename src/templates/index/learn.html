@@ -480,19 +480,51 @@ Learn
 			<h3>What are the different export options?</h3>
 		</div>
 		<p>
-		  You can extract GEMtracted result you  options to 
-		  those are the options....
-		  TODO:
-		  explain difference between the types "reaction network" and "enzyme network"
-		  explain formats
-		  and strange check boxes
-		  also explain that it may take some seconds to generate the desired file
-		  also explain that there may be ghost species
+		  When you're done trimming the model, you can export the resulting network in three different flavors:
+		  <ul>
+		    <li>The <strong>Enzyme-centric Network</strong> is a unipartite graph. Every node represents an enzyme and every edge indicates, that the source of the edge catalyzes a reactions, which produces a metabolite that is consumed by another reaction catalyzed by the target of the edge.</li>
+		    <li>The <strong>Reaction-centric Network</strong> is a unipartite graph of reactions and their interactions. Two reactions are linked, if the source produced a metabolite that is consumed by the target of the edge.</li>
+		    <li>The <strong>Metabolite-Reaction Network</strong> is a tripartite graph, that includes metabolites, reactions, and enzymes and their interactions.</li>
+		  </ul>
+		  See also <a href="#enzyme-reaction-diff">What's the difference between an Enzyme-centric and a Reaction-centric Network?</a>
 		</p>
 		<p>
-		  keep the following things in mind:
-		  * if you export EN as SBML, the GEMtractor will implicitely create "reactions", which are not really existent... they just indicate links between genes, and thus every reactions consumes exactly one gene and produces exactly one gene.
-		  * filter for sub-complexes
+		  You can export each flavor in different formats:
+		  <ul>
+		    <li>
+		      <strong>SBML</strong> &mdash; a standard format for computer models of biological processes.
+		      SBML is the only format that allows for proper annotations of entities.
+		      By design, SBML is bipartite.
+		      Thus, for the unipartite networks (Enzyme-centric and Reaction-centric) the GEMtractor needs to <em>invent fake-reactions</em> to link two nodes.
+		      These fake reactions have exactly one input and one output.
+		      However, if it's mandatory to receive a unipartite network and you don't need the annotation, you should go for one of the other formats.
+		      See also <a href="http://sbml.org/Main_Page">sbml.org</a>
+		    </li>
+		    <li><strong>GraphML</strong> &mdash; a graph format based on XML. In addition to the core network descriptions, the GEMtractor attaches a shape, a label, and a type to the nodes in the nodes in the graph. See also <a href=""></a></li>
+		    <li><strong>DOT</strong> &mdash; a graph description language with a simple syntax and many converters and tool support. See also <a href="https://en.wikipedia.org/wiki/DOT_(graph_description_language)">Wikipedia:DOT</a></li>
+		    <li><strong>GML</strong> &mdash; a graph description language with a simple syntax. See also <a href="https://en.wikipedia.org/wiki/Graph_Modelling_Language">Wikipedia:GML</a></li>
+		    <li><strong>CSV</strong> &mdash; comma separated values. This just lists the edges' sources and targets, separated with a comma :)</li>
+		  </ul>
+		  Which export works best for you? That depends on your applications..
+		  For example, if you want to analyze the model's behavior, you're probably well-advised with SBML and some simulation tool such as <a href="http://copasi.org/">COPASI</a>.
+		  If you instead want to study the network's topology, you may go with the GML export and <a href="https://cytoscape.org/">Cytoscape</a>.
+		  To quickly generate visualizations of the network, the DOT format will be your choice. Just compile it with e.g. <a href="http://graphviz.org/">dot, neato, twopi or circo</a>.
+		  To visualize the network in the browser, we can recommend GraphML together with <a href="http://js.cytoscape.org/">Cytoscape.js</a>.
+		  And if you just want to count the connections or some other simple statistics, you would go for the CSV file.
+		</p>
+		<p>
+		  A few more export options provide control over inconsistencies in the trimmed graph:
+		  <ul>
+		    <li><strong>Remove reactions, whose enzymes were all removed:</strong> </li>
+		    <li><strong>Remove ghost species:</strong> </li>
+		    <li><strong>Discard fake enzymes:</strong> </li>
+		    <li><strong>Remove reactions, in which at least one species was removed:</strong> </li>
+		    <li><strong>Removing an enzyme removes all complexes in which it participates:</strong> </li>
+		  </ul>
+		</p>
+		<p>
+		  Please note, that it may take a few seconds (sometimes minutes) to generate the different output files, depending on the size of your model.
+		  So don't get nervous &mdash; the click will return! (Sometimes even with an error ;-)
 		</p>
 	</div>
 	
