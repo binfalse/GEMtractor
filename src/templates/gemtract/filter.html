@@ -69,7 +69,7 @@
 
     <div id="filter-tables" class="w3-margin">
       <div id="filter-species" class="w3-responsive" style="display:none">
-		<p>You may sort the following table by clicking on the header cell.</p>
+		<p>You may sort the following table by clicking on the header cell. Move your mouse over the number of reactions of a species to find out in which reaction it is used.</p>
         <p>A red row indicates, that the corresponding species does not participate in any reaction anymore, so you may want to exclude it as well? If uncheck a species, it will not be removed from the entire model, but it will be removed from all reactions (it may still be used in other entities, such as functions or triggers). However, there may be ghost species afterwards, not participating in any reaction. See also: <a href="{% url 'index:learn' %}#filter-species">What exactly happens when I remove a species during filtering?</a></p>
         <table class="w3-table w3-striped sortable notfirst">
            <thead>
@@ -96,7 +96,7 @@
         </table>
       </div>
       <div id="filter-gene" class="w3-responsive" style="display:none" class="">
-	<p>You may sort the following table by clicking on the header cell.</p>
+	<p>You may sort the following table by clicking on the header cell. Move your mouse over the number of reactions or enzyme complexes in the table to find out where the enzyme is used.</p>
         <p>Unselecting an enzyme will also remove all complexes in which it appears (they will be highlighted in read under the <em>Enzyme Complex</em> tab). A red enzyme indicates, that the enzyme is not used in any reaction anymore. Thus, it will be excluded even if you keep it selected here. See also: <a href="{% url 'index:learn' %}#gene-association">How does the GEMtractor identify genes that are associated to a reaction?</a> and <a href="{% url 'index:learn' %}#filter-gene">What exactly happens when I remove an enzyme during filtering?</a></p>
         <table class="w3-table w3-striped sortable notfirst">
            <thead>
@@ -109,7 +109,7 @@
         </table>
       </div>
       <div id="filter-gene-complex" class="w3-responsive" style="display:none" class="">
-	<p>You may sort the following table by clicking on the header cell.</p>
+	<p>You may sort the following table by clicking on the header cell. Move your mouse over the number of reactions in the table to find out where the enzyme complex is used.</p>
         <p>Unselecting an enzyme complex will <strong>not</strong> remove the individual enzymes appearing in that complex! Other complexes, which are a superset of a removed complex, will be highlighted in red-italics &mdash; move your mouse over the complex' id to learn which sub-complexes are to be removed. If you do not remove those yourself, they are assumed to be still available in the model. See also: <a href="{% url 'index:learn' %}#gene-association">How does the GEMtractor identify genes that are associated to a reaction?</a> and <a href="{% url 'index:learn' %}#enzyme-complex">What is an enzyme complex?</a> and <a href="{% url 'index:learn' %}#filter-enzyme-complex">What exactly happens when I remove an enzyme complex during filtering?</a></p>
         <table class="w3-table w3-striped sortable notfirst">
            <thead>
