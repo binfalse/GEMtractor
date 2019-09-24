@@ -27,5 +27,13 @@ Hello
 <p>
   If you dare to harvest your models, click <a href="{% url 'gemtract:index' %}">Start</a> from the top panel.
 </p>
-
+<p id="mobile-warning" style="display:none">
+  You seem to be using a mobile device? <strong>Please be aware, that there may be quite some data shipped through the network.</strong>
+  So be careful on metered connections!
+</p>
+<script>
+if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.screen.width < 1000) {
+  $("#mobile-warning").show();
+}
+</script>
 {% endblock %}
