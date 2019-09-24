@@ -24,7 +24,8 @@ from libsbml import FbcAssociation_parseFbcInfixAssociation, SBMLReader
 from .network.gene import Gene
 from .network.genecomplex import GeneComplex
 from .network.network import Network
-from .utils import BreakLoops, InvalidGeneExpression, Utils
+from .utils import Utils
+from .exceptions import BreakLoops, InvalidGeneExpression
 
 
 class GEMtractor:

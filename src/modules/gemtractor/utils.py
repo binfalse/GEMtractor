@@ -27,16 +27,8 @@ from django.conf import settings
 from django.http import HttpResponse
 
 from .constants import Constants
+from .exceptions import UnableToRetrieveBiomodel, InvalidBiomodelsId, InvalidBiggId
 
-
-class InvalidBiggId (Exception): pass
-class InvalidBiomodelsId (Exception): pass
-class UnableToRetrieveBiomodel (Exception): pass
-class BreakLoops (Exception): pass
-class NotYetImplemented (Exception): pass
-class InvalidGeneExpression (Exception): pass
-class InvalidGeneComplexExpression (Exception): pass
-class TooBigForBrowser (Exception): pass
 
 class Utils:
   

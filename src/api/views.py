@@ -30,10 +30,11 @@ from libsbml import SBMLWriter
 from gemtract.forms import ExportForm
 from modules.gemtractor.constants import Constants
 from modules.gemtractor.gemtractor import GEMtractor
-from modules.gemtractor.utils import (InvalidBiggId, InvalidBiomodelsId,
+from modules.gemtractor.utils import Utils
+from modules.gemtractor.exceptions import (InvalidBiggId, InvalidBiomodelsId,
                                       InvalidGeneComplexExpression,
                                       InvalidGeneExpression, TooBigForBrowser,
-                                      UnableToRetrieveBiomodel, Utils)
+                                      UnableToRetrieveBiomodel)
 
 logging.config.dictConfig(settings.LOGGING)
 __logger = logging.getLogger(__name__)
