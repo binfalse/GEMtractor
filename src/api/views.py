@@ -99,7 +99,7 @@ def get_network (request):
           filter_enzyme_complexes = request.session[Constants.SESSION_FILTER_ENZYME_COMPLEXES]
       __logger.info ("sending response")
       if len (network.species) + len (network.reactions) + len (network.genes) + len (network.gene_complexes) > settings.MAX_ENTITIES_FILTER:
-        raise TooBigForBrowser ("This model is probably too big for your browser... It contains "+str (len (network.species))+" species, "+str (len (network.reactions))+" reactions and "+str (len (network.genenet))+" gene combinations. We won't load it for filtering, as you're browser is very likely to die when trying to process that amount of data.. Max is currently set to "+str (settings.MAX_ENTITIES_FILTER)+" entities in total. Please export it w/o filtering or use the API instead.")
+        raise TooBigForBrowser ("This model is probably too big for your browser... It contains "+str (len (network.species))+" species, "+str (len (network.reactions))+" reactions, "+str (len (network.genes))+" genes, and "+str (len (network.gene_complexes))+" gene complexes. We won't load it for filtering, as you're browser is very likely to die when trying to process that amount of data.. Max is currently set to "+str (settings.MAX_ENTITIES_FILTER)+" entities in total. Please export it w/o filtering or use the API instead.")
       net = network.serialize()
       __logger.info ("serialised the network")
       return JsonResponse ({
