@@ -205,17 +205,13 @@ def parse_env_var (key, default):
     if the value is <= 0, it will return infinity
     if the environment doesn't contain such a variable, it will return default
     
-    Parameters
-    ----------
-    key : str
-        the os' envirenment variable to evaluate
-    default : int
-        the default to return if the variable is not set
+    :param key: the os' envirenment variable to evaluate
+    :param default: the default to return if the variable is not set
+    :type key: str
+    :type default: int
 
-    Returns
-    -------
-    int
-        the os' environment variable, or default, or infinity (if var <= 0)
+    :return: the os' environment variable, or default, or infinity (if value <= 0)
+    :rtype: int
   """
   val = float (os.getenv(key, default))
   if val <= 0:

@@ -40,7 +40,7 @@ class GEMtractorTests (TestCase):
         self.assertTrue ("modelname" in sbml.getModel ().getName ()) 
         self.assertTrue ("modelid" in sbml.getModel ().getId ())
         
-        net = gemtractor.extract_network_from_sbml (sbml)
+        net = gemtractor.extract_network_from_sbml ()
         self.assertEqual (len (net.species), 3)
         self.assertEqual (len (net.reactions), 3)
         
@@ -68,7 +68,7 @@ class GEMtractorTests (TestCase):
         self.assertTrue ("modelname" in sbml.getModel ().getName ()) 
         self.assertTrue ("modelid" in sbml.getModel ().getId ())
         
-        net = gemtractor.extract_network_from_sbml (sbml)
+        net = gemtractor.extract_network_from_sbml ()
         self.assertEqual (len (net.species), 3)
         self.assertEqual (len (net.reactions), 3)
         
@@ -97,7 +97,7 @@ class GEMtractorTests (TestCase):
         self.assertTrue ("modelname" in sbml.getModel ().getName ()) 
         self.assertTrue ("modelid" in sbml.getModel ().getId ())
         
-        net = gemtractor.extract_network_from_sbml (sbml)
+        net = gemtractor.extract_network_from_sbml ()
         self.assertEqual (len (net.species), 3)
         self.assertEqual (len (net.reactions), 3)
         
@@ -130,7 +130,7 @@ class GEMtractorTests (TestCase):
         self.assertTrue ("modelid" in sbml.getModel ().getName ()) 
         self.assertTrue ("modelid" in sbml.getModel ().getId ())
         
-        net = gemtractor.extract_network_from_sbml (sbml)
+        net = gemtractor.extract_network_from_sbml ()
         self.assertEqual (len (net.species), 3)
         self.assertEqual (len (net.reactions), 3)
         
@@ -152,7 +152,7 @@ class GEMtractorTests (TestCase):
         sbml = gemtractor.get_sbml (filter_species = ["b"], remove_reaction_missing_species = False)
         self.assertEqual (sbml.getNumErrors(), 0)
         
-        net = gemtractor.extract_network_from_sbml (sbml)
+        net = gemtractor.extract_network_from_sbml ()
         self.assertEqual (len (net.species), 3)
         self.assertEqual (len (net.reactions), 3)
         
@@ -163,7 +163,7 @@ class GEMtractorTests (TestCase):
         sbml = gemtractor.get_sbml (filter_species = ["a", "b"])
         self.assertEqual (sbml.getNumErrors(), 0)
         
-        net = gemtractor.extract_network_from_sbml (sbml)
+        net = gemtractor.extract_network_from_sbml ()
         self.assertEqual (len (net.species), 3)
         self.assertEqual (len (net.reactions), 2)
         
@@ -174,7 +174,7 @@ class GEMtractorTests (TestCase):
         sbml = gemtractor.get_sbml (filter_species = ["a", "c"], remove_reaction_missing_species = True)
         self.assertEqual (sbml.getNumErrors(), 0)
         
-        net = gemtractor.extract_network_from_sbml (sbml)
+        net = gemtractor.extract_network_from_sbml ()
         self.assertEqual (len (net.species), 3)
         self.assertEqual (len (net.reactions), 2)
         
@@ -185,7 +185,7 @@ class GEMtractorTests (TestCase):
         sbml = gemtractor.get_sbml (filter_species = ["a", "c"], filter_reactions = ["r3"], remove_reaction_missing_species = True)
         self.assertEqual (sbml.getNumErrors(), 0)
         
-        net = gemtractor.extract_network_from_sbml (sbml)
+        net = gemtractor.extract_network_from_sbml ()
         self.assertEqual (len (net.species), 3)
         self.assertEqual (len (net.reactions), 1)
         
@@ -196,7 +196,7 @@ class GEMtractorTests (TestCase):
         sbml = gemtractor.get_sbml (filter_genes = ["x", "y"])
         self.assertEqual (sbml.getNumErrors(), 0)
         
-        net = gemtractor.extract_network_from_sbml (sbml)
+        net = gemtractor.extract_network_from_sbml ()
         self.assertEqual (len (net.species), 3)
         self.assertEqual (len (net.reactions), 1)
         
@@ -207,7 +207,7 @@ class GEMtractorTests (TestCase):
         sbml = gemtractor.get_sbml (filter_genes = ["x", "y"], remove_reaction_enzymes_removed = False)
         self.assertEqual (sbml.getNumErrors(), 0)
         
-        net = gemtractor.extract_network_from_sbml (sbml)
+        net = gemtractor.extract_network_from_sbml ()
         self.assertEqual (len (net.species), 3)
         self.assertEqual (len (net.reactions), 3)
         
@@ -220,7 +220,7 @@ class GEMtractorTests (TestCase):
         sbml = gemtractor.get_sbml ()
         self.assertEqual (sbml.getNumErrors(), 0)
         
-        net = gemtractor.extract_network_from_sbml (sbml)
+        net = gemtractor.extract_network_from_sbml ()
         self.assertEqual (len (net.species), 3)
         self.assertEqual (len (net.reactions), 3)
         

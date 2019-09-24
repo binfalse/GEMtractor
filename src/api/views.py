@@ -339,7 +339,7 @@ def export (request):
     
     if form.cleaned_data['network_type'] == 'en':
       file_name = file_name + "-EnzymeNetwork"
-      net = gemtractor.extract_network_from_sbml (sbml)
+      net = gemtractor.extract_network_from_sbml ()
       net.calc_genenet ()
       if form.cleaned_data['network_format'] == 'sbml':
         file_name = file_name + ".sbml"
@@ -395,7 +395,7 @@ def export (request):
           return JsonResponse ({"status":"failed","error":"invalid format"})
     elif form.cleaned_data['network_type'] == 'rn':
       file_name = file_name + "-ReactionNetwork"
-      net = gemtractor.extract_network_from_sbml (sbml)
+      net = gemtractor.extract_network_from_sbml ()
       net.calc_reaction_net ()
       if form.cleaned_data['network_format'] == 'sbml':
         file_name = file_name + ".sbml"
@@ -460,7 +460,7 @@ def export (request):
         else:
           return JsonResponse ({"status":"failed","error":"error generating file"})
       else:
-        net = gemtractor.extract_network_from_sbml (sbml)
+        net = gemtractor.extract_network_from_sbml ()
         if form.cleaned_data['network_format'] == 'dot':
           file_name = file_name + ".dot"
           file_path = Utils.create_generated_file_web (request.session.session_key)
@@ -584,7 +584,7 @@ def execute (request):
   
   
   if export["network_type"] == "en":
-    net = gemtractor.extract_network_from_sbml (sbml)
+    net = gemtractor.extract_network_from_sbml ()
     net.calc_genenet ()
     if export["network_format"] == "sbml":
       net.export_en_sbml (outputFile.name, gemtractor, sbml.getModel ().getId (), sbml.getModel ().getName (), 
@@ -626,7 +626,7 @@ def execute (request):
       else:
         return HttpResponseServerError ("couldn't generate the csv file")
   elif export["network_type"] == "rn":
-    net = gemtractor.extract_network_from_sbml (sbml)
+    net = gemtractor.extract_network_from_sbml ()
     net.calc_reaction_net ()
     if export["network_format"] == "sbml":
       net.export_rn_sbml (outputFile.name, gemtractor, sbml.getModel ().getId () + "_RN", sbml.getModel ().getName () + " converted to ReactionNetwork",
@@ -675,7 +675,7 @@ def execute (request):
       else:
         return HttpResponseServerError ("couldn't generate the sbml file")
     else:
-      net = gemtractor.extract_network_from_sbml (sbml)
+      net = gemtractor.extract_network_from_sbml ()
       if export["network_format"] == "dot":
         net.export_mn_dot (outputFile.name)
         if os.path.exists(outputFile.name):
