@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/1.11/ref/settings/
 
 import math
 import os
+import uuid
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -22,8 +23,12 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # SECURITY WARNING: keep the secret key used in production secret!
 # SECRET_KEY = '!6qdx@dba$w9uh(6efjcnm_!gblg9i5_d^r&#8btxo=0na$b&)'
-with open('secret_key.txt') as f:
-    SECRET_KEY = f.read().strip()
+SECRET_KEY = str (uuid.uuid4())
+if os.path.isfile('secret_key.txt'):
+    with open('secret_key.txt') as f:
+        SECRET_KEY = f.read().strip()
+# else:
+    # SECRET_KEY = str (uuid.uuid4())
 
 # SECURITY WARNING: don't run with debug turned on in production!
 # TODO

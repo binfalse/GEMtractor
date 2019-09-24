@@ -23,7 +23,8 @@ import pyparsing as pp
 from django.test import TestCase
 
 from modules.gemtractor.gemtractor import GEMtractor
-from modules.gemtractor.network import Gene, GeneComplex
+from modules.gemtractor.network.gene import Gene
+from modules.gemtractor.network.genecomplex import GeneComplex
 from modules.gemtractor.utils import InvalidGeneExpression
 
 

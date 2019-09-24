@@ -17,7 +17,10 @@
 
 from django.test import TestCase
 
-from modules.gemtractor.network import Gene, Network, Reaction, Species
+from modules.gemtractor.network.gene import Gene
+from modules.gemtractor.network.network import Network
+from modules.gemtractor.network.reaction import Reaction
+from modules.gemtractor.network.species import Species
 
 # there are also many tests in GemtractorTests
 

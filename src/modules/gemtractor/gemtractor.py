@@ -21,15 +21,11 @@ import re
 import pyparsing as pp
 from libsbml import FbcAssociation_parseFbcInfixAssociation, SBMLReader
 
-from .network import Gene, GeneComplex, Network
+from .network.gene import Gene
+from .network.genecomplex import GeneComplex
+from .network.network import Network
 from .utils import BreakLoops, InvalidGeneExpression, Utils
 
-# assumptions:
-# * gene logic is stored per reaction in reaction->notes->html as "<p>GENE_ASSOCIATION: ....</p>"
-# * GENE_ASSOCIATION to lower _only_ changes char cases (not logic) -aka- gene names are basically case insensitive
-# * AND has priority over OR -> a or b and c == a or (b and c) -> better use parentheses to make sure!
-# * you know that ((a and b) and c) is the same as (a and (b and c)) etc... we don't care about the ordering, if you care you need to post process the results
-# * there is no list of modifiers
 
 class GEMtractor:
     """class to filter and extract protein-protein-interaction-networks from chemical reaction networks"""
