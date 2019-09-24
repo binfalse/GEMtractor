@@ -15,14 +15,17 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 
-from modules.gemtractor.gemtractor import GEMtractor
-from django.test import TestCase
 import os
 import tempfile
-import pyparsing as pp
-from modules.gemtractor.utils import InvalidGeneExpression
-from modules.gemtractor.network import Gene, GeneComplex
 from xml.dom import minidom
+
+import pyparsing as pp
+from django.test import TestCase
+
+from modules.gemtractor.gemtractor import GEMtractor
+from modules.gemtractor.network import Gene, GeneComplex
+from modules.gemtractor.utils import InvalidGeneExpression
+
 
 class GEMtractorTests (TestCase):
   def test_sbml_filter1 (self):

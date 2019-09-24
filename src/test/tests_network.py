@@ -15,8 +15,9 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 
-from modules.gemtractor.network import Species, Reaction, Network, Gene
 from django.test import TestCase
+
+from modules.gemtractor.network import Gene, Network, Reaction, Species
 
 # there are also many tests in GemtractorTests
 
@@ -167,7 +168,3 @@ class NetworkTests (TestCase):
     
     self.assertEqual (len (s1.occurence), 2)
     self.assertEqual (len (s2.occurence), 1)
-    
-    
-    
-    

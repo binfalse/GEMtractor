@@ -25,4 +25,3 @@ class ExportForm (forms.Form):
       cleaned_data = super().clean()
       if cleaned_data.get("network_type") == "en":
         cleaned_data["remove_reaction_enzymes_removed"] = True;
-      

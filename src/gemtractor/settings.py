@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/1.11/ref/settings/
 """
 
+import math
 import os
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -191,7 +192,6 @@ LOGGING = {
 STORAGE = os.getenv('STORAGE_DIR', "/tmp/gemtractor-storage/")
 
 
-import math
 def parse_env_var (key, default):
   """
     parse some environment variable.
@@ -242,4 +242,3 @@ URLS_BIOMODEL_SBML = lambda model_id, filename: "https://www.ebi.ac.uk/biomodels
 
 # what's the max number of entities to allow in the browser
 MAX_ENTITIES_FILTER = parse_env_var ('MAX_ENTITIES_FILTER', 100000)
-

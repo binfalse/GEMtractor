@@ -14,12 +14,14 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-from libsbml import SBMLReader, FbcAssociation_parseFbcInfixAssociation
-import re
-import pyparsing as pp
 import logging
-from .network import Network, Gene, GeneComplex
 import math
+import re
+
+import pyparsing as pp
+from libsbml import FbcAssociation_parseFbcInfixAssociation, SBMLReader
+
+from .network import Gene, GeneComplex, Network
 from .utils import BreakLoops, InvalidGeneExpression, Utils
 
 # assumptions:
@@ -388,5 +390,3 @@ class GEMtractor:
         
       self.__logger.info ("extracted network")
       return network
-
-

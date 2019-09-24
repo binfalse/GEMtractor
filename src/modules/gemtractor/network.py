@@ -15,9 +15,12 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import logging
-from libsbml import SBMLDocument, SBMLWriter, LIBSBML_OPERATION_SUCCESS
-from .utils import Utils
 import re
+
+from libsbml import LIBSBML_OPERATION_SUCCESS, SBMLDocument, SBMLWriter
+
+from .utils import Utils
+
 
 # TODO: logging
 class Species:
@@ -829,4 +832,3 @@ class Network:
             f.write ('"' + gene + '","' + associated.identifier + '"\n')
           for associated in self.gene_complexes[gene].links["gc"]:
             f.write ('"' + gene + '","' + associated.identifier + '"\n')
-      

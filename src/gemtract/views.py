@@ -14,11 +14,15 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-from django.shortcuts import render, redirect, reverse
 import os
-from modules.gemtractor.utils import Utils
+
+from django.shortcuts import redirect, render, reverse
+
 from modules.gemtractor.constants import Constants
+from modules.gemtractor.utils import Utils
+
 from .forms import ExportForm
+
 
 def __prepare_context (request):
   context = {}
@@ -139,4 +143,3 @@ def export(request):
   context["PREV_t"] = "Trim the Model"
   context["PREV_l"] = reverse ('gemtract:filter')
   return render(request, 'gemtract/export.html', context)
-  

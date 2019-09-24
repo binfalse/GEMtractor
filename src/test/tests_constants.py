@@ -15,8 +15,10 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 
-from modules.gemtractor.constants import Constants
 from django.test import TestCase
+
+from modules.gemtractor.constants import Constants
+
 
 class ConstantsTests (TestCase):
   def test_constants (self):

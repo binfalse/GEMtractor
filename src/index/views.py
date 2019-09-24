@@ -14,8 +14,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-from django.shortcuts import render
 from django.conf import settings
+from django.shortcuts import render
+
 
 def index(request):
     context = {}

@@ -14,23 +14,26 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
+import json
+import logging
+import os
+import tempfile
+import urllib
+
 from django.conf import settings
+from django.http import (HttpResponseBadRequest, HttpResponseServerError,
+                         JsonResponse)
 from django.shortcuts import redirect, reverse
 from django.views.decorators.csrf import csrf_exempt
-from django.http import JsonResponse, HttpResponseBadRequest, HttpResponseServerError
-
-from modules.gemtractor.gemtractor import GEMtractor
-from modules.gemtractor.constants import Constants
-from modules.gemtractor.utils import Utils, InvalidGeneExpression, InvalidBiomodelsId, UnableToRetrieveBiomodel, InvalidBiggId, TooBigForBrowser, InvalidGeneComplexExpression
+from libsbml import SBMLWriter
 
 from gemtract.forms import ExportForm
-
-import os
-import json
-import urllib
-import logging
-import tempfile
-from libsbml import SBMLWriter
+from modules.gemtractor.constants import Constants
+from modules.gemtractor.gemtractor import GEMtractor
+from modules.gemtractor.utils import (InvalidBiggId, InvalidBiomodelsId,
+                                      InvalidGeneComplexExpression,
+                                      InvalidGeneExpression, TooBigForBrowser,
+                                      UnableToRetrieveBiomodel, Utils)
 
 logging.config.dictConfig(settings.LOGGING)
 __logger = logging.getLogger(__name__)
@@ -711,4 +714,3 @@ def status (request):
   Utils.cleanup ()
   # TODO bit more information
   return JsonResponse ({"status": "success"})
-  

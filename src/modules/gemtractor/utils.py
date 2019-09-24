@@ -14,17 +14,20 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-from django.conf import settings
-import hashlib
-import time
-import os
 import errno
-import urllib.request
+import hashlib
 import json
-import re
-from .constants import Constants
 import logging
+import os
+import re
+import time
+import urllib.request
+
+from django.conf import settings
 from django.http import HttpResponse
+
+from .constants import Constants
+
 
 class InvalidBiggId (Exception): pass
 class InvalidBiomodelsId (Exception): pass

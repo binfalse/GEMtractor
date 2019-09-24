@@ -14,16 +14,19 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-from django.test import TestCase, Client
-from .forms import ExportForm
-import tempfile
-import os
 import json
+import logging
+import os
+import tempfile
 from xml.dom import minidom
+
+from django.test import Client, TestCase
 from libsbml import SBMLReader
+
 from modules.gemtractor.utils import Utils
 
-import logging
+from .forms import ExportForm
+
 # logging.getLogger(__name__).debug("---->>>>> " + str(j))
 
 

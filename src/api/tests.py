@@ -14,14 +14,16 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-from django.test import TestCase, Client
-from modules.gemtractor.constants import Constants
 import json
+import logging
 import tempfile
-from libsbml import SBMLReader
 from xml.dom import minidom
 
-import logging
+from django.test import Client, TestCase
+from libsbml import SBMLReader
+
+from modules.gemtractor.constants import Constants
+
 # logging.getLogger(__name__).debug("---->>>>> " + str(j))
 
 # Create your tests here.
@@ -654,5 +656,3 @@ class ApiTest(TestCase):
     else:
       self.assertEqual("failed", response.json()["status"], msg = "response was: " + str(response.json()))
       self.assertTrue("error" in response.json(), msg = "response was: " + str(response.json()))
-    
-  

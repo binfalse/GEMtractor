@@ -15,12 +15,15 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 
-from modules.gemtractor.utils import Utils
-from django.test import TestCase
 import os
-import tempfile
-from libsbml import SBMLReader
 import re
+import tempfile
+
+from django.test import TestCase
+from libsbml import SBMLReader
+
+from modules.gemtractor.utils import Utils
+
 
 class UtilsTests (TestCase):
   __regex_species_section_notes = re.compile (r"Filter Species:[^:]*(<ul>[^:]*</ul>)", re.DOTALL)
