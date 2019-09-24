@@ -15,7 +15,7 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 
-from modules.gemtractor.network import Species, Reaction, Network, Gene, GeneComplex
+from modules.gemtractor.network import Species, Reaction, Network, Gene
 from django.test import TestCase
 
 # there are also many tests in GemtractorTests

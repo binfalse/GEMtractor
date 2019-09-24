@@ -18,7 +18,7 @@ from libsbml import SBMLReader, FbcAssociation_parseFbcInfixAssociation
 import re
 import pyparsing as pp
 import logging
-from .network import Network, Reaction, Species, Gene, GeneComplex
+from .network import Network, Gene, GeneComplex
 import math
 from .utils import BreakLoops, InvalidGeneExpression, Utils
 
@@ -358,8 +358,6 @@ class GEMtractor:
         s = model.getSpecies (n)
         species[s.getId ()] = network.add_species (s.getId (), s.getName ())
       
-      # TODO remove debugging
-      max_genes = 0
       for n in range (0, model.getNumReactions()):
         if n % 100 == 0:
           self.__logger.info ("processing reaction " + str (n))
@@ -376,14 +374,8 @@ class GEMtractor:
         if len(current_genes) < 1:
           self.__logger.debug("did not find genes in reaction " + reaction.getId ())
           raise NotImplementedError ("did not find genes in reaction " + reaction.getId ())
-    
-        # TODO!!!
-        # ~ for g in current_genes:
-          # ~ if g not in r.genes:
-            # ~ r.genes.append (g)
         
         network.add_genes (r, current_genes)
-        
         
         for sn in range (0, reaction.getNumReactants()):
           s = reaction.getReactant(sn).getSpecies()
@@ -392,13 +384,6 @@ class GEMtractor:
         for sn in range (0, reaction.getNumProducts()):
           s = reaction.getProduct(sn).getSpecies()
           r.add_output (species[s])
-        
-        
-        
-        # TODO remove debugging
-        # ~ if max_genes < len (current_genes):
-          # ~ print (reaction.getId () + " -- " + str (len (current_genes)))
-          # ~ max_genes = len (current_genes)
       
         
       self.__logger.info ("extracted network")
