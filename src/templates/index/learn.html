@@ -39,6 +39,7 @@ Learn
       <li><a href="#red-enzyme-complex">Why is a certain enzyme complex highlighted in red?</a></li>
       <li><a href="#enzyme-complex">What is an enzyme complex?</a></li>
       <li><a href="#batch-filter">How does the batch filtering work?</a></li>
+      <li><a href="#waiting">Why does it take so long?</a></li>
       <li><a href="#what-currency-metabolites">What are currency metabolites?</a></li>
       <li><a href="#currency-metabolites">How can I discard currency metabolites (such as H<sup>+</sup>, H<sub>2</sub>O or ATP)?</a></li>
       <li><a href="#which-biomodels">How did the GEMtractor select the models from Biomodels?</a></li>
@@ -378,6 +379,45 @@ Learn
 		<p>
 		  The text-field expects four lines, each starting with either <code>species</code>, <code>reactions</code>, <code>enzymes</code>, or <code>enzyme_complexes</code>, followed by a color (<code>:</code>) and the list of comma-separated entity-identifiers.
 		  Applying the batch-filter will send the lists to the backend, where they will stored in your session, and reload the page to update the trimming selection.
+		</p>
+	</div>
+	
+	<div class="w3-padding w3-card w3-white learn-entry">
+		<div class=" anchor-heading">
+			<a name="waiting" id="waiting"></a>
+			<h3>Why does it take so long?</h3>
+		</div>
+		<p>
+		  As GEMs are typically pretty big it takes some time to process them.
+		  We have of course been aware of that when developing the GEMtractor and implemented the modules with a strong focus on efficiency.
+		  And it actually works quite well for most models, but some models cause a significant delay.
+		  Nevertheless, let's have a look into the different delays to give you a feeling about what you're waiting for.
+		  We distinguish the following waiting times:
+		  <ul>
+		    <li><strong>When selecting a model:</strong> (i) If you select a model from BiGG or Biomodels, the GEMtractor need to download the model. Some of those models are extremely big, with up to 200 MB in size! Thus, it takes some time to obtain the model's SBML code &mdash; the model's name in the table is replaced by a loading indicator to let you know that something's happening. (ii) If you upload a model, it may also take some time depending on the size of your model and your internet connection. If this delay is a problem for you, you may want to <a href="#own-gemtractor">run your own GEMtractor locally</a> to get rid of the upload-waiting-time.</li>
+		    <li>
+		      <strong>When clicking <em>Trim:</em></strong> To start the trimming process, your browser needs the necessary information about the network encoded in your model.
+		      Thus, at the server-side the GEMtractor needs to (i) read the model, (ii) extract the network, (iii) unfold the gene-association, (iv) serialize all the information in JSON and send it to your browser.
+		      Typically, all sub-tasks grow with the model size, and so grows the waiting time.
+		      However, some models come with pretty complex gene-association, such as <code>(A or B) and (C or D or E) and (F or G or H)</code>, which unfolds into 18 possible enzyme combinations...
+		      This increases the computational time exponentially.
+		      That's all done on our servers which are already quite fast, so there is not much you can do about it.
+		      Unless you have a faster server &mdash; then it would make sense to <a href="#own-gemtractor">run your own GEMtractor</a>.
+		    </li>
+		    <li>
+		      <strong>While Trimming:</strong> As soon as you obtained the model's network, you can start trimming the model.
+		      The whole trimming process is done in your browser &mdash; thus, the performance depends on your local computer/laptop.
+		      For most models you won't recognize a delay, but for some models it will take a second or two after you (de)select a model entity, because your browser needs to recompute the trimmed whole network to check for inconsistencies.
+		      If you for example remove a reaction, it needs to check all species, enzymes, and enzyme-complexes to see if they now lack a connection in the model. Thus, in case of Recon3D it would need to re-evaluate almost 25 thousand model entities! And that may take a second on old laptops or out-dated browsers. Change/upgrade your browser or switch to a faster computer to speed-up this process.
+		    </li>
+		    <li>
+		      <strong>When Exporting:</strong> Exporting the trimmed model takes about as long as waiting for the network when clicking <em>Trim,</em> because the task is similar and it's all done on the server-side:
+		      The GEMtractor needs to (i) read the model, (ii) apply your trimming filters, (iii) extract the network, (iv) unfold the gene-association, and (v) serialize the network in your chosen format.
+		      The serialization process is fast and thus neglectable.
+		      The waiting time may however decrease a lot if you trimmed a lot &mdash; if there are for instance just a few reactions left, there won't be much to extract or unfold...
+		      Thus, to improve the speed you can trim more entities or <a href="#own-gemtractor">deploy the GEMtractor on a faster server</a>.
+		    </li>
+		  </ul>
 		</p>
 	</div>
 	
