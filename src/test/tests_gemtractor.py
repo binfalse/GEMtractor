@@ -319,7 +319,7 @@ class GEMtractorTests (TestCase):
           s = model.getSpecies (n)
           identifier = s.getName ()
           if " + " in identifier:
-            print (s.getAnnotationString ())
+            # print (s.getAnnotationString ())
             self.assertTrue ("<bqbiol:hasPart>" in s.getAnnotationString ())
             self.assertEqual (len (net.gene_complexes[identifier].genes), s.getAnnotationString ().count ("<rdf:li rdf:resource="))
           elif identifier == "x":

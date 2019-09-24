@@ -740,8 +740,6 @@ class Network:
     annotations = ""
     
     for gene in genes:
-      print (gene.identifier)
-      print (nodemap[gene.identifier])
       annotations += '<rdf:li rdf:resource="#' + nodemap[gene.identifier].getMetaId () + '" />'
     
     if len (annotations) > 0:

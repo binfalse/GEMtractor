@@ -596,6 +596,35 @@ class ApiTest(TestCase):
       c = response.content.decode("utf-8")
       self.assertEqual (c.count ("label="), 10)
       
+      response = self.client.post('/api/execute', json.dumps({
+          "export": {
+            "network_type":"en",
+            "network_format":"csv"
+          },
+          "filter": {
+            "reactions": ["r1", "r2", "r3"],
+          },
+          "file": model
+          }),content_type="application/json")
+      self.assertEqual(response.status_code, 200)
+      c = response.content.decode("utf-8")
+      self.assertEqual (c.strip().count ("\n"), 0)
+      
+      response = self.client.post('/api/execute', json.dumps({
+          "export": {
+            "network_type":"mn",
+            "network_format":"dot",
+            "remove_ghost_species": True
+          },
+          "filter": {
+            "species": ["a", "b", "c"],
+          },
+          "file": model
+          }),content_type="application/json")
+      self.assertEqual(response.status_code, 200)
+      c = response.content.decode("utf-8")
+      self.assertEqual (c.count ("label="), 0)
+      
     
   
   def _valid_xml (self, xml):
