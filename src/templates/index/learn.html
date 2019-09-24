@@ -515,11 +515,11 @@ Learn
 		<p>
 		  A few more export options provide control over inconsistencies in the trimmed graph:
 		  <ul>
-		    <li><strong>Remove reactions, whose enzymes were all removed:</strong> </li>
-		    <li><strong>Remove ghost species:</strong> </li>
-		    <li><strong>Discard fake enzymes:</strong> </li>
-		    <li><strong>Remove reactions, in which at least one species was removed:</strong> </li>
-		    <li><strong>Removing an enzyme removes all complexes in which it participates:</strong> </li>
+		    <li><strong>Remove reactions, whose enzymes were all removed:</strong> You may have trimmed all the enzymes and enzyme complexes that catalyzes a certain reaction, but didn't trim the reaction itself &mdash; so the reaction is still in the mode, but it may not occur anymore. Should such reactions without enzymes be removed as well? (If you export the Enzyme-centric Network removing these reactions is mandatory: As there are no enzymes there is no Enzyme-centric Network to extract..)</li>
+		    <li><strong>Remove ghost species:</strong> After trimming there may be species in the model, that do not appear in any reaction anymore &mdash; we call those <em>ghost species</em>. They may still be required in other entities in the model, that's the GEMtractor keeps them in the model by default. Do you still want to remove those species? This decision only affects the Metabolite-Reaction Network.</li>
+		    <li><strong>Discard fake enzymes:</strong> When a reaction does not have an annotation with a gene-association. In these cases, the GEMtractor invents an enzyme (see <a href="no-gene-name">What if no enzyme is associated to a reaction?</a>). Should these fake enzymes be removed prior to subsequent analyzes?</li>
+		    <li><strong>Remove reactions, in which at least one species was removed:</strong> If you trim a species off a reaction, this reaction (and its kinetic laws) may become invalid. Should reactions, which do not have all original species anymore, be removed?</li>
+		    <li><strong>Removing an enzyme removes all complexes in which it participates:</strong> A trimmed enzyme may be part of an enzyme complex &mdash; thus, the enzyme complex may be invalid without a certain enzyme.. However, it could as well be, that the enzyme's active site is broken for a certain substrate, but is still fully functional in a complex with other enzymes... So it's up to you: Should enzyme complexes be removed if an individual enzyme is trimmed?</li>
 		  </ul>
 		</p>
 		<p>
