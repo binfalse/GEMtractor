@@ -32,14 +32,12 @@ class GEMtractor:
   """Main class for the GEMtractor
   
   It reads an SBML file, trims entities, and extracts the encoded network.
+  
+  :param sbml_file: path to the SBML file
+  :type sbml_file: str
   """
   
   def __init__(self, sbml_file):
-    """ Spawn a GEMtractor for an sbml model
-    
-    :param sbml_file: path to the SBML file
-    :type sbml_file: str
-    """
     self.__GENE_ASSOCIATION_PATTERN = re.compile(r".*GENE_ASSOCIATION:([^<]+) *<.*", re.DOTALL)
     self.__GENE_LIST_PATTERN = re.compile(r".*GENE_LIST: *([^ <][^<]*)<.*", re.DOTALL)
     self.__EXPRESSION_PARSER = self.__get_expression_parser ()

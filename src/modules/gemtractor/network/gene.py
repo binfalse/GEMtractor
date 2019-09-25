@@ -17,11 +17,10 @@
 class Gene:
   """
   a gene (or gene product, or enzyme) in a network
+    
+  :param identifier: the gene's id
   """
   def __init__(self, identifier):
-    """
-    :param identifier: the gene's id
-    """
     self.identifier = identifier
     self.reactions = []
     self.links = {"g":set (), "gc":set()}

@@ -15,6 +15,12 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 class GeneComplex:
+  """
+  a gene complex (or gene product complex, or enzyme complex) in a network
+    
+  :param gene: initialize this complex with a first gene
+  :type gene: :class:`.gene.Gene`
+  """
   def __init__(self, gene = None):
     self.genes = set ()
     self.reactions = []

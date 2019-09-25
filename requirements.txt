@@ -4,3 +4,5 @@ pyparsing>=2.2.0
 gunicorn
 django-nose
 coverage
+sphinx
+sphinx-bootstrap-theme
