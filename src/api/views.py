@@ -83,7 +83,8 @@ def get_network (request):
     try:
       __logger.info ("getting sbml")
       gemtractor = GEMtractor (Utils.get_model_path (request.session[Constants.SESSION_MODEL_TYPE], request.session[Constants.SESSION_MODEL_ID], request.session.session_key))
-      network = gemtractor.extract_network_from_sbml (gemtractor.get_sbml ())
+      # gemtractor.get_sbml ()
+      network = gemtractor.extract_network_from_sbml ()
       if len (network.species) + len (network.reactions) > settings.MAX_ENTITIES_FILTER:
         raise TooBigForBrowser ("This model is probably too big for your browser... It contains "+str (len (network.species))+" species and "+str (len (network.reactions))+" reactions. We won't load it for filtering, as you're browser is very likely to die when trying to process that amount of data.. Max is currently set to "+str (settings.MAX_ENTITIES_FILTER)+" entities in total. Please export it w/o filtering or use the API instead.")
       __logger.info ("got sbml")
