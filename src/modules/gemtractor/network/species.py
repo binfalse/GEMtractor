@@ -18,7 +18,15 @@ import logging
 
 
 class Species:
+  """
+  a species in a metabolite-reaction network
+  """
+  
   def __init__ (self, identifier, name):
+    """
+    :param identifier: the species' id
+    :param name: the species' name
+    """
     self.__logger = logging.getLogger(__name__)
     self.name = name
     self.identifier = identifier
@@ -27,6 +35,9 @@ class Species:
     self.occurence = []
     
   def serialize (self):
+    """
+    serialize to a JSON-dumpable object
+    """
     return {
       "id" : self.identifier,
       "name" : self.name,
