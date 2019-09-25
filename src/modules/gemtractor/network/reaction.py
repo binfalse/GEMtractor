@@ -15,6 +15,16 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 class Reaction:
+  """
+  a reaction in a network
+    
+  :param identifier: the reaction's identifier
+  :param name: the reaction's name
+  :param reversible: is the reaction reversible?
+  :type identifier: str
+  :type name: str
+  :type reversible: bool
+  """
 
   def __init__(self, identifier, name, reversible = True):
     self.identifier = identifier
@@ -28,14 +38,29 @@ class Reaction:
 
 
   def add_input (self, species):
+    """
+    adds a species that is consumed by this reaction
+    
+    :param species: the consumed species
+    :type species: :class:`.species.Species`
+    """
     species.occurence.append (self.identifier)
     self.consumed.append (species.identifier)
 
   def add_output (self, species):
+    """
+    adds a species that is produced by this reaction
+    
+    :param species: the produced species
+    :type species: :class:`.species.Species`
+    """
     species.occurence.append (self.identifier)
     self.produced.append (species.identifier)
       
   def serialize (self, species_mapper, gene_mapper, gene_complex_mapper):
+    """
+    serialize to a JSON-dumpable object
+    """
     ret =  {
       "id" : self.identifier,
       "name" : self.name,
