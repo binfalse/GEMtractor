@@ -25,6 +25,17 @@ from .forms import ExportForm
 
 
 def __prepare_context (request):
+  """
+  prepare the context dictionary
+  
+  to always send default information to the browser
+  
+  :param request: the request
+  :type request: `django:HttpRequest <https://docs.djangoproject.com/en/2.2/_modules/django/http/request/#HttpRequest>`_
+  
+  :return: the default context
+  :rtype: dict
+  """
   context = {}
   if Constants.SESSION_MODEL_NAME in request.session:
     context[Constants.SESSION_MODEL_NAME] = request.session[Constants.SESSION_MODEL_NAME]
@@ -41,7 +52,18 @@ def __prepare_context (request):
 
 
 
-def model_exists (request, context):
+def model_exists (request):
+  """
+  does a model actually exist?
+  
+  maybe it was cleared by the cache or we had some storage issues?
+  
+  :param request: the request
+  :type request: `django:HttpRequest <https://docs.djangoproject.com/en/2.2/_modules/django/http/request/#HttpRequest>`_
+  
+  :return: true if the user's model exists
+  :rtype: bool
+  """
   if not Constants.SESSION_MODEL_ID in request.session:
     return False
   
@@ -57,6 +79,18 @@ def model_exists (request, context):
 
 # Create your views here.
 def index(request):
+  """
+  answer the request for /gemtract
+  
+  - delivers the index page
+  - optionally accepts an uploaded model
+  - optionally displays the top bar with different steps
+  
+  :param request: the request
+  :type request: `django:HttpRequest <https://docs.djangoproject.com/en/2.2/_modules/django/http/request/#HttpRequest>`_
+  
+  :return: redirect to filter after upload, otherwise delivers the template
+  """
   
   if request.session.session_key is None:
     request.session[Constants.SESSION_HAS_SESSION] = Constants.SESSION_HAS_SESSION_VALUE
@@ -89,7 +123,7 @@ def index(request):
   context["NEXT_l"] = False
   context["PREV_l"] = False
   context['error'] = False
-  if not model_exists (request, context):
+  if not model_exists (request):
     if Constants.SESSION_MODEL_ID in request.session:
       context['error'] = "did not find model on the server... either your session expired or our storage needed to be cleaned for some reason."
     Utils.del_session_key (request, context, Constants.SESSION_MODEL_ID)
@@ -108,13 +142,23 @@ def index(request):
 
 
 def filter(request):
+  """
+  answer the request for /gemtract/filter
+  
+  delivers the filter template
+  
+  :param request: the request
+  :type request: `django:HttpRequest <https://docs.djangoproject.com/en/2.2/_modules/django/http/request/#HttpRequest>`_
+  
+  :return: redirect to /gemtract on error, otherwise delivers the template
+  """
   if Constants.SESSION_MODEL_ID not in request.session:
     return redirect('gemtract:index')
   
   
   context = __prepare_context (request)
   context['error'] = False
-  if not model_exists (request, context):
+  if not model_exists (request):
     return redirect('gemtract:index')
   
   context["PREV_s"] = "Step 1"
@@ -127,11 +171,21 @@ def filter(request):
 
 
 def export(request):
+  """
+  answer the request for /gemtract/export
+  
+  delivers the export template
+  
+  :param request: the request
+  :type request: `django:HttpRequest <https://docs.djangoproject.com/en/2.2/_modules/django/http/request/#HttpRequest>`_
+  
+  :return: redirect to /gemtract on error, otherwise delivers the template
+  """
   if Constants.SESSION_MODEL_ID not in request.session:
     return redirect('gemtract:index')
   
   context = __prepare_context (request)
-  if not model_exists (request, context):
+  if not model_exists (request):
     return redirect('gemtract:index')
   
   context = __prepare_context (request)

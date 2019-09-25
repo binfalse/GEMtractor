@@ -14,6 +14,9 @@ FORMAT = (
 )
 
 class ExportForm (forms.Form):
+  """
+  Form to export the gemtracted network
+  """
   network_type = forms.ChoiceField(choices=TYPE)
   remove_reaction_enzymes_removed = forms.BooleanField(required=False)
   remove_ghost_species = forms.BooleanField(required=False)
