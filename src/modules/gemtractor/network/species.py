@@ -38,6 +38,7 @@ class Species:
     serialize to a JSON-dumpable object
     
     the object will contain the following information:
+    
     - id: the species' identifier
     - name: the species' name
     - occ: in which reactions does the species occur?

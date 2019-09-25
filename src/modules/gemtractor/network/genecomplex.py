@@ -139,6 +139,7 @@ class GeneComplex:
         the id can only be calculated once! so please only calculate it when the complex contains all genes
     
     the object will contain the following information:
+    
     - id: the complex' identifier
     - enzs: list of enzymes that part of this complex - as list of integers pointing into the serialized enzymes
     - reactions: which reactions does the complex catalyze?

@@ -62,6 +62,7 @@ class Reaction:
     serialize to a JSON-dumpable object
     
     the object will contain the following information:
+    
     - id: the reaction's identifier
     - name: the reaction's name
     - rev: is the reaction reversible?

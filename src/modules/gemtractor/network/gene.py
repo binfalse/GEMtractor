@@ -65,6 +65,7 @@ class Gene:
     serialize to a JSON-dumpable object
     
     the object will contain the following information:
+    
     - id: the gene's identifier
     - reactions: which reactions does the gene catalyze?
     - cplx: in which complexes does the gene participate?
