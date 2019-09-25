@@ -54,7 +54,10 @@ class GeneComplex:
     """
     get the identifier of this complex
     
-    this can only be calculated once! so please only calculate it when the complex contains all genes
+    will calculate the id using :func:`calc_id`, if the id is not yet calculated
+    
+    .. warning::
+        the id can only be calculated once! so please only calculate it when the complex contains all genes
     
     :return: the identifier of this complex
     :rtype: str
@@ -83,8 +86,9 @@ class GeneComplex:
     """
     calculate the identifier of this complex
     
-    please note that this can only be calculated once!
-    so only calculate it when the complex contains all genes
+    .. warning::
+        please note that this can only be calculated once!
+        so only calculate it when the complex contains all genes
     
     
     :raises RuntimeError: if the identifier was already calculated before
