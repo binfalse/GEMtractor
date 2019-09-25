@@ -14,11 +14,43 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-class InvalidBiggId (Exception): pass
-class InvalidBiomodelsId (Exception): pass
-class UnableToRetrieveBiomodel (Exception): pass
-class BreakLoops (Exception): pass
-class NotYetImplemented (Exception): pass
-class InvalidGeneExpression (Exception): pass
-class InvalidGeneComplexExpression (Exception): pass
-class TooBigForBrowser (Exception): pass
+class InvalidBiggId (Exception):
+  """
+  signals that the user supplied an invalid bigg id
+  """
+  pass
+class InvalidBiomodelsId (Exception):
+  """
+  signals that the user supplied an invalid biomodels id
+  """
+  pass
+class UnableToRetrieveBiomodel (Exception):
+  """
+  signals that there was an error retrieving a model from biomodles
+  """
+  pass
+class BreakLoops (Exception):
+  """
+  just to skip multiple loops...
+  """
+  pass
+class NotYetImplemented (Exception):
+  """
+  this is not implemented yet..
+  """
+  pass
+class InvalidGeneExpression (Exception):
+  """
+  signals that the model uses a gene expression that the GEMtractor doesn't understand
+  """
+  pass
+class InvalidGeneComplexExpression (Exception):
+  """
+  signals that the user supplied a gene-complex expression that the GEMtractor doesn't understand
+  """
+  pass
+class TooBigForBrowser (Exception):
+  """
+  signals that the model is too big for the browser
+  """
+  pass
