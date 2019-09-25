@@ -36,6 +36,14 @@ class Species:
   def serialize (self):
     """
     serialize to a JSON-dumpable object
+    
+    the object will contain the following information:
+    - id: the species' identifier
+    - name: the species' name
+    - occ: in which reactions does the species occur?
+    
+    :return: JSON-dumpable object
+    :rtype: dict
     """
     return {
       "id" : self.identifier,

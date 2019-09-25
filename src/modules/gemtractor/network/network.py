@@ -27,7 +27,9 @@ from libsbml import LIBSBML_OPERATION_SUCCESS, SBMLDocument, SBMLWriter
 
 
 class Network:
-
+  """
+  a class representing a network
+  """
   def __init__ (self):
     self.__logger = logging.getLogger(__name__)
     self.species = {}
@@ -39,21 +41,84 @@ class Network:
     self.__annotation_about_pattern = re.compile (r"<rdf:Description rdf:about=['\"]#[^'\"]+['\"]>", re.IGNORECASE)
     
   def add_species (self, identifier, name):
+    """
+    adds a species to the network
+    
+    if there is not yet a species with that identifier, it will
+    create a new species and add it to the internal structure
+    
+    eventually, the species with the corresponding identifier is returned (may be an already existing species, though)
+    
+    :param identifier: the id of the species
+    :param name: the name of the species
+    :type identifier: str
+    :type name: str
+    
+    :return: the species with id 'identifier'
+    :rtype: :class:`.species.Species`
+    """
     if identifier not in self.species:
       self.species[identifier] = Species (identifier, name)
     return self.species[identifier]
 
   def add_reaction (self, identifier, name):
+    """
+    adds a reaction to the network
+    
+    if there is not yet a reaction with that identifier, it will
+    create a new reaction and add it to the internal structure
+    
+    eventually, the reaction with the corresponding identifier is returned (may be an already existing reaction, though)
+    
+    :param identifier: the id of the reaction
+    :param name: the name of the reaction
+    :type identifier: str
+    :type name: str
+    
+    :return: the reaction with id 'identifier'
+    :rtype: :class:`.reaction.Reaction`
+    """
     if identifier not in self.reactions:
       self.reactions[identifier] = Reaction (identifier, name)
     return self.reactions[identifier]
   
   def add_gene (self, gene):
+    """
+    adds a gene/gene-product/enzyme to the network
+    
+    if there is not yet a gene with that identifier, it will
+    create a new gene and add it to the internal structure
+    
+    eventually, the gene with the corresponding identifier is returned (may be an already existing gene, though)
+    
+    :param identifier: the id of the gene
+    :param name: the name of the gene
+    :type identifier: str
+    :type name: str
+    
+    :return: the gene with id 'identifier'
+    :rtype: :class:`.gene.Gene`
+    """
     if gene.identifier not in self.genes:
       self.genes[gene.identifier] = Gene (gene.identifier)
     return self.genes[gene.identifier]
 
   def add_genes (self, reaction, gene_complexes):
+    """
+    adds multiple genes to this network and to a reaction
+    
+    iterates all genes and complexes from 'gene_complexes' in 'gene_complexes' and
+    - creates new genes if necessary (using :func:`add_gene`)
+    - creates new gene complexes and their genes if necessary (using :func:`add_gene`)
+    - links the gene and the reaction
+    
+    
+    
+    :param reaction: the reaction that is catalyzed by gene_complexes
+    :param gene_complexes: list of (mixed) genes and gene complexes that catalyze the reaction
+    :type reaction: :class:`.reaction.Reaction`
+    :type gene_complexes: list of :class:`.gene.Gene` and :class:`.genecomplex.GeneComplex`
+    """
     for gc in gene_complexes:
       if type (gc) is Gene:
         g = self.add_gene (gc)

@@ -132,6 +132,24 @@ class GeneComplex:
   def serialize (self, gene_mapper):
     """
     serialize to a JSON-dumpable object
+    
+    will calculate the id using :func:`calc_id`, if the id is not yet calculated
+    
+    .. warning::
+        the id can only be calculated once! so please only calculate it when the complex contains all genes
+    
+    the object will contain the following information:
+    - id: the complex' identifier
+    - enzs: list of enzymes that part of this complex - as list of integers pointing into the serialized enzymes
+    - reactions: which reactions does the complex catalyze?
+    
+    :param gene_mapper: dict that maps a gene id to an integer, which corresponds to the entry in the serialized genes list
+    :type gene_mapper: dict
+    
+    :return: JSON-dumpable object
+    :rtype: dict
+    
+    
     """
     if self.identifier is None:
       self.calc_id ()

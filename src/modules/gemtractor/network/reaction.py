@@ -60,6 +60,25 @@ class Reaction:
   def serialize (self, species_mapper, gene_mapper, gene_complex_mapper):
     """
     serialize to a JSON-dumpable object
+    
+    the object will contain the following information:
+    - id: the reaction's identifier
+    - name: the reaction's name
+    - rev: is the reaction reversible?
+    - cons: consumed species - as list of integers pointing into the serialized species
+    - prod: produced species - as list of integers pointing into the serialized species
+    - enzs: enzymes that catalyze this reaction - as list of integers pointing into the serialized enzymes
+    - enzc: enzyme complexes that catalyze this reaction - as list of integers pointing into the serialized enzyme complexes
+    
+    :param species_mapper: dict that maps a species id to an integer, which corresponds to the entry in the serialized species list
+    :param gene_mapper: dict that maps a gene id to an integer, which corresponds to the entry in the serialized genes list
+    :param gene_complex_mapper: dict that maps a gene complex id to an integer, which corresponds to the entry in the serialized gene complex list
+    :type species_mapper: dict
+    :type gene_mapper: dict
+    :type gene_complex_mapper: dict
+    
+    :return: JSON-dumpable object
+    :rtype: dict
     """
     ret =  {
       "id" : self.identifier,
