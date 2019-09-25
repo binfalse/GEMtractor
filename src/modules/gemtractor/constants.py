@@ -16,6 +16,8 @@
 
 
 class Constants:
+  """constants to prevent typos..
+  """
   SESSION_MODEL_ID                = "model_id"
   SESSION_MODEL_NAME              = "model_name"
   SESSION_MODEL_TYPE              = "model_type"

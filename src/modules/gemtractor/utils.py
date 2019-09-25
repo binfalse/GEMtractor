@@ -32,14 +32,29 @@ from .exceptions import UnableToRetrieveBiomodel, InvalidBiomodelsId, InvalidBig
 
 class Utils:
   
+  """
+  some utils that may make life easier
+  """
+  
   __logger = logging.getLogger(__name__)
   
   
   @staticmethod
-  def __cleanup (rootDir, max_age):
-    for dirName, subdirList, fileList in os.walk(rootDir):
+  def __cleanup (root_dir, max_age):
+    """
+    get rid of old stuff
+    
+    will remove cached and unused file in a certain directory
+    
+    :param root_dir: the directory to traverse
+    :param max_age: the max age of files that will survive
+    
+    :type root_dir: str
+    :type max_age: int
+    """
+    for dirName, subdirList, fileList in os.walk(root_dir):
       for fname in fileList:
-        if  time.time() - os.path.getmtime(os.path.join (dirName, fname)) > settings.CACHE_BIOMODELS_MODEL:
+        if  time.time() - os.path.getmtime(os.path.join (dirName, fname)) > max_age:
           try:
             Utils.__logger.info('deleting old file: ' + os.path.join (dirName, fname))
             os.remove (os.path.join (dirName, fname))
@@ -49,6 +64,11 @@ class Utils:
   
   @staticmethod
   def cleanup ():
+    """
+    get rid of old stuff
+    
+    will remove cached and unused file for the whole instance
+    """
     Utils.__cleanup (os.path.join (settings.STORAGE, "cache", "biomodels"), settings.CACHE_BIOMODELS_MODEL)
     Utils.__cleanup (os.path.join (settings.STORAGE, "cache", "bigg"), settings.CACHE_BIGG_MODEL)
     Utils.__cleanup (os.path.join (settings.STORAGE, Constants.STORAGE_GENERATED_DIR), settings.KEEP_GENERATED)
@@ -57,6 +77,35 @@ class Utils:
   
   @staticmethod
   def add_model_note (model, filter_species, filter_reactions, filter_enzymes, filter_enzyme_complexes, remove_reaction_enzymes_removed, remove_ghost_species, discard_fake_enzymes, remove_reaction_missing_species, removing_enzyme_removes_complex):
+    """'
+    annotate the model to indicate that is has been generated using the GEMtractor
+    
+    adds a note to the model note..
+    
+    :param model: the SBML model
+    :param filter_species: species identifiers to get rid of
+    :param filter_reactions: reaction identifiers to get rid of
+    :param filter_enzymes: enzyme identifiers to get rid of
+    :param filter_enzyme_complexes: enzyme-complex identifiers to get rid of, every list-item should be of format: 'A + B + gene42'
+    :param remove_reaction_enzymes_removed: should we remove a reaction if all it's genes were removed?
+    :param remove_ghost_species: should species be removed, that do not participate in any reaction anymore - even though they might be required in other entities?
+    :param discard_fake_enzymes: should fake enzymes (implicitly assumes enzymes, if no enzymes are annotated to a reaction) be removed?
+    :param remove_reaction_missing_species: remove a reaction if one of the participating genes was removed?
+    :param removing_enzyme_removes_complex: if an enzyme is removed, should also all enzyme complexes be removed in which it participates?
+    
+    :type model: `libsbml:Model <http://sbml.org/Special/Software/libSBML/docs/python-api/classlibsbml_1_1_model.html>`_
+    :type filter_species: list of str
+    :type filter_reactions: list of str
+    :type filter_enzymes: list of str
+    :type filter_enzyme_complexes: list of str
+    :type remove_reaction_enzymes_removed: bool
+    :type remove_ghost_species: bool
+    :type discard_fake_enzymes: bool
+    :type remove_reaction_missing_species: bool
+    :type removing_enzyme_removes_complex: bool
+    
+    
+    """
     # TODO can we do better? eg. annotate with proper structure?
     note = model.getNotesString ()
     # print (note)
@@ -94,6 +143,12 @@ class Utils:
   
   @staticmethod
   def _create_dir (d):
+    """
+    create some directory (recursively) the pythonic way
+    
+    :param d: the directories to create
+    :type d: str
+    """
     try:
       os.makedirs(d)
     except OSError as e:
@@ -103,6 +158,16 @@ class Utils:
   
   @staticmethod
   def create_generated_file_web (sessionid):
+    """
+    get a file to generate something for the user
+    
+    :param sessionid: the users' session id
+    :type sessionid: str
+    
+    :return: path to a file that is safe for the user
+    :rtype: str
+    
+    """
     d = os.path.join (settings.STORAGE, Constants.STORAGE_GENERATED_DIR)
     Utils._create_dir(d)
     return os.path.join (d, sessionid)
@@ -110,6 +175,16 @@ class Utils:
   
   @staticmethod
   def get_upload_path (sessionid):
+    """
+    get a file to upload something for the user
+    
+    :param sessionid: the users' session id
+    :type sessionid: str
+    
+    :return: path to a file that is safe for the user
+    :rtype: str
+    
+    """
     d = os.path.join (settings.STORAGE, Constants.STORAGE_UPLOAD_DIR)
     Utils._create_dir(d)
     return os.path.join (d, sessionid)
@@ -119,7 +194,15 @@ class Utils:
   def get_bigg_models (force = False):
     """ Retrieve the list of models from BiGG
     
-    may raise HTTPError or URLError (see api/get_bigg_models)
+    :param force: should the cache be renewed even if it's not too old?
+    :type force: bool
+    
+    :return: the list of models at BiGG
+    :rtype: json object
+    
+    :raises HTTPError: if there was a problem contacting BiGG
+    :raises URLError: if there was a problem contacting BiGG
+    :raises JSONDecodeError: if the BiGG answer is no proper JSON
     """
     d = os.path.join (settings.STORAGE, "cache", "bigg")
     Utils._create_dir(d)
@@ -142,6 +225,15 @@ class Utils:
       
   @staticmethod
   def _get_bigg_model_base_path (model_id):
+    """
+    get the path at which we would store a BiGG model
+    
+    :param model_id: the model's id
+    :type model_id: str
+
+    :return: the path to the cached BiGG model
+    :rtype: str
+    """
     if not re.match('^[a-zA-Z0-9_-]+$', model_id):
       raise InvalidBiggId ("this BiGG id is invalid: " + model_id)
     d = os.path.join (settings.STORAGE, "cache", "bigg")
@@ -151,6 +243,15 @@ class Utils:
   
   @staticmethod
   def rm_cached_bigg_model (model_id):
+    """
+    remove a cached BiGG model
+    
+    uses :func:`_get_bigg_model_base_path` to determine the path to the model
+    
+    :param model_id: the model's id
+    :type model_id: str
+
+    """
     try:
       os.remove (Utils._get_bigg_model_base_path (model_id))
     except Exception as e:
@@ -158,9 +259,20 @@ class Utils:
   
   @staticmethod
   def get_bigg_model (model_id, force = False):
-    """ Retrieve a model from BiGG
+    """ Retrieve a specific model from BiGG
     
-    may raise HTTPError or URLError (see api/get_bigg_models)
+    uses :func:`_get_bigg_model_base_path` to determine the path to the model
+    
+    :param model_id: the model's id
+    :param force: should the cache be renewed even if it's not too old?
+    :type model_id: str
+    :type force: bool
+    
+    :return: the path to the model
+    :rtype: str
+    
+    :raises HTTPError: if there was a problem contacting BiGG
+    :raises URLError: if there was a problem contacting BiGG
     """
     f = Utils._get_bigg_model_base_path (model_id)
     if force or not os.path.isfile (f):
@@ -173,6 +285,18 @@ class Utils:
   
   @staticmethod
   def get_biomodels (force = False):
+    """ Retrieve the list of models from Biomodels
+    
+    :param force: should the cache be renewed even if it's not too old?
+    :type force: bool
+    
+    :return: the list of models for our search at Biomodels
+    :rtype: json object
+    
+    :raises HTTPError: if there was a problem contacting Biomodels
+    :raises URLError: if there was a problem contacting Biomodels
+    :raises JSONDecodeError: if the Biomodels answer is no proper JSON
+    """
     d = os.path.join (settings.STORAGE, "cache", "biomodels")
     Utils._create_dir(d)
     f = os.path.join (d, "models.json")
@@ -194,6 +318,15 @@ class Utils:
       
   @staticmethod
   def _get_biomodel_base_path (model_id):
+    """
+    get the path at which we would store a biomodels model
+    
+    :param model_id: the model's id
+    :type model_id: str
+
+    :return: the path to the cached model from biomodels
+    :rtype: str
+    """
     if not re.match('^[BM][A-Z]+[0-9]{10}$', model_id):
       raise InvalidBiomodelsId ("this biomodels id is invalid: " + model_id)
     d = os.path.join (settings.STORAGE, "cache", "biomodels")
@@ -203,6 +336,15 @@ class Utils:
   
   @staticmethod
   def rm_cached_biomodel (model_id):
+    """
+    remove a cached model from biomodels
+    
+    uses :func:`_get_biomodel_base_path` to determine the path to the model
+    
+    :param model_id: the model's id
+    :type model_id: str
+
+    """
     try:
       os.remove (Utils._get_biomodel_base_path (model_id) + ".sbml")
     except Exception as e:
@@ -214,6 +356,21 @@ class Utils:
   
   @staticmethod
   def get_biomodel (model_id, force = False):
+    """ Retrieve a specific model from biomodels
+    
+    uses :func:`_get_biomodel_base_path` to determine the path to the model
+    
+    :param model_id: the model's id
+    :param force: should the cache be renewed even if it's not too old?
+    :type model_id: str
+    :type force: bool
+    
+    :return: the path to the model
+    :rtype: str
+    
+    :raises HTTPError: if there was a problem contacting biomodels
+    :raises URLError: if there was a problem contacting biomodels
+    """
     f = Utils._get_biomodel_base_path (model_id) + ".json"
     if force or not os.path.isfile (f):
       Utils.__logger.info('need to (re)download the model information from biomodels: ' + model_id)
@@ -240,6 +397,23 @@ class Utils:
   
   @staticmethod
   def get_model_path (model_type, model_id, sessionid):
+    """
+    get the path to a model
+    
+    depending on how the model was obtained (downloaded from BiGG/biomodels or uploaded) the path may differ
+    
+    :param model_type: the obtain type (see :class:`.constants.Constants`)
+    :param model_id: the model's id
+    :param sessionid: the user's session id - only relevant if the model was uploaded
+    
+    :type model_type: str
+    :type model_id: str
+    :type sessionid: str
+    
+    :return: the path to the model
+    :rtype: str
+    
+    """
     if model_type == Constants.SESSION_MODEL_TYPE_UPLOAD:
       return Utils.get_upload_path (sessionid)
     if model_type == Constants.SESSION_MODEL_TYPE_BIGG:
@@ -249,6 +423,16 @@ class Utils:
       
   @staticmethod
   def serve_file (file_path, file_name, file_type):
+    """
+    deliver a file to the user
+    
+    :param file_path: the path to the file to deliver
+    :param file_name: the name to suggest to the client (browser)
+    :param file_type: the mime type to suggest to the client (browser)
+    :type file_path: str
+    :type file_name: str
+    :type file_type: str
+    """
     with open(file_path, 'rb') as fh:
       response = HttpResponse(fh.read(), content_type=file_type)
       response['Content-Disposition'] = 'attachment; filename=' + file_name
@@ -256,6 +440,16 @@ class Utils:
     
   @staticmethod
   def del_session_key (request, context, key):
+    """
+    delete a certain session key as requested by the user
+    
+    :param request: django's HTTP request object
+    :param context: the context object
+    :param key: the key to delete
+    :type key: str
+    :type context: dict
+    :type request: `django:HttpRequest <https://docs.djangoproject.com/en/2.2/_modules/django/http/request/#HttpRequest>`_
+    """
     try:
       del request.session[key]
     except KeyError:
@@ -271,15 +465,11 @@ class Utils:
     """
     convert a size in bytes to a human readable string
     
-    Parameters:
-    -----------
-    byt: int
-      the byte size
+    :param byt: the byte size
+    :type byt: int
     
-    Returns
-    -------
-    string
-      the human readable  size (such as 1 MB or 2.7 TB)
+    :return: the human readable  size (such as 1 MB or 2.7 TB)
+    :rtype: str
     """
     if byt == 1:
       return "1 Byte"
