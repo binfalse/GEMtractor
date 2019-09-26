@@ -40,6 +40,43 @@ logging.config.dictConfig(settings.LOGGING)
 __logger = logging.getLogger(__name__)
 
 def get_session_data (request):
+  """
+  get your session data at /api/get_session_data
+  
+  the returned JSON object will have the following keys:
+  
+  - status: 'success' if it was successful
+  - data: dict of the data:
+    - session: dict on session keys and values
+    - files: array of string about uploaded files
+  
+  example:
+  
+  .. code-block:: json
+  
+    {
+      "status": "success",
+      "data": {
+        "session": {
+          "has_session": "yes",
+          "model_id": "e_coli_core",
+          "model_name": "e_coli_core",
+          "model_type": "bigg",
+          "filter_species": [],
+          "filter_reactions": [],
+          "filter_enzymes": [],
+          "filter_enzyme_complexes": []
+        },
+        "files": []
+      }
+    }
+  
+  :param request: the request
+  :type request: `django:HttpRequest <https://docs.djangoproject.com/en/2.2/_modules/django/http/request/#HttpRequest>`_
+  
+  :return: json object with information about the user's session
+  :rtype: `django:JsonResponse <https://docs.djangoproject.com/en/2.2/ref/request-response/#jsonresponse-objects>`_
+  """
   if request.session.session_key is None:
     return JsonResponse ({
             "status":"success",
@@ -60,6 +97,17 @@ def get_session_data (request):
         })
 
 def clear_data (request):
+  """
+  clear your data at /api/clear_data
+  
+  will return a JSON object with one key 'status' and the value 'success' if successful
+  
+  :param request: the request
+  :type request: `django:HttpRequest <https://docs.djangoproject.com/en/2.2/_modules/django/http/request/#HttpRequest>`_
+  
+  :return: json object with information about the success
+  :rtype: `django:JsonResponse <https://docs.djangoproject.com/en/2.2/ref/request-response/#jsonresponse-objects>`_
+  """
   if Constants.SESSION_MODEL_TYPE in request.session and request.session[Constants.SESSION_MODEL_TYPE] == Constants.SESSION_MODEL_TYPE_UPLOAD:
     os.remove (Utils.get_model_path (request.session[Constants.SESSION_MODEL_TYPE], request.session[Constants.SESSION_MODEL_ID], request.session.session_key))
   Utils.del_session_key (request, None, Constants.SESSION_HAS_SESSION)
@@ -75,6 +123,94 @@ def clear_data (request):
         })
 
 def get_network (request):
+  """
+  get the network at /api/get_network
+  
+  as encoded in the currently selected model
+  
+  the returned JSON object will look like this (check for 'status' = 'success'):
+  
+  .. code-block:: json
+  
+    { 
+      "status":"success",
+      "network":{ 
+        "species":[ 
+          { 
+            "id":"EmptySet",
+            "name":"",
+            "occ":[ 27, 10 ]
+          },
+          {"...": "..."}
+        ],
+        "reactions":[
+          { 
+            "id":"Reaction1",
+            "name":"",
+            "rev":false,
+            "cons":[ 30, 10 ],
+            "prod":[ 17 ],
+            "enzs":[ 13 ],
+            "enzc":[ 1 ]
+          },
+          {"...": "..."}
+        ],
+        "enzs":[
+          { 
+            "id":"b0351",
+            "reactions":[ 22 ],
+            "cplx":[ 42 ]
+          },
+          {"...": "..."}
+        ],
+        "enzc":[
+          { 
+            "id":"b0116 + b0738",
+            "enzs":[ 12, 28 ],
+            "reactions":[ 23 ]
+          },
+          {"...": "..."}
+        ]
+      },
+      "filter":{ 
+        "filter_species":[ "..." ],
+        "filter_reactions":[ "..." ],
+        "filter_enzymes":[ "..." ],
+        "filter_enzyme_complexes":[ "..." ]
+      }
+    }
+  
+  special notes:
+  
+  - network.species[x].occ: in which reactions does the species appear? -> link into the network.reactions array
+  - network.reactions[x].cons: which species are consumed? -> link into the network.species array
+  - network.reactions[x].prod: which species are produced? -> link into the snetwork.pecies array
+  - network.reactions[x].enzs: which enzymes catalyze the reaction? -> link into the network.enzs array
+  - network.reactions[x].enzc: which enzyme complexes catalyze the reaction? -> link into the network.enzc array
+  - network.enzs[x].reactions: which reactions are catalyzed by the enzyme? -> link into the network.reactions array
+  - network.enzs[x].cplx: in which enzyme complexes does the enzyme participate? -> link into the network.enzc array
+  - network.enzc[x].enzs: which enzymes participate in this complex? -> link into the network.enzs array
+  - network.enzc[x].reactions: which reactions are catalyzed by this complex? -> link into the network.reactions array
+  - network.filter.filter_species: list of species identifiers (str)
+  - network.filter.filter_reactions: list of reaction identifiers (str)
+  - network.filter.filter_enzymes: list of gene identifiers (str)
+  - network.filter.filter_enzyme_complexes: list of gene complex identifiers (str)
+  
+  if the request was not successful, the 'status' key will have a value other than 'success'
+  and there will be an 'error' key with some information about what went wrong
+  
+  
+  
+  :param request: the request
+  :type request: `django:HttpRequest <https://docs.djangoproject.com/en/2.2/_modules/django/http/request/#HttpRequest>`_
+  
+  :return: json object with information about the network
+  :rtype: `django:JsonResponse <https://docs.djangoproject.com/en/2.2/ref/request-response/#jsonresponse-objects>`_
+  
+  
+  """
+  
+  
   if request.method == 'POST':
     # TODO
     return redirect('index:index')
@@ -132,6 +268,19 @@ def get_network (request):
   return redirect('index:index')
 
 def prepare_filter (request):
+  """
+  prepare the session filter setup
+  
+  produced empty arrays for 
+  
+  - request.session[Constants.SESSION_FILTER_SPECIES]
+  - request.session[Constants.SESSION_FILTER_REACTION]
+  - request.session[Constants.SESSION_FILTER_ENZYMES]
+  - request.session[Constants.SESSION_FILTER_ENZYME_COMPLEXES]
+  
+  :param request: the request
+  :type request: `django:HttpRequest <https://docs.djangoproject.com/en/2.2/_modules/django/http/request/#HttpRequest>`_
+  """
   if not Constants.SESSION_FILTER_SPECIES in request.session:
     request.session[Constants.SESSION_FILTER_SPECIES] = []
   if not Constants.SESSION_FILTER_REACTION in request.session:
@@ -142,6 +291,24 @@ def prepare_filter (request):
     request.session[Constants.SESSION_FILTER_ENZYME_COMPLEXES] = []
 
 def sort_gene_complexes (complexes):
+  """
+  sorts the genes in the gene complex identifiers
+  
+  splits every identifier it at " + ", sorts the parts, and joins them with " + "
+  
+  :Example:
+  
+  - input: ["z + k + y", "a + b"]
+  - output: ["k + y + z", "a + b"]
+  
+  
+  :param complexes: the complex identifiers
+  :type complexes: list of str
+  
+  :return: the sorted identifiers
+  :rtype: list of str
+  
+  """
   c2 = []
   for c in complexes:
     if " + " not in c:
@@ -150,6 +317,44 @@ def sort_gene_complexes (complexes):
   return c2
 
 def store_filter (request):
+  """
+  store the user's filters in the session at /api/store_filter
+  
+  returns the stored filters in a json object just like this
+  
+  .. code-block:: json
+  
+    { 
+      "status":"success",
+      "filter":{ 
+        "filter_species":[ 
+           "M_13dpg_c",
+           "M_2pg_c"
+        ],
+        "filter_reactions":[ 
+           "reaction1"
+        ],
+        "filter_enzymes":[ 
+
+        ],
+        "filter_enzyme_complexes":[ 
+
+        ]
+      }
+    }
+    
+  check for "status" = "success"
+  
+  if the request was not successful, the 'status' key will have a value other than 'success'
+  and there will be an 'error' key with some information about what went wrong
+  
+  :param request: the request
+  :type request: `django:HttpRequest <https://docs.djangoproject.com/en/2.2/_modules/django/http/request/#HttpRequest>`_
+  
+  :return: json object with information about the filters
+  :rtype: `django:JsonResponse <https://docs.djangoproject.com/en/2.2/ref/request-response/#jsonresponse-objects>`_
+  
+  """
   if request.method != 'POST':
     # TODO
     return redirect('index:index')
@@ -181,6 +386,40 @@ def store_filter (request):
             }})
   
 def get_bigg_models (request):
+  """
+  get the list of models from BiGG at /api/get_bigg_models
+  
+  returns the models in a json object just like this
+  
+  .. code-block:: json
+  
+    { 
+      "status":"success",
+      "results_count":108,
+      "results":[ 
+        { 
+           "reaction_count":95,
+           "metabolite_count":72,
+           "organism":"Escherichia coli str. K-12 substr. MG1655",
+           "bigg_id":"e_coli_core",
+           "gene_count":137
+        },
+        {"...": "..."}
+      ]
+    }
+    
+  check for "status" = "success"
+  
+  if the request was not successful, the 'status' key will have a value other than 'success'
+  and there will be an 'error' key with some information about what went wrong
+  
+  :param request: the request
+  :type request: `django:HttpRequest <https://docs.djangoproject.com/en/2.2/_modules/django/http/request/#HttpRequest>`_
+  
+  :return: json object with information about the models
+  :rtype: `django:JsonResponse <https://docs.djangoproject.com/en/2.2/ref/request-response/#jsonresponse-objects>`_
+  
+  """
   try:
     models = Utils.get_bigg_models ()
     models["status"] = "success"
@@ -200,6 +439,29 @@ def get_bigg_models (request):
       return JsonResponse ({"status":"failed","error":str (getattr(e, 'code', repr(e))) + getattr(e, 'message', repr(e))})
   
 def select_bigg_model (request):
+  """
+  select a certain model from BiGG at /api/select_bigg_model
+  
+  expects JSON with the key "bigg_id" posted to this endpoint, just like:
+  
+  .. code-block:: json
+  
+    {
+      "bigg_id":"e_coli_core"
+    }
+  
+  returns JSON {"status": "success"} if successful
+  
+  if the request was not successful, the 'status' key will have a value other than 'success'
+  and there will be an 'error' key with some information about what went wrong
+  
+  :param request: the request
+  :type request: `django:HttpRequest <https://docs.djangoproject.com/en/2.2/_modules/django/http/request/#HttpRequest>`_
+  
+  :return: json object with information about the success
+  :rtype: `django:JsonResponse <https://docs.djangoproject.com/en/2.2/ref/request-response/#jsonresponse-objects>`_
+  
+  """
   if request.method != 'POST':
     # TODO
     return redirect('index:index')
@@ -236,6 +498,42 @@ def select_bigg_model (request):
   
   
 def get_biomodels (request):
+  """
+  get the list of models from biomodels at /api/get_biomodels
+  
+  returns the models in a json object just like this
+  
+  .. code-block:: json
+  
+    { 
+      "status":"success",
+      "matches":6979,
+      "models":[ 
+        { 
+           "format":"SBML",
+           "id":"BIOMD0000000239",
+           "lastModified":"2016-04-07T23:00:00Z",
+           "name":"Jiang2007 - GSIS system, Pancreatic Beta Cells",
+           "submissionDate":"2016-04-07T23:00:00Z",
+           "submitter":"Kieran Smallbone",
+           "url":"https://www.ebi.ac.uk/biomodels/BIOMD0000000239"
+        },
+        {"...": "..."}
+      ]
+    }
+    
+  check for "status" = "success"
+  
+  if the request was not successful, the 'status' key will have a value other than 'success'
+  and there will be an 'error' key with some information about what went wrong
+  
+  :param request: the request
+  :type request: `django:HttpRequest <https://docs.djangoproject.com/en/2.2/_modules/django/http/request/#HttpRequest>`_
+  
+  :return: json object with information about the models
+  :rtype: `django:JsonResponse <https://docs.djangoproject.com/en/2.2/ref/request-response/#jsonresponse-objects>`_
+  
+  """
   try:
     models = Utils.get_biomodels ()
     models["status"] = "success"
@@ -255,6 +553,29 @@ def get_biomodels (request):
       return JsonResponse ({"status":"failed","error":str (getattr(e, 'code', repr(e))) + getattr(e, 'message', repr(e))})
   
 def select_biomodel (request):
+  """
+  select a certain model from biomodels at /api/select_biomodel
+  
+  expects JSON with the key "biomodels_id" posted to this endpoint, just like:
+  
+  .. code-block:: json
+  
+    {
+      "biomodels_id":"BIOMD0000000496"
+    }
+  
+  returns JSON {"status": "success"} if successful
+  
+  if the request was not successful, the 'status' key will have a value other than 'success'
+  and there will be an 'error' key with some information about what went wrong
+  
+  :param request: the request
+  :type request: `django:HttpRequest <https://docs.djangoproject.com/en/2.2/_modules/django/http/request/#HttpRequest>`_
+  
+  :return: json object with information about the success
+  :rtype: `django:JsonResponse <https://docs.djangoproject.com/en/2.2/ref/request-response/#jsonresponse-objects>`_
+  
+  """
   if request.method != 'POST':
     # TODO
     return redirect('index:index')
@@ -293,6 +614,19 @@ def select_biomodel (request):
   
 
 def parse_json_body (request, expected_keys = []):
+  """
+  parse some json payload
+  
+  loads the json payload from the request and checks if all keys in expected_keys are present
+  
+  :param request: the request
+  :param expected_keys: array of keys to expect
+  :type request: `django:HttpRequest <https://docs.djangoproject.com/en/2.2/_modules/django/http/request/#HttpRequest>`_
+  :type expected_keys: array of str
+  
+  :return: [true, parsed data] if all expected keys were found, otherwise [false, error message]
+  :rtype: [bool, dict] or [bool, message]
+  """
   try:
     data=json.loads(request.body)
     
@@ -305,6 +639,21 @@ def parse_json_body (request, expected_keys = []):
     return False, "request is not proper json"
 
 def serve_file (request, file_name, file_type):
+  """
+  server a file at /api/serve/file_name/file_type
+  
+  serves the file user-generated file
+    
+  :param request: the request
+  :param file_name: the name of the file, will be used in HTTP's Content-Disposition
+  :param file_type: the mime type of the file, will be used to indicate the mime-type in the HTTP response
+  :type request: `django:HttpRequest <https://docs.djangoproject.com/en/2.2/_modules/django/http/request/#HttpRequest>`_
+  :type file_name: str
+  :type file_type: str
+  
+  :return: HTTP 200 and the file or 404 if no such file
+  :rtype: `django:HttpResponse <https://docs.djangoproject.com/en/2.2/ref/request-response/#httpresponse-objects>`_
+  """
   file_path = Utils.create_generated_file_web (request.session.session_key)
   if not os.path.exists(file_path):
     return HttpResponseBadRequest("file does not exist")
@@ -312,7 +661,41 @@ def serve_file (request, file_name, file_type):
   return Utils.serve_file (file_path, file_name, file_type)
 
 def export (request):
+  """
+  export the gemtracted file at /api/export
   
+  generates the export and returns some JSON data to call /api/serve ... (-> :func:`serve_file`)
+  
+  expects a job submitted as HTTP POST form data (see :class:`.gemtract.forms.ExportForm`), just like:
+  
+  .. code-block:: python
+  
+    network_type: en
+    network_format: sbml
+    removing_enzyme_removes_complex: on
+  
+  returns as JSON object such as:
+  
+  .. code-block:: python
+  
+    {
+      "status": "success",
+      "name": "BIOMD0000000006-gemtracted-EnzymeNetwork.sbml",
+      "mime": "application/xml"
+    }
+    
+  check for "status" = "success"
+  
+  if the request was not successful, the 'status' key will have a value other than 'success'
+  and there will be an 'error' key with some information about what went wrong
+  
+  :param request: the request
+  :type request: `django:HttpRequest <https://docs.djangoproject.com/en/2.2/_modules/django/http/request/#HttpRequest>`_
+  
+  :return: json object with information about the exported file
+  :rtype: `django:JsonResponse <https://docs.djangoproject.com/en/2.2/ref/request-response/#jsonresponse-objects>`_
+  
+  """
   if request.session.session_key is None or Constants.SESSION_MODEL_NAME not in request.session:
     return HttpResponseBadRequest("no such session")
     
@@ -502,6 +885,36 @@ def export (request):
 
 @csrf_exempt
 def execute (request):
+  """
+  execute a job at /api/execute
+  
+  processed the job, that is send as JSON HTTP POST data, such as:
+  
+  .. code-block:: python
+  
+    {
+      "export": {
+          "network_type":"en",
+          "network_format":"sbml"
+      },
+      "filter": {
+          "species": ["h2o", "atp"],
+          "reactions": [],
+          "enzymes": ["gene_abc"],
+          "enzyme_complexes": ["a + b + c", "x + Y", "b_098 + r_abc"],
+      },
+      "file": model
+    }
+  
+  returns HTTP 200 and the generated file, or some other HTTP status and an error message
+  
+  :param request: the request
+  :type request: `django:HttpRequest <https://docs.djangoproject.com/en/2.2/_modules/django/http/request/#HttpRequest>`_
+  
+  :return: HTTP 200 and the file or 404 if no such file
+  :rtype: `django:HttpResponse <https://docs.djangoproject.com/en/2.2/ref/request-response/#httpresponse-objects>`_
+  
+  """
   if request.method != 'POST':
     return redirect(reverse('index:learn') + '#api')
 
@@ -712,6 +1125,15 @@ def execute (request):
 
 @csrf_exempt
 def status (request):
+  """
+  get the status of this instance
+  
+  :param request: the request
+  :type request: `django:HttpRequest <https://docs.djangoproject.com/en/2.2/_modules/django/http/request/#HttpRequest>`_
+  
+  :return: json object with information about the exported file
+  :rtype: `django:JsonResponse <https://docs.djangoproject.com/en/2.2/ref/request-response/#jsonresponse-objects>`_
+  """
   
   Utils.cleanup ()
   # TODO bit more information
