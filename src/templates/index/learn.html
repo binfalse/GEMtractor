@@ -947,8 +947,42 @@ Learn
       <h2>Run your own GEMtractor</h2>
     </div>
     <p>
-  -> easy setup with advanced privace
-  we may restart the service at any time, so be quick filtering ;-)
+      GEMtractor comes with proper support for <a href="https://www.docker.com/">Docker</a>.
+      Thus, installing an own instance is pretty easy, including all benefits as increased speed and privacy.
+    </p>
+  </div>
+  
+  <div class="w3-padding w3-card w3-white learn-entry">
+	<div class=" anchor-heading">
+		<a name="own-install" id="own-install"></a>
+		<h3>Install your own GEMtractor</h3>
+	</div>
+    <p>
+      We recommend doing so using Docker.
+    </p>
+    <p>
+      Just get a copy of the sources from <a href="https://github.com/binfalse/gemtractor">GitHub:GEMtractor</a> and you will find a <code>Dockerfile</code> and a <code>docker-compose.yml</code> file (see <a href="https://docs.docker.com/compose/">Docker Compose</a>) in the root of GEMtractor's directory.
+      It should be sufficient, to just run
+    </p>
+    <pre>docker-compose up</pre>
+    <p>
+      and everything will be built and started.
+      You'll then find the GEMtractor listening at port 80 on your local machine.
+      Just open your web browser and browse to <a href="http://localhost">http://localhost</a>.
+      That's been easy, wasn't it? :)
+    </p>
+    <p>
+      Look inside the <code>docker-compose.yml</code> and check <a href"#own-settings">the Settings section below</a> to configure your GEMtractor instance.
+      Those who want to deploy it to some local server will know what to do..
+    </p>
+    <p>
+      <strong>A quick node on the infrastructure:</strong> There are actually two services necessary to run the GEMtractor:
+      <ul>
+	<li>A webserver to deliver static files and forward dynamic requests to the application server (we prefer using an <a href="https://www.nginx.com/">Nginx</a>)</li>
+	<li>An application server to run the Python code (we prefer <a href="https://gunicorn.org/">gunicorn</a>)</li>
+      </ul>
+      To learn how both are setup and linked, have a look into the <code>Dockerfile</code> and a <code>docker-compose.yml</code> file and check the <code>nginx.conf</code>.
+      However, all this setup is just our recommendation &mdash; you can of course use any other web server (e.g. <a href="https://httpd.apache.org/">Apache's httpd</a>) or other means to server the Python parts (e.g. <a href="https://uwsgi-docs.readthedocs.io/en/latest/">uwsgi</a>)
     </p>
   </div>
   
