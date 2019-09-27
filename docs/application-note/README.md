@@ -46,6 +46,9 @@ The GEMtractor is free software and easy to deploy to third party infrastructure
 * easy to install
 * directed enzyme interactions
 
+![workflow](fig.svg)
+
+
 ## Conclusion
 
 The GEMtractor is good!
