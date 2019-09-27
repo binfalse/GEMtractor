@@ -19,7 +19,9 @@
 
 
 ## Abstract
-* **Summary:** Genome-scale metabolic models The GEMtractor is an online tool 
+* **Summary:** Computational models in systems biology typically encode for multipartite graphs of species, reactions, and enzymes.
+Analysing and comparing these complex networks and their topology is challenging.
+The GEMtractor is an online tool to extract subnetworks, for example focussing on enzyme-centric views into the model.
 * **Availability and Implementation:** The GEMtractor is licensed under the terms of [GPLv3]() and developed at [github.com/binfalse/GEMtractor/](https://github.com/binfalse/GEMtractor/) -- a public version is available at [sbi.uni-rostock.de/gemtractor](https://www.sbi.uni-rostock.de/gemtractor).
 * **Contact:** ..@..
 
@@ -41,27 +43,40 @@ In addition, the GEMtractor allows for trimming of models to, for example, remov
 The GEMtractor is free software and easy to deploy to third party infrastructures, including an increased privacy and speed.
 
 ## Technical Notes
-* Focus on datensparsamkeit und Datenschutz, documentation
-* no registration
-* in all modern browsers
-* easy to install
-* directed enzyme interactions
-* libsbml
-* python
-* django
-* jquery
-* w3css
-* docker + nginx
-* enalyzer module can basically be extracted and used individually
+The GEMtractor is a Django web application, that we developed with privacy, simplicity and speed in mind.
+The interactive front-end is developed using jQuery and designed using W3CSS.
+Thus, it works in all modern browsers as well as on mobile devices and there is no need for registration.
+
+
+explain workflow
+* read SBML using libsbml
+* filter for entities
+* optionally extract a specific view into the remaining network
+* directed reaction and enzyme interactions
+* export in one of several formats
+
+specialities
+* gemtractor module can basically be extracted and used individually
 * api
-* preserves annotations if possible
+
+
 * limitations? model size etc
   * some models do not work, because of incorrect gene associations, biomodels is informed of those we spotted
   * not all GEMs have gene associations... (especially not in biomodels)
+
+
+* deployment
+* easy to install
+
+The GEMtractor has a souvereign test coverage
+
+* docker + nginx
+* preserves annotations if possible
 * mention caches
 * cite BiGG Biomodels cytoscape.js
 * Compatibility
 
+As documentation is key to dissemination, the GEMtractor comes with an extensive FAQ, proper Python documentation and example client implementations in different programming languages.
 
 
 ![workflow](fig.svg)
@@ -70,6 +85,7 @@ The GEMtractor is free software and easy to deploy to third party infrastructure
 ## Conclusion
 
 The GEMtractor is good!
+It's the best GEMtractor people have ever seen.
 
 even though the gemtractor was build for genome scale metabolic networks, it is basically applicable to any sbml model. You won't get useful enzyme networks, as kinetic models typically lack the gene association annotations, but you can still trim models to focus on submodels or extract the reaction centric network to analyze these...
 
