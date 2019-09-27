@@ -1252,9 +1252,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="0.7"
-     inkscape:cx="591.19431"
-     inkscape:cy="548.83346"
+     inkscape:zoom="2.8"
+     inkscape:cx="265.14536"
+     inkscape:cy="642.54891"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -1271,7 +1271,7 @@
      inkscape:snap-object-midpoints="true"
      inkscape:snap-center="true"
      inkscape:snap-text-baseline="true"
-     inkscape:snap-global="true"
+     inkscape:snap-global="false"
      inkscape:window-width="1916"
      inkscape:window-height="1041"
      inkscape:window-x="0"
@@ -1289,7 +1289,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -2698,14 +2698,15 @@
         <path
            inkscape:connector-curvature="0"
            style="opacity:1;vector-effect:none;fill:#ffffff;fill-opacity:0.68159204;stroke:none;stroke-width:0.25271881;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
-           d="m -825.31716,252.84794 v 81.46392 h 111.05579 v -81.46392 z m 17.67059,21.63372 h 73.03015 v 39.32232 h -73.03015 z"
+           d="m -825.31716,252.84794 v 81.46392 h 111.05579 v -81.46392 z m 24.09619,25.50798 63.76973,0 0,32.80223 -63.76973,0 z"
            id="rect66040-3"
            sodipodi:nodetypes="cccccccccc" />
         <path
            inkscape:connector-curvature="0"
-           style="opacity:1;vector-effect:none;fill:#ffffff;fill-opacity:0.42786069;stroke:none;stroke-width:0.25271881;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
-           d="m -825.31716,252.84793 v 81.46391 h 111.05579 v -81.46391 z m 7.61642,13.16705 h 93.66765 v 53.60981 h -93.66765 z"
-           id="rect66040" />
+           style="opacity:1;vector-effect:none;fill:#ffffff;fill-opacity:0.61194032;stroke:none;stroke-width:0.25271881;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+           d="m -825.31716,252.84793 v 81.46391 h 111.05579 v -81.46391 z m 11.26479,15.90738 88.69636,0 v 53.13734 l -88.69636,0 z"
+           id="rect66040"
+           sodipodi:nodetypes="cccccccccc" />
       </g>
       <g
          transform="translate(0,3.4155629)"
