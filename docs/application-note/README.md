@@ -1,4 +1,4 @@
-# GEMtractor: Trim and Extract Genome-scale Metabolic Networks
+# GEMtractor: Extracting Views into Genome-scale Metabolic Models
 
 ### Authors
 * Martin Scharm
