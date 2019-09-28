@@ -28,9 +28,9 @@ The GEMtractor is an online tool to extract subnetworks, for example focussing o
 
 ## Introduction
 
-Genome-scale metabolic models (GEMs) describe the molecular mechanisms of a particular organism.
+Genome-scale metabolic models (GEMs) describe the associations between genes, proteins, and reactions (GPR) of entire metabolic contents of a particular organism.
 Such models are typically encoded in multipartite graphs, whose vertices can be categorised into metabolites, reactions, and enzymes.
-Due to the intrinsic complexity it is challenging to analyse and compare the molecular topology of metabolic networks.
+Due to the intrinsic complexity it is challenging to analyse and compare the molecular topology of GEMs.
 Extracting the reaction-centric (links of reactions) or enzyme-centric (links of enzymes) view onto the metabolism simplifies the graph structure and shifts its perspective -- from kinetic connections to phenotypical interactions.
 Thus, it opens opportunities for novel topological analysis of the metabolism.
 In fact, enzyme-centric networks provide us a critical precursor of physiological representation from genomics data, by determining metabolic distances between enzymes.
