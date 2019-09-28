@@ -17,7 +17,6 @@
 ## Cover letter
 * explaining the suitability of the paper for Bioinformatics
 
-
 ## Abstract
 * **Summary:** Computational models in systems biology typically encode for multipartite graphs of species, reactions, and enzymes.
 Analysing and comparing these complex networks and their topology is challenging.
@@ -25,6 +24,8 @@ The GEMtractor is an online tool to extract subnetworks, for example focussing o
 * **Availability and Implementation:** The GEMtractor is licensed under the terms of [GPLv3](https://www.gnu.org/licenses/gpl-3.0.en.html) and developed at [github.com/binfalse/GEMtractor/](https://github.com/binfalse/GEMtractor/) -- a public version is available at [sbi.uni-rostock.de/gemtractor](https://www.sbi.uni-rostock.de/gemtractor).
 * **Contact:** ..@..
 
+
+## 188 words till here
 
 ## Introduction
 
@@ -80,31 +81,28 @@ For example, the *species* in the reaction-centric network will have all the ann
 Similarly, if the gene products were annotated using the FBC package, they will be annotated in the exported file.
 
 In addition to the web browser front-end, the GEMtractor provides a decent API.
-Trimming an extraction tasks can be encoded in JSON jobs and sent to the API endpoint
+Trimming an extraction tasks can be encoded in JSON jobs and sent to the API endpoint, which will take care of the computation and immediately return the results.
+Client implementations in several languages are shipped with the source code.
+Due to Django's architecture, the heart of the GEMtractor can be used as a Python module if a network connection is undesired.
 
-specialities
-* gemtractor module can basically be extracted and used individually
-* api
-* preserves annotations if possible
-* mention caches
+Even though the GEMtractor can basically handle all valid SBML models, some models cause problems.
+For example, the computation time increases a lot with model sizes, which may cause timeouts at the web server.
+Similarly the maximum upload size allowed by the webserver is quickly hit, so not every model may be uploadable.
+[//]: <> (However, we configured our limits to be useful for the majority of analyses on GEMs.)
+Furthermore, some model may have invalid gene associations while being valid SBML.
+That is, because in SBML prior to level 3 there was no standard on encoding the gene associations -- they were basically encoded in a free-text field, which is of course error-prone.
+This is primarily the case for models from BioModels, as those models are often encoded in SBML level 2.
+If the GEMtractor finds a gene association but is not able to parse it, it will stop and report an error.
 
+Our public GEMtractor instance at [sbi.uni-rostock.de/gemtractor](https://www.sbi.uni-rostock.de/gemtractor) should be useful for the majority of analyses on GEMs.
+However, if you still need extended quotas, cache quotas, web server upload limits or timeouts, you are invited to install your own GEMtractor, which is no magic at all.
+The installation process is documented on the GEMtractor's website and in the source code.
+It requires a Python application server (e.g. gunicorn) to deal with the dynamic pages, and a default web server (e.g. nginx) to serve the static files.
+However, if you are happy with Docker, installing a Gemtractor boils down to a single command line.
 
-* limitations? model size etc
-  * some models do not work, because of incorrect gene associations, biomodels is informed of those we spotted
-  * not all GEMs have gene associations... (especially not in biomodels)
-
-
-* deployment
-  * comparatively to install
-  * docker + nginx
-
-The GEMtractor has a souvereign test coverage
-
-
-* cite BiGG Biomodels cytoscape.js
-* Compatibility
 
 As documentation is key to dissemination, the GEMtractor comes with an extensive FAQ, proper Python documentation and example client implementations in different programming languages.
+Automatic tests cover most of its source code to prevent future programming mistakes and the GEMtractor exposes a monitoring endpoint to keep an eye on its health.
 
 
 ![workflow](fig.svg)
