@@ -19,7 +19,7 @@
 
 
 ## Abstract
-* **Summary:** Computational models in systems biology typically encode for multipartite graphs of species, reactions, and enzymes.
+* **Summary:** Computational metabolic models in systems biology typically encode for multipartite graphs of species, reactions, and enzymes.
 Analysing and comparing these complex networks and their topology is challenging.
 The GEMtractor is an online tool to extract subnetworks, for example focussing on enzyme-centric views into the model.
 * **Availability and Implementation:** The GEMtractor is licensed under the terms of [GPLv3](https://www.gnu.org/licenses/gpl-3.0.en.html) and developed at [github.com/binfalse/GEMtractor/](https://github.com/binfalse/GEMtractor/) -- a public version is available at [sbi.uni-rostock.de/gemtractor](https://www.sbi.uni-rostock.de/gemtractor).
