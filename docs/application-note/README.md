@@ -20,19 +20,20 @@
 ## Abstract
 * **Summary:** Computational models in systems biology typically encode for multipartite graphs of species, reactions, and enzymes.
 Analysing and comparing these complex networks and their topology is challenging.
-The GEMtractor is an online tool to extract subnetworks, for example focussing on enzyme-centric views into the model.
+The GEMtractor is an online tool to trim models encoded in SBML.
+It can be used to extract subnetworks, for example focussing on enzyme-centric views into the model.
 * **Availability and Implementation:** The GEMtractor is licensed under the terms of [GPLv3](https://www.gnu.org/licenses/gpl-3.0.en.html) and developed at [github.com/binfalse/GEMtractor/](https://github.com/binfalse/GEMtractor/) -- a public version is available at [sbi.uni-rostock.de/gemtractor](https://www.sbi.uni-rostock.de/gemtractor).
 * **Contact:** ..@..
 
 
-## 188 words till here
+## 197 words till here
 
 ## Introduction
 
-Genome-scale metabolic models (GEMs) describe the molecular mechanisms of a particular organism.
-Such models are typically encoded in multipartite graphs, whose vertices can be categorised into metabolites, reactions, and enzymes.
-Due to the intrinsic complexity it is challenging to analyse and compare the molecular topology of metabolic networks.
-Extracting the reaction-centric (links of reactions) or enzyme-centric (links of enzymes) view onto the metabolism simplifies the graph structure and shifts its perspective -- from kinetic connections to phenotypical interactions.
+Genome-scale metabolic models (GEMs) describe the molecular mechanisms of an organism.
+Such models are typically encoded in multipartite graphs, whose vertices can be categorised as metabolites, reactions, and enzymes.
+Due to the intrinsic complexity of that graph it is challenging to analyse and compare the molecular topology of metabolic networks.
+Extracting the reaction-centric (links of reactions) or enzyme-centric (links of enzymes) view onto the metabolism simplifies the graph structure and shifts its perspective -- from kinetic interactions to phenotypical connections.
 Thus, it opens opportunities for novel topological analysis of the metabolism.
 In fact, enzyme-centric networks provide us a critical precursor of physiological representation from genomics data, by determining metabolic distances between enzymes.
 
@@ -44,17 +45,17 @@ In addition, the GEMtractor allows for trimming of models to, for example, remov
 The GEMtractor is free software and easy to deploy to third party infrastructures, including an increased privacy and speed.
 
 ## Technical Notes
-The GEMtractor is a Django web application, that we developed with privacy, simplicity and speed in mind.
-The interactive front-end is developed using jQuery and designed using W3CSS.
-Thus, it works in all modern browsers as well as on mobile devices and there is no need for registration.
+The GEMtractor is a Django web application, that we developed with a focus on privacy, compatibility and speed.
+The interactive front-end is implemented using jQuery and designed using W3CSS.
+Thus, it works in all modern browsers as well as on mobile devices; there is no need for registration.
 Figure XX shows a typical workflow when using the GEMtractor.
 
 To start an analysis, the user needs to select a model.
-The GEMtractor supports all models encoded in SBML using libsbml [Bornstein et al 2008](https://www.ncbi.nlm.nih.gov/pubmed/18252737).
+The GEMtractor uses libsbml [Bornstein et al 2008](https://www.ncbi.nlm.nih.gov/pubmed/18252737) to support all models encoded in SBML ([sbml.org](http://sbml.org/Main_Page)).
 Users may upload their own models or choose a published model form BiGG ([King et al 2016](https://academic.oup.com/nar/article/44/D1/D515/2502593)) or BioModels ([Chelliah et al 2015](https://nar.oxfordjournals.org/content/early/2014/11/20/nar.gku1181)).
 Decoding the metabolite-reaction network from the SBML is straightforward.
 However, understanding which enzyme combinations catalyse a certain reaction is a bit tricky.
-The GEMtractor supports to flavours: Gene-product associations using the reactions' notes and proper annotations using the SBML FBC package [Olivier et al 2015](https://co.mbine.org/specifications/sbml.level-3.version-1.fbc.version-2.release-1).
+The GEMtractor supports to flavours of gene-product associations: Using the reactions' notes and proper annotations using the SBML FBC package [Olivier et al 2015](https://co.mbine.org/specifications/sbml.level-3.version-1.fbc.version-2.release-1).
 Some reactions lack both annotations -- in those cases, the GEMtractor assumes, that there is an implicit enzyme whose identifier matches the identifier of the reaction, prefixed with `reaction_`.
 We call these invented enzymes *fake enzymes.*
 
