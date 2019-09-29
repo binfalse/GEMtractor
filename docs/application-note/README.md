@@ -3,6 +3,7 @@
 ### Authors
 * Martin Scharm
 * Olaf Wolkenhauer
+* Mahdi Jalili
 * Ali Salehzadeh-Yazdi
 
 ### Rules
