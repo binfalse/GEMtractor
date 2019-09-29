@@ -24,8 +24,7 @@ Hematology, Oncology and SCT Research Center, Tehran University of Medical Scien
 
 ## Abstract
 * **Summary:** Computational metabolic models in systems biology typically encode for multipartite graphs of species, reactions, and enzymes. Construction and topological analysis of these complex networks is still challenging.
-The GEMtractor is an web-based tool to trim models encoded in SBML.
-It can be used to extract subnetworks, for example focussing on enzyme-centric views into the model.
+The GEMtractor is a web-based tool to trim models encoded in SBML and it can also be used to extract subnetworks, focussing on reaction and enzyme-centric views.
 * **Availability and Implementation:** The GEMtractor is licensed under the terms of [GPLv3](https://www.gnu.org/licenses/gpl-3.0.en.html) and developed at [github.com/binfalse/GEMtractor/](https://github.com/binfalse/GEMtractor/) -- a public version is available at [sbi.uni-rostock.de/gemtractor](https://www.sbi.uni-rostock.de/gemtractor).
 * **Contact:** ..@..
 
@@ -33,20 +32,17 @@ It can be used to extract subnetworks, for example focussing on enzyme-centric v
 ## 197 words till here
 
 ## Introduction
-
-Genome-scale metabolic models (GEMs) describe the molecular mechanisms of an organism.
-Such models are typically encoded in multipartite graphs, whose vertices can be categorised as metabolites, reactions, and enzymes.
+In the most basic abstraction level, biological phenomenon can be quantified as mathematical graphs and thus graph theory is employed to the analysis of molecular topology. Genome-scale metabolic models (GEMs) describe the assiciations between genes, proteins and reactions of entire metabolic contents of a particular organism.Such models are typically encoded in multipartite graphs, whose vertices can be categorised as metabolites, reactions, and enzymes.
 Due to the intrinsic complexity of that graph it is challenging to analyse and compare the molecular topology of metabolic networks.
-Extracting the reaction-centric (links of reactions) or enzyme-centric (links of enzymes) view onto the metabolism simplifies the graph structure and shifts its perspective -- from kinetic interactions to phenotypical connections.
-Thus, it opens opportunities for novel topological analysis of the metabolism.
+Extracting the reaction-centric (links of reactions) or enzyme-centric (links of enzymes) view onto the metabolism simplifies the graph structure and shifts its perspective -- from kinetic interactions to phenotypical connections. Thus, it opens opportunities for novel topological analysis of the metabolism (Ref: An Introduction to Metabolic Networks and Their Structural Analysis).
 In fact, enzyme-centric networks provide us a critical precursor of physiological representation from genomics data, by determining metabolic distances between enzymes.
 
 The idea of extracting and analysing the enzyme-centric network of a GEM is not new and there are already two tools claiming to do so.
 However, [Horne et al 2004](https://academic.oup.com/bioinformatics/article/20/13/2050/241978) is not available any more and the authors are not reachable, and [Asgari et al 2018](https://www.ingentaconnect.com/contentone/ben/cbio/2018/00000013/00000001/art00015) apparently mistook the reaction-centric network for an enzyme-centric network.
 
-Here we introduce the GEMtractor, an online tool to extract reaction-centric and enzyme-centric views from metabolite-reaction networks.
-In addition, the GEMtractor allows for trimming of models to, for example, remove currency metabolites or to focus on the results of flux balance analyses (FBA).
-The GEMtractor is free software and easy to deploy to third party infrastructures, including an increased privacy and speed.
+Here we introduce the GEMtractor, a web-based tool to extract reaction-centric and enzyme-centric views metabolic networks.
+In addition, the GEMtractor allows for trimming of models to, for example, remove currency metabolites or to focus on context-based models.
+The GEMtractor is a free software and easy to deploy to third party infrastructures, including an increased privacy and speed.
 
 ## Technical Notes
 The GEMtractor is a Django web application, that we developed with a focus on privacy, compatibility and speed.
@@ -54,9 +50,8 @@ The interactive front-end is implemented using jQuery and designed using W3CSS.
 Thus, it works in all modern browsers as well as on mobile devices; there is no need for registration.
 Figure XX shows a typical workflow when using the GEMtractor.
 
-To start an analysis, the user needs to select a model.
 The GEMtractor uses libsbml [Bornstein et al 2008](https://www.ncbi.nlm.nih.gov/pubmed/18252737) to support all models encoded in SBML ([sbml.org](http://sbml.org/Main_Page)).
-Users may upload their own models or choose a published model form BiGG ([King et al 2016](https://academic.oup.com/nar/article/44/D1/D515/2502593)) or BioModels ([Chelliah et al 2015](https://nar.oxfordjournals.org/content/early/2014/11/20/nar.gku1181)).
+To start an analysis, the user needs to select a model. Users may upload their own models or choose a published model form BiGG ([King et al 2016](https://academic.oup.com/nar/article/44/D1/D515/2502593)) or BioModels ([Chelliah et al 2015](https://nar.oxfordjournals.org/content/early/2014/11/20/nar.gku1181)).
 Decoding the metabolite-reaction network from the SBML is straightforward.
 However, understanding which enzyme combinations catalyse a certain reaction is a bit tricky.
 The GEMtractor supports to flavours of gene-product associations: Using the reactions' notes and proper annotations using the SBML FBC package [Olivier et al 2015](https://co.mbine.org/specifications/sbml.level-3.version-1.fbc.version-2.release-1).
@@ -72,7 +67,6 @@ For example, if an enzyme is to be removed, it may be necessary to also remove a
 Such inconsistencies are highlighted and summarised at the top of the page to inform the user.
 
 The user may then decide to extract a specific view from that trimmed model.
-That is, he may only be interested in a phenotypical view onto the sub-network.
 In the reaction-centric network consecutive reactions are linked.
 That means, if a reaction `r` produces a metabolite that is consumed by the reaction `s`, there will be a link from `r` to `s`.
 Similarly, the enzyme-centric network links consecutive enzymes and enzyme complexes.
@@ -94,7 +88,7 @@ Even though the GEMtractor can basically handle all valid SBML models, some mode
 For example, the computation time increases a lot with model sizes, which may cause timeouts at the web server.
 Similarly the maximum upload size allowed by the webserver is quickly hit, so not every model may be uploadable.
 [//]: <> (However, we configured our limits to be useful for the majority of analyses on GEMs.)
-Furthermore, some model may have invalid gene associations while being valid SBML.
+Furthermore, some models may have invalid gene associations while being valid SBML.
 That is, because in SBML prior to level 3 there was no standard on encoding the gene associations -- they were basically encoded in a free-text field, which is of course error-prone.
 This is primarily the case for models from BioModels, as those models are often encoded in SBML level 2.
 If the GEMtractor finds a gene association but is not able to parse it, it will stop and report an error.
@@ -115,15 +109,13 @@ Automatic tests cover most of its source code to prevent future programming mist
 
 ## Conclusion
 
-The GEMtractor is good!
-It's the best GEMtractor people have ever seen.
-
-even though the gemtractor was build for genome scale metabolic networks, it is basically applicable to any sbml model. You won't get useful enzyme networks, as kinetic models typically lack the gene association annotations, but you can still trim models to focus on submodels or extract the reaction centric network to analyze these...
+Although the GEMtractor was build to trim genome scale metabolic models, it is basically applicable to any sbml model. You won't get useful enzyme networks, as kinetic models typically lack the gene association annotations, but you can still trim models to focus on submodels or extract the reaction centric network to topologically analyze them.
 
 ## Acknowledgements
 
 We would like to thank Markus Wolfien and Tom Gebhardt for creative brainstormings ;-)
 
 ## Funding
+The authors acknowledge funding for the ERACoBioTech project BESTER provided by BMBF.
 
 
