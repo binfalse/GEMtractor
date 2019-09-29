@@ -7,8 +7,9 @@
 * Ali Salehzadeh-Yazdi
 
 ### Affiliations
-Department of Systems Biology and Bioinformatics, University of Rostock, 18051 Rostock, Germany
-Hematology, Oncology and SCT Research Center, Tehran University of Medical Sciences, Tehran, Iran
+* Department of Systems Biology and Bioinformatics, University of Rostock, 18051 Rostock, Germany
+
+* Hematology, Oncology and SCT Research Center, Tehran University of Medical Sciences, Tehran, Iran
 
 ### Rules
 
