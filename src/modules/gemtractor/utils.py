@@ -60,7 +60,8 @@ class Utils:
             os.remove (os.path.join (dirName, fname))
           except Exception as e:
             Utils.__logger.critical('error deleting old file: ' + os.path.join (dirName, fname) + " -- error: " + getattr(e, 'message', repr(e)))
-            
+    
+  
   
   @staticmethod
   def cleanup ():
@@ -73,7 +74,53 @@ class Utils:
     Utils.__cleanup (os.path.join (settings.STORAGE, "cache", "bigg"), settings.CACHE_BIGG_MODEL)
     Utils.__cleanup (os.path.join (settings.STORAGE, Constants.STORAGE_GENERATED_DIR), settings.KEEP_GENERATED)
     Utils.__cleanup (os.path.join (settings.STORAGE, Constants.STORAGE_UPLOAD_DIR), settings.KEEP_UPLOADED)
+            
   
+  @staticmethod
+  def __collect_stats (root_dir):
+    """
+    collect some stats about the files below root_dir
+    
+    :param root_dir: the root directory
+    :type root_dir: str
+    
+    :return: tupel of number of files and the sum of their sizes
+    :rtype: typel of ints
+    """
+    nfiles = 0
+    size = 0
+    for dirName, subdirList, fileList in os.walk(root_dir):
+      for fname in fileList:
+        nfiles += 1
+        size += os.path.getsize (os.path.join (dirName, fname))
+    
+    return nfiles, size
+  
+  @staticmethod
+  def collect_stats (response_obj):
+    """
+    collect some health stats about this instance
+    
+    will check cached and uploaded files and their sizes
+    
+    :param response_obj: the response object to attach the information to
+    :type response_obj: dict
+    """
+    response_obj['cache'] = {}
+    response_obj['user'] = {}
+    
+    nfiles, size = Utils.__collect_stats (os.path.join (settings.STORAGE, "cache", "biomodels"))
+    response_obj['cache']['biomodels'] = {"nfiles" : nfiles, "size": size}
+    
+    nfiles, size = Utils.__collect_stats (os.path.join (settings.STORAGE, "cache", "bigg"))
+    response_obj['cache']['bigg'] = {"nfiles" : nfiles, "size": size}
+    
+    nfiles, size = Utils.__collect_stats (os.path.join (settings.STORAGE,  Constants.STORAGE_UPLOAD_DIR))
+    response_obj['user']['uploaded'] = {"nfiles" : nfiles, "size": size}
+    
+    nfiles, size = Utils.__collect_stats (os.path.join (settings.STORAGE,  Constants.STORAGE_GENERATED_DIR))
+    response_obj['user']['generated'] = {"nfiles" : nfiles, "size": size}
+    
   
   @staticmethod
   def add_model_note (model, filter_species, filter_reactions, filter_enzymes, filter_enzyme_complexes, remove_reaction_enzymes_removed, remove_ghost_species, discard_fake_enzymes, remove_reaction_missing_species, removing_enzyme_removes_complex):

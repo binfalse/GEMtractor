@@ -1130,6 +1130,43 @@ def status (request):
   """
   get the status of this instance
   
+  this will clean obsolete files
+  
+  send the health-secret as JSON POST to get health information about this instance:
+  
+  .. code-block:: json
+  
+    {"secret": "XXXX"}
+  
+  this will then return a json object listing how many files and data we store, such as:
+  
+  .. code-block:: json
+  
+    {
+      "status": "success",
+      "cache": {
+        "biomodels": {
+          "nfiles": 8,
+          "size": 212254013
+        },
+        "bigg": {
+          "nfiles": 5,
+          "size": 59429817
+        }
+      },
+      "user": {
+        "uploaded": {
+          "nfiles": 0,
+          "size": 0
+        },
+        "generated": {
+          "nfiles": 0,
+          "size": 0
+        }
+      }
+    }
+  
+  
   :param request: the request
   :type request: `django:HttpRequest <https://docs.djangoproject.com/en/2.2/_modules/django/http/request/#HttpRequest>`_
   
@@ -1138,5 +1175,16 @@ def status (request):
   """
   
   Utils.cleanup ()
+  
+  response = {"status": "success"}
+  
+  if request.method == 'POST':
+    succ, data = parse_json_body (request, [])
+    if not succ:
+      return HttpResponseBadRequest(data)
+    
+    if settings.HEALTH_SECRET == "" or ("secret" in data and data["secret"] == settings.HEALTH_SECRET):
+      Utils.collect_stats (response)
+  
   # TODO bit more information
-  return JsonResponse ({"status": "success"})
+  return JsonResponse (response)

@@ -39,9 +39,26 @@ class ApiTest(TestCase):
     self._expect_response (response, True)
   
   def test_status_post (self):
+      
+    response = self.client.post('/api/status', json.dumps({'request': 'something'}) + " invalid",content_type="application/json")
+    self.assertEqual(response.status_code, 400)
+    
     response = self.client.post('/api/status', json.dumps({'request': 'something'}),content_type="application/json")
     self._expect_response (response, True)
+    self.assertEqual("success", response.json()["status"])
+    self.assertTrue("cache" in response.json())
     
+    with self.settings(HEALTH_SECRET='abc'):
+      
+      response = self.client.post('/api/status', json.dumps({'request': 'something'}),content_type="application/json")
+      self._expect_response (response, True)
+      self.assertEqual("success", response.json()["status"])
+      self.assertFalse("cache" in response.json())
+      
+      response = self.client.post('/api/status', json.dumps({'secret': 'abc'}),content_type="application/json")
+      self._expect_response (response, True)
+      self.assertEqual("success", response.json()["status"])
+      self.assertTrue("cache" in response.json())
   
   def test_store_filter (self):
     # only post allowed
@@ -719,10 +736,11 @@ class ApiTest(TestCase):
           },
           "filter": {
             "enzymes": ["a"],
-            "enzyme_complexes": ["a"],
+            "enzyme_complexes": ["a + b"],
           },
           "file": model
           }),content_type="application/json")
+      print (response.content.decode("utf-8"))
       self.assertEqual(response.status_code, 200)
       c = response.content.decode("utf-8")
       self.assertEqual (c.count ("label="), 10)

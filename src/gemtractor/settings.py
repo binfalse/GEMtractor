@@ -243,3 +243,8 @@ URLS_BIOMODEL_SBML = lambda model_id, filename: "https://www.ebi.ac.uk/biomodels
 
 # what's the max number of entities to allow in the browser
 MAX_ENTITIES_FILTER = parse_env_var ('MAX_ENTITIES_FILTER', 100000)
+
+# health secret to protect the healtmonitoring
+# if it is set, it must be sent as POST '{"secret": XXX}', otherwise /api/status won't export the health information
+HEALTH_SECRET = os.getenv ("HEALTH_SECRET", "")
+
