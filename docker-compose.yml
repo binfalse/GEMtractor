@@ -20,6 +20,7 @@ services:
         CACHE_BIOMODELS: 86400
         CACHE_BIOMODELS_MODEL: 432000
         MAX_ENTITIES_FILTER: 10000
+        HEALTH_SECRET: XXX
     volumes:
         - ./src:/code
         # optionally also mount a directory to /storage (see STORAGE_DIR above)
