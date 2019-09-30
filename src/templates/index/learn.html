@@ -579,129 +579,15 @@ Learn
 		<p>
 		  However, there are some sommon pitfalls.
 		  Let's for example have a look at the following Metabolite-Reaction Network
-		  <div id="wrong-directions-example" class="learn-graph"></div>
-		  <script>
-		    var cy = cytoscape({
-		      container: document.getElementById('wrong-directions-example'),
-		      elements: [ // list of graph elements to start with
-			{ data: { id: 'A' } },
-			{ data: { id: 'B' } },
-			{ data: { id: 'C' } },
-			{ data: { id: 'r', source: 'A', target: 'B', label: 'r' } },
-			{ data: { id: 's', source: 'C', target: 'B', label: 's' } }
-		      ],
-
-		      style: [
-			{
-			  selector: 'node',
-			  style: {
-			    'background-color': '#666',
-			    'label': 'data(id)'
-			  }
-			},
-			{
-			  selector: 'edge',
-			  style: {
-			    'label': 'data(label)',
-			    'width': 3,
-			    'text-margin-y': -10,
-			    'line-color': '#ccc',
-			    'target-arrow-color': '#ccc',
-			    'curve-style': 'bezier',
-			    'target-arrow-shape': 'triangle'
-			  }
-			}
-		      ],
-		      layout: {
-			name: 'grid',
-			rows: 1
-		      }
-		    });
-		  </script>
+		  <img src="{% static 'pics/sbgn/directions-example-1.png' %}" class="w3-image w3-padding w3-margin" alt="Metabolite-Reaction Network: A-r-&gt;B-s-&gt;C">
 		  which encodes for a reaction <code>r</code> that consumes <code>A</code> and produces <code>B</code>, and another reaction <code>s</code> that consumes <code>C</code> and produces <code>B</code>.
 		  Given this network, you could anticipate, that the reaction-centric network contains no edges.
 		  However, the SBML code may define <code>s</code> to be <em>reversible</em>!
 		  This may only be defined implicitely: In SBML prior to level 3 all reactions are in fact reversible, unless explicitly defined otherwise.
-		  Thus, the actual network encoded in the model will look like this:
-		  <div id="wrong-directions-example2" class="learn-graph"></div>
-		  <script>
-		    var cy = cytoscape({
-		      container: document.getElementById('wrong-directions-example2'),
-		      elements: [ // list of graph elements to start with
-			{ data: { id: 'A' } },
-			{ data: { id: 'B' } },
-			{ data: { id: 'C' } },
-			{ data: { id: 'r', source: 'A', target: 'B', label: 'r' } },
-			{ data: { id: 's', source: 'C', target: 'B', label: 's' } },
-			{ data: { id: 's2', source: 'B', target: 'C', label: 's' } }
-		      ],
-
-		      style: [ // the stylesheet for the graph
-			{
-			  selector: 'node',
-			  style: {
-			    'background-color': '#666',
-			    'label': 'data(id)'
-			  }
-			},
-
-			{
-			  selector: 'edge',
-			  style: {
-			    'label': 'data(label)',
-			    'width': 3,
-			    'text-margin-y': -10,
-			    'line-color': '#ccc',
-			    'target-arrow-color': '#ccc',
-			    'curve-style': 'bezier',
-			    'target-arrow-shape': 'triangle'
-			  }
-			}
-		      ],
-		      layout: {
-			name: 'grid',
-			rows: 1
-		      }
-		    });
-		  </script>
+		  Thus, the network encoded in the model actually looks like this:
+		  <img src="{% static 'pics/sbgn/directions-example-2.png' %}" class="w3-image w3-padding w3-margin" alt="Metabolite-Reaction Network: A-r-&gt;B&lt;-s-&gt;C">
 		  And suddenly, there is an edge in the reaction-centric network:
-		  <div id="wrong-directions-example3" class="learn-graph"></div>
-		  <script>
-		    var cy = cytoscape({
-		      container: document.getElementById('wrong-directions-example3'),
-		      elements: [ // list of graph elements to start with
-			{ data: { id: 'r' } },
-			{ data: { id: 's' } },
-			{ data: { id: 'x', source: 'r', target: 's' } }
-		      ],
-
-		      style: [ // the stylesheet for the graph
-			{
-			  selector: 'node',
-			  style: {
-			    'background-color': '#666',
-			    'label': 'data(id)'
-			  }
-			},
-
-			{
-			  selector: 'edge',
-			  style: {
-			    'width': 3,
-			    'text-margin-y': -10,
-			    'line-color': '#ccc',
-			    'target-arrow-color': '#ccc',
-			    'curve-style': 'bezier',
-			    'target-arrow-shape': 'triangle'
-			  }
-			}
-		      ],
-		      layout: {
-			name: 'grid',
-			rows: 1
-		      }
-		    });
-		  </script>
+		  <img src="{% static 'pics/sbgn/directions-example-3.png' %}" class="w3-image w3-padding w3-margin" alt="Reaction-centric Network: r-&gt;s">
 		  The same also applies to enzyme-centric networks.
 		</p>
 	</div>
