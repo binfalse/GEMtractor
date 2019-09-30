@@ -93,14 +93,14 @@ Due to Django's architecture, the heart of the GEMtractor can be used as a Pytho
 
 Even though the GEMtractor can basically handle all valid SBML models, some models cause problems.
 For example, the computation time increases with model size, which may cause timeouts at the web server.
-Similarly the maximum upload size allowed by the webserver **could prevent an upload -- is quickly hit**, so not every model may be uploadable.
+Similarly the maximum upload size allowed by the web server could terminate a data transfer, so not every model may be upload-able.
 Furthermore, some models may have invalid gene associations while being valid SBML.
 That is, because in SBML prior to level 3 there was no standard on encoding the gene associations -- they were basically encoded in a free-text field, which is of course error-prone.
 This is primarily the case for models from BioModels, as those models are often encoded in SBML level 2.
 If the GEMtractor finds a gene association but is not able to parse it, it will stop and report an error.
 
 While the GEMtractor was built for GEMs, it is applicable to any SBML model.
-Extracting an enzyme network my be pointless, as kinetic models typically lack the gene association annotations, but you can still trim models to focus on submodels or extract the reaction centric network for subsequent analyses.
+Extracting an enzyme network my be pointless, as kinetic models typically lack the gene association annotations, but you can still trim models to focus on submodels or extract the reaction-centric network for subsequent analyses.
 
 Our public GEMtractor instance at [sbi.uni-rostock.de/gemtractor](https://www.sbi.uni-rostock.de/gemtractor) should be useful for the majority of analyses on GEMs.
 However, if you still need extended quotas, cache options, web server upload limits or timeouts, you are invited to install your own GEMtractor.
@@ -109,7 +109,7 @@ It requires a Python application server (e.g. gunicorn) to deal with the dynamic
 However, if you are happy with Docker, installing a GEMtractor boils down to a single command line.
 
 
-As documentation is key to dissemination, the GEMtractor comes with an extensive FAQ, proper Python documentation and example client implementations in different programming languages.
+As documentation is key to dissemination, the GEMtractor comes with an [extensive FAQ](https://gemtractor.bio.informatik.uni-rostock.de/learn), proper [Python documentation](https://doc.bio.informatik.uni-rostock.de/GEMtractor/) and [example client implementations](https://github.com/binfalse/GEMtractor/tree/master/clients) in different programming languages.
 Automatic tests cover most of its source code to prevent future programming mistakes and the GEMtractor exposes a monitoring endpoint to keep an eye on its health.
 
 
