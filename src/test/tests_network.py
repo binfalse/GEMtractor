@@ -18,6 +18,7 @@
 from django.test import TestCase
 
 from modules.gemtractor.network.gene import Gene
+from modules.gemtractor.network.genecomplex import GeneComplex
 from modules.gemtractor.network.network import Network
 from modules.gemtractor.network.reaction import Reaction
 from modules.gemtractor.network.species import Species
@@ -101,6 +102,42 @@ class NetworkTests (TestCase):
     self.assertEqual (len (gs1["reactions"]), 2, msg="unexpected number of reactions")
     self.assertEqual (len (gs1["cplx"]), 0, msg="unexpected number of complexes")
     
+    
+  
+  def test_gene (self):
+    g = Gene ("someid")
+    
+    self.assertTrue (g.contains_one_of (["someid"]))
+    self.assertTrue (g.contains_one_of (["some", "someid", "id"]))
+    self.assertFalse (g.contains_one_of (["some", "id"]))
+    
+    self.assertTrue ("someid" in g.to_string ())
+    
+    
+  
+  def test_gene_complex (self):
+    g = GeneComplex (Gene ("someid"))
+    
+    self.assertTrue (g.contains_one_of (["someid"]))
+    self.assertTrue (g.contains_one_of (["some", "someid", "id"]))
+    self.assertFalse (g.contains_one_of (["some", "id"]))
+    
+    g.add_gene (Gene ("some"))
+    
+    self.assertTrue (g.contains_one_of (["someid"]))
+    self.assertTrue (g.contains_one_of (["some", "someid", "id"]))
+    self.assertTrue (g.contains_one_of (["some", "id"]))
+    
+    self.assertTrue ("someid+" in g.to_string ())
+    self.assertTrue ("+some" in g.to_string ())
+    
+    gm = {}
+    gm["someid"] = 0
+    gm["some"] = 1
+    self.assertTrue (len (g.serialize (gm)) == 3)
+    
+    with self.assertRaises (RuntimeError):
+      g.calc_id()
     
   
   def test_reaction_serialisation (self):
