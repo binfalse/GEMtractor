@@ -47,7 +47,7 @@ This opens opportunities for novel topological analyses of the metabolism ([Lacr
 The idea of extracting and analysing the enzyme-centric network of a GEM is not new.
 However, [Horne et al 2004](https://academic.oup.com/bioinformatics/article/20/13/2050/241978) is not available anymore and [Asgari et al 2018](https://www.ingentaconnect.com/contentone/ben/cbio/2018/00000013/00000001/art00015) apparently mistook the reaction-centric network for an enzyme-centric network.
 
-Here we introduce GEMtractor, a web-based tool to extract reaction-centric and enzyme-centric views of genome-scale metabolic models (GEM).
+Here we introduce the GEMtractor, a web-based tool to extract reaction-centric and enzyme-centric views of genome-scale metabolic models (GEM).
 GEMtractor allows for trimming of models to, for example, remove currency metabolites or to focus on context-based models.
 The GEMtractor is a free software and easy to install, including an increased privacy and speed because it can be deployed locally.
 
@@ -91,7 +91,7 @@ Trimming an extraction tasks can be encoded in JSON jobs and sent to the API end
 Client implementations in several languages are shipped with the source code.
 Due to Django's architecture, the heart of the GEMtractor can be used as a Python module if a network connection is undesired.
 
-Even though GEMtractor can basically handle all valid SBML models, some models cause problems.
+Even though the GEMtractor can basically handle all valid SBML models, some models cause problems.
 For example, the computation time increases with model size, which may cause timeouts at the web server.
 Similarly the maximum upload size allowed by the webserver **could prevent an upload -- is quickly hit**, so not every model may be uploadable.
 Furthermore, some models may have invalid gene associations while being valid SBML.
@@ -99,11 +99,11 @@ That is, because in SBML prior to level 3 there was no standard on encoding the 
 This is primarily the case for models from BioModels, as those models are often encoded in SBML level 2.
 If the GEMtractor finds a gene association but is not able to parse it, it will stop and report an error.
 
-Even though the GEMtractor was build for GEMs, it is basically applicable to any SBML model.
-It will not be able to extract useful enzyme networks, as kinetic models typically lack the gene association annotations, but you can still trim models to focus on submodels or extract the reaction centric network for subsequent analyses.
+While the GEMtractor was built for GEMs, it is applicable to any SBML model.
+Extracting an enzyme network my be pointless, as kinetic models typically lack the gene association annotations, but you can still trim models to focus on submodels or extract the reaction centric network for subsequent analyses.
 
 Our public GEMtractor instance at [sbi.uni-rostock.de/gemtractor](https://www.sbi.uni-rostock.de/gemtractor) should be useful for the majority of analyses on GEMs.
-However, if you still need extended quotas, cache quotas, web server upload limits or timeouts, you are invited to install your own GEMtractor.
+However, if you still need extended quotas, cache options, web server upload limits or timeouts, you are invited to install your own GEMtractor.
 The installation process is documented on the GEMtractor's website and in the source code.
 It requires a Python application server (e.g. gunicorn) to deal with the dynamic pages, and a default web server (e.g. nginx) to serve the static files.
 However, if you are happy with Docker, installing a GEMtractor boils down to a single command line.
