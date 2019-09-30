@@ -18,7 +18,7 @@
 * explaining the suitability of the paper for Bioinformatics
 
 ## Abstract
-* **Summary:** Computational models in systems biology typically encode for multipartite graphs of species, reactions, and enzymes.
+* **Summary:** Computational metabolic models in systems biology typically encode for multipartite graphs of species, reactions, and enzymes.
 Analysing and comparing these complex networks and their topology is challenging.
 The GEMtractor is an online tool to trim models encoded in SBML.
 It can be used to extract subnetworks, for example focussing on enzyme-centric views into the model.
@@ -30,9 +30,9 @@ It can be used to extract subnetworks, for example focussing on enzyme-centric v
 
 ## Introduction
 
-Genome-scale metabolic models (GEMs) describe the molecular mechanisms of an organism.
+Genome-scale metabolic models (GEMs) describe the associations between genes, proteins, and reactions (GPR) of entire metabolic contents of an organism.
 Such models are typically encoded in multipartite graphs, whose vertices can be categorised as metabolites, reactions, and enzymes.
-Due to the intrinsic complexity of that graph it is challenging to analyse and compare the molecular topology of metabolic networks.
+Due to the intrinsic complexity of that graph it is challenging to analyse and compare the molecular topology of GEMs.
 Extracting the reaction-centric (links of reactions) or enzyme-centric (links of enzymes) view onto the metabolism simplifies the graph structure and shifts its perspective -- from kinetic interactions to phenotypical connections.
 Thus, it opens opportunities for novel topological analysis of the metabolism.
 In fact, enzyme-centric networks provide us a critical precursor of physiological representation from genomics data, by determining metabolic distances between enzymes.
