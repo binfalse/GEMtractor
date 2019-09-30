@@ -999,7 +999,7 @@ def execute (request):
   
   if export["network_type"] == "en":
     net = gemtractor.extract_network_from_sbml ()
-    net.calc_genenet ()
+    # net.calc_genenet ()
     if export["network_format"] == "sbml":
       net.export_en_sbml (outputFile.name, gemtractor, sbml.getModel ().getId (), sbml.getModel ().getName (), 
           filter_species = filter_species, 
@@ -1041,7 +1041,7 @@ def execute (request):
         return HttpResponseServerError ("couldn't generate the csv file")
   elif export["network_type"] == "rn":
     net = gemtractor.extract_network_from_sbml ()
-    net.calc_reaction_net ()
+    # net.calc_reaction_net ()
     if export["network_format"] == "sbml":
       net.export_rn_sbml (outputFile.name, gemtractor, sbml.getModel ().getId () + "_RN", sbml.getModel ().getName () + " converted to ReactionNetwork",
           filter_species = filter_species, 

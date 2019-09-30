@@ -16,6 +16,8 @@
 
 import json
 import logging
+import os
+import time
 import tempfile
 from xml.dom import minidom
 
@@ -23,6 +25,7 @@ from django.test import Client, TestCase
 from libsbml import SBMLReader
 
 from modules.gemtractor.constants import Constants
+from modules.gemtractor.utils import Utils
 
 # logging.getLogger(__name__).debug("---->>>>> " + str(j))
 
@@ -208,6 +211,13 @@ class ApiTest(TestCase):
         response = self.client.get('/api/get_biomodels')
         self._expect_response (response, False)
     
+      with self.settings(CACHE_BIOMODELS = 1):
+        response = self.client.get('/api/get_biomodels')
+        self._expect_response (response, True)
+        time.sleep(1)
+        response = self.client.get('/api/get_biomodels')
+        self._expect_response (response, True)
+    
   
   
   def test_get_biomodel (self):
@@ -252,6 +262,34 @@ class ApiTest(TestCase):
       self._expect_response (response, True)
       self.assertEqual("MODEL6614787694", response.json()["data"]["session"][Constants.SESSION_MODEL_ID])
       self.assertEqual(Constants.SESSION_MODEL_TYPE_BIOMODELS, response.json()["data"]["session"][Constants.SESSION_MODEL_TYPE])
+      
+      with self.settings(CACHE_BIOMODELS_MODEL = 1):
+        response = self.client.post('/api/select_biomodel', json.dumps({'biomodels_id': "BIOMD0000000007"}),content_type="application/json")
+        self._expect_response (response, True)
+        response = self.client.get('/api/get_session_data')
+        self._expect_response (response, True)
+        self.assertEqual("BIOMD0000000007", response.json()["data"]["session"][Constants.SESSION_MODEL_ID])
+        self.assertEqual(Constants.SESSION_MODEL_TYPE_BIOMODELS, response.json()["data"]["session"][Constants.SESSION_MODEL_TYPE])
+          
+        time.sleep(1)
+        
+        response = self.client.post('/api/select_biomodel', json.dumps({'biomodels_id': "BIOMD0000000007"}),content_type="application/json")
+        self._expect_response (response, True)
+        response = self.client.get('/api/get_session_data')
+        self._expect_response (response, True)
+        self.assertEqual("BIOMD0000000007", response.json()["data"]["session"][Constants.SESSION_MODEL_ID])
+        self.assertEqual(Constants.SESSION_MODEL_TYPE_BIOMODELS, response.json()["data"]["session"][Constants.SESSION_MODEL_TYPE])
+        
+        p = Utils.get_model_path (Constants.SESSION_MODEL_TYPE_BIOMODELS, "BIOMD0000000007", None)
+        self.assertTrue (os.path.isfile (p))
+        Utils.rm_cached_biomodel ("BIOMD0000000007")
+        self.assertFalse (os.path.isfile (p))
+        
+        Utils.rm_cached_biomodel ("BIOMD0000000007")
+        
+        
+        
+        
     
     
     d = tempfile.TemporaryDirectory()
@@ -328,7 +366,7 @@ class ApiTest(TestCase):
           "file": model
           }),content_type="application/json")
       self.assertEqual(response.status_code, 200)
-      valid, sbml_rn = self._valid_sbml (response.content)
+      valid, sbml_mn = self._valid_sbml (response.content)
       self.assertTrue (valid, msg="invalid SBML of rn")
       
       response = self.client.post('/api/execute', json.dumps({
@@ -342,15 +380,26 @@ class ApiTest(TestCase):
       valid, sbml_en = self._valid_sbml (response.content)
       self.assertTrue (valid, msg="invalid SBML of en")
       
+      response = self.client.post('/api/execute', json.dumps({
+          "export": {
+            "network_type":"rn",
+            "network_format":"sbml"
+          },
+          "file": model
+          }),content_type="application/json")
+      self.assertEqual(response.status_code, 200)
+      valid, sbml_rn = self._valid_sbml (response.content)
+      self.assertTrue (valid, msg="invalid SBML of rn")
+      
       
         
-      rnSpecies = sbml_rn.getModel ().getNumSpecies ()
-      rnReactions = sbml_rn.getModel ().getNumReactions ()
-      rnEdges = 0
-      for r in range (rnReactions):
-        reaction = sbml_rn.getModel ().getReaction (r)
-        rnEdges += reaction.getNumReactants ()
-        rnEdges += reaction.getNumProducts ()
+      mnSpecies = sbml_mn.getModel ().getNumSpecies ()
+      mnReactions = sbml_mn.getModel ().getNumReactions ()
+      mnEdges = 0
+      for r in range (mnReactions):
+        reaction = sbml_mn.getModel ().getReaction (r)
+        mnEdges += reaction.getNumReactants ()
+        mnEdges += reaction.getNumProducts ()
         
       enSpecies = sbml_en.getModel ().getNumSpecies ()
       enReactions = sbml_en.getModel ().getNumReactions ()
@@ -359,6 +408,14 @@ class ApiTest(TestCase):
         reaction = sbml_en.getModel ().getReaction (r)
         enEdges += reaction.getNumReactants ()
         enEdges += reaction.getNumProducts ()
+        
+      rnSpecies = sbml_rn.getModel ().getNumSpecies ()
+      rnReactions = sbml_rn.getModel ().getNumReactions ()
+      rnEdges = 0
+      for r in range (rnReactions):
+        reaction = sbml_rn.getModel ().getReaction (r)
+        rnEdges += reaction.getNumReactants ()
+        rnEdges += reaction.getNumProducts ()
       
       
       
@@ -372,10 +429,10 @@ class ApiTest(TestCase):
       self.assertEqual(response.status_code, 200)
       self.assertTrue (self._valid_xml (response.content), msg="invalid xml of rn")
       c = response.content.decode("utf-8")
-      self.assertEqual (c.count ("<node "), rnSpecies + rnReactions)
-      self.assertEqual (c.count (">species</data"), rnSpecies)
-      self.assertEqual (c.count (">reaction<"), rnReactions)
-      self.assertEqual (c.count ("<edge"), rnEdges)
+      self.assertEqual (c.count ("<node "), mnSpecies + mnReactions)
+      self.assertEqual (c.count (">species</data"), mnSpecies)
+      self.assertEqual (c.count (">reaction<"), mnReactions)
+      self.assertEqual (c.count ("<edge"), mnEdges)
       
       response = self.client.post('/api/execute', json.dumps({
           "export": {
@@ -391,6 +448,20 @@ class ApiTest(TestCase):
       self.assertEqual (c.count (">enzyme</data") + c.count (">enzyme_complex</data"), enSpecies)
       self.assertEqual (c.count ("<edge"), enReactions)
       
+      response = self.client.post('/api/execute', json.dumps({
+          "export": {
+            "network_type":"rn",
+            "network_format":"graphml"
+          },
+          "file": model
+          }),content_type="application/json")
+      self.assertEqual(response.status_code, 200)
+      self.assertTrue (self._valid_xml (response.content), msg="invalid xml of en")
+      c = response.content.decode("utf-8")
+      self.assertEqual (c.count ("<node "), rnSpecies)
+      self.assertEqual (c.count (">reaction</data"), rnSpecies)
+      self.assertEqual (c.count ("<edge"), rnReactions)
+      
       
       response = self.client.post('/api/execute', json.dumps({
           "export": {
@@ -401,8 +472,8 @@ class ApiTest(TestCase):
           }),content_type="application/json")
       self.assertEqual(response.status_code, 200)
       c = response.content.decode("utf-8")
-      self.assertEqual (c.count ("node ["), rnSpecies + rnReactions)
-      self.assertEqual (c.count ("edge ["), rnEdges)
+      self.assertEqual (c.count ("node ["), mnSpecies + mnReactions)
+      self.assertEqual (c.count ("edge ["), mnEdges)
       
       response = self.client.post('/api/execute', json.dumps({
           "export": {
@@ -418,6 +489,18 @@ class ApiTest(TestCase):
       
       response = self.client.post('/api/execute', json.dumps({
           "export": {
+            "network_type":"rn",
+            "network_format":"gml"
+          },
+          "file": model
+          }),content_type="application/json")
+      self.assertEqual(response.status_code, 200)
+      c = response.content.decode("utf-8")
+      self.assertEqual (c.count ("node ["), rnSpecies)
+      self.assertEqual (c.count ("edge ["), rnReactions)
+      
+      response = self.client.post('/api/execute', json.dumps({
+          "export": {
             "network_type":"mn",
             "network_format":"dot"
           },
@@ -425,8 +508,8 @@ class ApiTest(TestCase):
           }),content_type="application/json")
       self.assertEqual(response.status_code, 200)
       c = response.content.decode("utf-8")
-      self.assertEqual (c.count ("label="), rnSpecies + rnReactions)
-      self.assertEqual (c.count (" -> "), rnEdges)
+      self.assertEqual (c.count ("label="), mnSpecies + mnReactions)
+      self.assertEqual (c.count (" -> "), mnEdges)
       
       response = self.client.post('/api/execute', json.dumps({
           "export": {
@@ -439,6 +522,51 @@ class ApiTest(TestCase):
       c = response.content.decode("utf-8")
       self.assertEqual (c.count ("label="), enSpecies)
       self.assertEqual (c.count (" -> "), enReactions)
+      
+      response = self.client.post('/api/execute', json.dumps({
+          "export": {
+            "network_type":"rn",
+            "network_format":"dot"
+          },
+          "file": model
+          }),content_type="application/json")
+      self.assertEqual(response.status_code, 200)
+      c = response.content.decode("utf-8")
+      self.assertEqual (c.count ("label="), rnSpecies)
+      self.assertEqual (c.count (" -> "), rnReactions)
+      
+      response = self.client.post('/api/execute', json.dumps({
+          "export": {
+            "network_type":"mn",
+            "network_format":"csv"
+          },
+          "file": model
+          }),content_type="application/json")
+      self.assertEqual(response.status_code, 200)
+      c = response.content.decode("utf-8")
+      self.assertEqual (c.count ("\n"), mnEdges + 1)
+      
+      response = self.client.post('/api/execute', json.dumps({
+          "export": {
+            "network_type":"en",
+            "network_format":"csv"
+          },
+          "file": model
+          }),content_type="application/json")
+      self.assertEqual(response.status_code, 200)
+      c = response.content.decode("utf-8")
+      self.assertEqual (c.count ("\n"), enReactions + 1)
+      
+      response = self.client.post('/api/execute', json.dumps({
+          "export": {
+            "network_type":"rn",
+            "network_format":"csv"
+          },
+          "file": model
+          }),content_type="application/json")
+      self.assertEqual(response.status_code, 200)
+      c = response.content.decode("utf-8")
+      self.assertEqual (c.count ("\n"), rnReactions + 1)
       
       
       
