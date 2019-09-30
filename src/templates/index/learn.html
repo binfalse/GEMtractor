@@ -1006,6 +1006,7 @@ Learn
 	<li><code>CACHE_BIGG_MODEL</code>: Time in seconds &mdash; how long to cache a single model from BiGG Models? <small>(default: <code>7*60*60*24</code> = 7 days, currently: <code>{{CACHE_BIGG_MODEL}}</code> seconds)</small></li>
 	<li><code>CACHE_BIOMODELS</code>: Time in seconds &mdash; how long to cache the search results of models available from Biomodels? <small>(default: <code>60*60*24</code> = 24 hours, currently: <code>{{CACHE_BIOMODELS}}</code> seconds)</small></li>
 	<li><code>CACHE_BIOMODELS_MODEL</code>: Time in seconds &mdash; how long to cache a single model from Biomodels? <small>(default: <code>7*60*60*24</code> = 7 days, currently: <code>{{CACHE_BIOMODELS_MODEL}}</code> seconds)</small></li>
+	<li><code>HEALTH_SECRET</code>: Some secret that needs to be sent as JSON POST to <code>/api/status</code> to get health information about the instance. If not explicitly set, everyone can get the health data.</li>
       </ul>
       
       There are different ways to set the variables. If you're running the GEMtractor from a shell script, for example, you could do something like that:
@@ -1031,6 +1032,51 @@ services:
         MAX_ENTITIES_FILTER: 20000
         [...]</pre>
 	
+  </div>
+  
+  <div class="w3-padding w3-card w3-white learn-entry">
+	<div class=" anchor-heading">
+		<a name="own-monitoring" id="own-monitoring"></a>
+		<h3>Monitoring</h3>
+	</div>
+    <p>
+      GEMtractor is able to export some health data about the instance.
+      Just send a JSON request through HTTP POST to <code>/api/status</code> to learn how many files are cached, how many files are uploaded, how how much storage space is used.
+    </p>
+    <p>
+      You may protect this data by setting <code>HEALTH_SECRET</code> to something non-empty.
+      In that case, you need to submit the secret in the JSON POST object.
+      For example, using cURL:
+      
+      <pre>curl -X POST -d '{"secret": "XXX"}' URL/api/status</pre>
+      
+      will return a JSON object such as:
+      
+      <pre>{
+  "status": "success",
+  "cache": {
+    "biomodels": {
+      "nfiles": 8,
+      "size": 212254013
+    },
+    "bigg": {
+      "nfiles": 5,
+      "size": 59429817
+    }
+  },
+  "user": {
+    "uploaded": {
+      "nfiles": 0,
+      "size": 0
+    },
+    "generated": {
+      "nfiles": 0,
+      "size": 0
+    }
+  }
+}</pre>
+      So go ahead and make sure people do not exploit your instance ;-)
+    </p>
   </div>
 </div>
 {% endblock %}
