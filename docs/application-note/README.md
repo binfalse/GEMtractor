@@ -123,6 +123,5 @@ Automatic tests cover most of its source code to prevent future programming mist
 We would like to thank Markus Wolfien and Tom Gebhardt for creative brainstormings.
 
 ## Funding
-The authors acknowledge funding for the ERACoBioTech project BESTER provided by BMBF FKZ... and systeract?.
-
+This study was conducted in the frame of ERACoBioTech project BESTER (031B0594B) provided by Federal Ministry of Education and Research (BMBF).
 
