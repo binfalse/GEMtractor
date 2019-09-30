@@ -26,10 +26,9 @@
 ## Abstract
 * **Summary:** Computational metabolic models typically encode for graphs of species, reactions, and enzymes.
 Comparing genome-scale models through topological analysis of multipartite graphs is challenging.
-However, in many practical cases it is not neccesary to compare the full networks.
-Identifing a subnetwork from a whole genome model can be done by FBA or knock out experiments.
+However, in many practical cases it is not necessary to compare the full networks.
 The GEMtractor is a web-based tool to trim models encoded in SBML.
-It can be used to extract subnetworks, for example focussing on reaction- and enzyme-centric views into the model.
+It can be used to extract subnetworks, for example focusing on reaction- and enzyme-centric views into the model.
 * **Availability and Implementation:** The GEMtractor is licensed under the terms of [GPLv3](https://www.gnu.org/licenses/gpl-3.0.en.html) and developed at [github.com/binfalse/GEMtractor/](https://github.com/binfalse/GEMtractor/) -- a public version is available at [sbi.uni-rostock.de/gemtractor](https://www.sbi.uni-rostock.de/gemtractor).
 * **Contact:** ..@..
 
@@ -87,7 +86,7 @@ For example, the *species* in the reaction-centric network will have all the ann
 Similarly, if the gene products were annotated using the FBC package, they will be annotated in the exported file.
 
 In addition to the web browser front-end, the GEMtractor provides a decent API.
-Trimming an extraction tasks can be encoded in JSON jobs and sent to the API endpoint, which will take care of the computation and immediately return the results.
+Trimming and extracting can be encoded in JSON jobs and sent to the API endpoint, which will take care of the computation and immediately return the results.
 Client implementations in several languages are shipped with the source code.
 Due to Django's architecture, the heart of the GEMtractor can be used as a Python module if a network connection is undesired.
 
@@ -123,5 +122,4 @@ Automatic tests cover most of its source code to prevent future programming mist
 We would like to thank Markus Wolfien and Tom Gebhardt for creative brainstormings.
 
 ## Funding
-This study was conducted in the frame of ERACoBioTech project BESTER (031B0594B) provided by Federal Ministry of Education and Research (BMBF).
-
+This study was conducted in the frame of ERACoBioTech project BESTER (FKZ 031B0594B) provided by the German Federal Ministry of Education and Research (BMBF).
