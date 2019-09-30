@@ -120,7 +120,7 @@ Automatic tests cover most of its source code to prevent future programming mist
 
 ## Acknowledgements
 
-We would like to thank Markus Wolfien and Tom Gebhardt for creative brainstormings ;-)
+We would like to thank Markus Wolfien and Tom Gebhardt for creative brainstormings.
 
 ## Funding
 The authors acknowledge funding for the ERACoBioTech project BESTER provided by BMBF FKZ... and systeract?.
