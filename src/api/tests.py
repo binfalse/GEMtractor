@@ -719,6 +719,7 @@ class ApiTest(TestCase):
           },
           "filter": {
             "enzymes": ["a"],
+            "enzyme_complexes": ["a"],
           },
           "file": model
           }),content_type="application/json")
@@ -756,6 +757,20 @@ class ApiTest(TestCase):
       self.assertEqual (c.count ("label="), 0)
       
     
+    d = tempfile.TemporaryDirectory()
+    with self.settings(STORAGE=d.name):
+      response = self.client.post('/api/serve/filename/some/type',content_type="application/json")
+      c = response.content.decode("utf-8")
+      self.assertEqual(c, "bad session")
+      self.assertEqual(response.status_code, 400)
+      
+      response = self.client.post('/api/select_biomodel', json.dumps({'biomodels_id': "BIOMD0000000007"}),content_type="application/json")
+      self._expect_response (response, True)
+      
+      response = self.client.post('/api/serve/filename/some/type',content_type="application/json")
+      c = response.content.decode("utf-8")
+      self.assertEqual(c, "file does not exist")
+      self.assertEqual(response.status_code, 400)
   
   def _valid_xml (self, xml):
     try:

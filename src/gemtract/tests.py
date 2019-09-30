@@ -136,6 +136,19 @@ class GemtractTest(TestCase):
     d = tempfile.TemporaryDirectory()
     with self.settings(STORAGE=d.name):
       with open("test/gene-filter-example.xml") as fp:
+        
+        
+        
+        form = self._create_export ('mn', 'sbml', False, True)
+        self.assertTrue (form.is_valid())
+        response = self.client.post('/api/export', form.cleaned_data)
+        self.assertEqual(response.status_code, 400)
+        self.assertTrue (b"no such session" in response.content)
+        
+        
+        
+        
+        
         response = self.client.post('/gemtract/', {"custom-model": fp})
         self.assertEqual(response.status_code, 302)
         self.assertEqual("/gemtract/filter", response["location"])
@@ -177,16 +190,16 @@ class GemtractTest(TestCase):
         self.assertTrue(len(data["name"]) > 0)
         self.assertTrue(len(data["mime"]) > 0)
         response = self.client.post('/api/serve/' + data["name"] + "/" + data["mime"])
-        valid, sbml_rn = self._valid_sbml (response.content)
+        valid, sbml_mn = self._valid_sbml (response.content)
         self.assertTrue (valid, msg="invalid SBML of rn")
         
-        rnSpecies = sbml_rn.getModel ().getNumSpecies ()
-        rnReactions = sbml_rn.getModel ().getNumReactions ()
-        rnEdges = 0
-        for r in range (rnReactions):
-          reaction = sbml_rn.getModel ().getReaction (r)
-          rnEdges += reaction.getNumReactants ()
-          rnEdges += reaction.getNumProducts ()
+        mnSpecies = sbml_mn.getModel ().getNumSpecies ()
+        mnReactions = sbml_mn.getModel ().getNumReactions ()
+        mnEdges = 0
+        for r in range (mnReactions):
+          reaction = sbml_mn.getModel ().getReaction (r)
+          mnEdges += reaction.getNumReactants ()
+          mnEdges += reaction.getNumProducts ()
         
         form = self._create_export ('en', 'sbml', False, True)
         self.assertTrue (form.is_valid())
@@ -207,6 +220,25 @@ class GemtractTest(TestCase):
           enEdges += reaction.getNumReactants ()
           enEdges += reaction.getNumProducts ()
         
+        form = self._create_export ('rn', 'sbml', False, True)
+        self.assertTrue (form.is_valid())
+        response = self.client.post('/api/export', form.cleaned_data)
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertTrue(len(data["name"]) > 0)
+        self.assertTrue(len(data["mime"]) > 0)
+        response = self.client.post('/api/serve/' + data["name"] + "/" + data["mime"])
+        valid, sbml_rn = self._valid_sbml (response.content)
+        self.assertTrue (valid, msg="invalid SBML of en")
+        
+        rnSpecies = sbml_rn.getModel ().getNumSpecies ()
+        rnReactions = sbml_rn.getModel ().getNumReactions ()
+        rnEdges = 0
+        for r in range (rnReactions):
+          reaction = sbml_rn.getModel ().getReaction (r)
+          rnEdges += reaction.getNumReactants ()
+          rnEdges += reaction.getNumProducts ()
+        
         
         
         form = self._create_export ('mn', 'graphml', False, True)
@@ -219,10 +251,10 @@ class GemtractTest(TestCase):
         response = self.client.post('/api/serve/' + data["name"] + "/" + data["mime"])
         self.assertTrue (self._valid_xml (response.content))
         c = response.content.decode("utf-8")
-        self.assertEqual (c.count ("<node "), rnSpecies + rnReactions)
-        self.assertEqual (c.count (">species</data"), rnSpecies)
-        self.assertEqual (c.count (">reaction<"), rnReactions)
-        self.assertEqual (c.count ("<edge"), rnEdges)
+        self.assertEqual (c.count ("<node "), mnSpecies + mnReactions)
+        self.assertEqual (c.count (">species</data"), mnSpecies)
+        self.assertEqual (c.count (">reaction<"), mnReactions)
+        self.assertEqual (c.count ("<edge"), mnEdges)
         
         
         
@@ -242,6 +274,22 @@ class GemtractTest(TestCase):
         
         
         
+        form = self._create_export ('rn', 'graphml', False, True)
+        self.assertTrue (form.is_valid())
+        response = self.client.post('/api/export', form.cleaned_data)
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertTrue(len(data["name"]) > 0)
+        self.assertTrue(len(data["mime"]) > 0)
+        response = self.client.post('/api/serve/' + data["name"] + "/" + data["mime"])
+        self.assertTrue (self._valid_xml (response.content))
+        c = response.content.decode("utf-8")
+        self.assertEqual (c.count ("<node "), rnSpecies)
+        self.assertEqual (c.count (">reaction</data"), rnSpecies)
+        self.assertEqual (c.count ("<edge"), rnReactions)
+        
+        
+        
         form = self._create_export ('mn', 'gml', False, True)
         self.assertTrue (form.is_valid())
         response = self.client.post('/api/export', form.cleaned_data)
@@ -251,8 +299,8 @@ class GemtractTest(TestCase):
         self.assertTrue(len(data["mime"]) > 0)
         response = self.client.post('/api/serve/' + data["name"] + "/" + data["mime"])
         c = response.content.decode("utf-8")
-        self.assertEqual (c.count ("node ["), rnSpecies + rnReactions)
-        self.assertEqual (c.count ("edge ["), rnEdges)
+        self.assertEqual (c.count ("node ["), mnSpecies + mnReactions)
+        self.assertEqual (c.count ("edge ["), mnEdges)
         
         
         
@@ -270,6 +318,20 @@ class GemtractTest(TestCase):
         
         
         
+        form = self._create_export ('rn', 'gml', False, True)
+        self.assertTrue (form.is_valid())
+        response = self.client.post('/api/export', form.cleaned_data)
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertTrue(len(data["name"]) > 0)
+        self.assertTrue(len(data["mime"]) > 0)
+        response = self.client.post('/api/serve/' + data["name"] + "/" + data["mime"])
+        c = response.content.decode("utf-8")
+        self.assertEqual (c.count ("node ["), rnSpecies)
+        self.assertEqual (c.count ("edge ["), rnReactions)
+        
+        
+        
         form = self._create_export ('mn', 'dot', False, True)
         self.assertTrue (form.is_valid())
         response = self.client.post('/api/export', form.cleaned_data)
@@ -279,8 +341,8 @@ class GemtractTest(TestCase):
         self.assertTrue(len(data["mime"]) > 0)
         response = self.client.post('/api/serve/' + data["name"] + "/" + data["mime"])
         c = response.content.decode("utf-8")
-        self.assertEqual (c.count ("label="), rnSpecies + rnReactions)
-        self.assertEqual (c.count (" -> "), rnEdges)
+        self.assertEqual (c.count ("label="), mnSpecies + mnReactions)
+        self.assertEqual (c.count (" -> "), mnEdges)
         
         
         
@@ -295,6 +357,59 @@ class GemtractTest(TestCase):
         c = response.content.decode("utf-8")
         self.assertEqual (c.count ("label="), enSpecies)
         self.assertEqual (c.count (" -> "), enReactions)
+        
+        
+        
+        form = self._create_export ('rn', 'dot', False, True)
+        self.assertTrue (form.is_valid())
+        response = self.client.post('/api/export', form.cleaned_data)
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertTrue(len(data["name"]) > 0)
+        self.assertTrue(len(data["mime"]) > 0)
+        response = self.client.post('/api/serve/' + data["name"] + "/" + data["mime"])
+        c = response.content.decode("utf-8")
+        self.assertEqual (c.count ("label="), rnSpecies)
+        self.assertEqual (c.count (" -> "), rnReactions)
+        
+        
+        
+        form = self._create_export ('mn', 'csv', False, True)
+        self.assertTrue (form.is_valid())
+        response = self.client.post('/api/export', form.cleaned_data)
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertTrue(len(data["name"]) > 0)
+        self.assertTrue(len(data["mime"]) > 0)
+        response = self.client.post('/api/serve/' + data["name"] + "/" + data["mime"])
+        c = response.content.decode("utf-8")
+        self.assertEqual (c.count ("\n"), mnEdges + 1)
+        
+        
+        
+        form = self._create_export ('en', 'csv', False, True)
+        self.assertTrue (form.is_valid())
+        response = self.client.post('/api/export', form.cleaned_data)
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertTrue(len(data["name"]) > 0)
+        self.assertTrue(len(data["mime"]) > 0)
+        response = self.client.post('/api/serve/' + data["name"] + "/" + data["mime"])
+        c = response.content.decode("utf-8")
+        self.assertEqual (c.count ("\n"), enReactions + 1)
+        
+        
+        
+        form = self._create_export ('rn', 'csv', False, True)
+        self.assertTrue (form.is_valid())
+        response = self.client.post('/api/export', form.cleaned_data)
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertTrue(len(data["name"]) > 0)
+        self.assertTrue(len(data["mime"]) > 0)
+        response = self.client.post('/api/serve/' + data["name"] + "/" + data["mime"])
+        c = response.content.decode("utf-8")
+        self.assertEqual (c.count ("\n"), rnReactions + 1)
         
         
         

@@ -654,6 +654,8 @@ def serve_file (request, file_name, file_type):
   :return: HTTP 200 and the file or 404 if no such file
   :rtype: `django:HttpResponse <https://docs.djangoproject.com/en/2.2/ref/request-response/#httpresponse-objects>`_
   """
+  if request.session.session_key is None:
+    return HttpResponseBadRequest("bad session")
   file_path = Utils.create_generated_file_web (request.session.session_key)
   if not os.path.exists(file_path):
     return HttpResponseBadRequest("file does not exist")
