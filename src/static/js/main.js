@@ -593,6 +593,43 @@ function loadNetwork () {
 		
 		
 	});
+	
+	
+	$("#toggle-species").click (function (){
+		if ($('#species-table input:checkbox:checked').length < $('#species-table input:checkbox').length / 2) {
+				$('#species-table input:checkbox').prop('checked', true);
+		} else {
+				$('#species-table input:checkbox').prop('checked', false);
+		}
+		updateNetwork ();
+	});
+	$("#toggle-reactions").click (function (){
+		if ($('#reaction-table input:checkbox:checked').length < $('#reaction-table input:checkbox').length / 2) {
+				$('#reaction-table input:checkbox').prop('checked', true);
+		} else {
+				$('#reaction-table input:checkbox').prop('checked', false);
+		}
+		updateNetwork ();
+	});
+	$("#toggle-gene").click (function (){
+		if ($('#gene-table input:checkbox:checked').length < $('#gene-table input:checkbox').length / 2) {
+				$('#gene-table input:checkbox').prop('checked', true);
+		} else {
+				$('#gene-table input:checkbox').prop('checked', false);
+		}
+		updateNetwork ();
+	});
+	$("#toggle-gene-complex").click (function (){
+		if ($('#gene-complex-table input:checkbox:checked').length < $('#gene-complex-table input:checkbox').length / 2) {
+				$('#gene-complex-table input:checkbox').prop('checked', true);
+		} else {
+				$('#gene-complex-table input:checkbox').prop('checked', false);
+		}
+		updateNetwork ();
+	});
+	
+	
+	
 }
 
 /**

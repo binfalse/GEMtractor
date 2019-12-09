@@ -64,6 +64,10 @@ a.biomodels_id,
 a.bigg_id {
   border-bottom: 1px solid;
 }
+#toggle-species,
+#toggle-reactions,
+#toggle-gene,
+#toggle-gene-complex,
 a.biomodels_id:hover,
 a.bigg_id:hover {
  cursor:pointer;
