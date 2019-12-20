@@ -180,7 +180,7 @@ class Utils:
       for s in filter_enzyme_complexes:
         additional_note = additional_note + "<li>"+s+"</li>"
       additional_note = additional_note + "</ul>"
-    additional_note = additional_note + "<p>Remove reactions which's enzymes are removed: " +str(remove_reaction_enzymes_removed)+ "</p>"
+    additional_note = additional_note + "<p>Remove reactions whose enzymes are removed: " +str(remove_reaction_enzymes_removed)+ "</p>"
     additional_note = additional_note + "<p>Remove ghost species: " +str(remove_ghost_species)+ "</p>"
     additional_note = additional_note + "<p>Discard fake enzymes: " +str(discard_fake_enzymes)+ "</p>"
     additional_note = additional_note + "<p>Remove reactions that are missing a species: " +str(remove_reaction_missing_species)+ "</p>"
