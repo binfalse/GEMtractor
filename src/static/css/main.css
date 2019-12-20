@@ -72,6 +72,7 @@ a.biomodels_id:hover,
 a.bigg_id:hover {
  cursor:pointer;
 }
+#choose-public-model abbr,
 #filter-tables abbr {
   text-decoration: none;
 }

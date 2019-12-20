@@ -828,7 +828,7 @@ function prepareIndex () {
 					// if it was successful: build the table
 					for (var model of data.models) {
 						model.DOM = domIdMapper (model.id);
-						const row = $("<tr id='"+model.DOM+"'><td><a class='biomodels_id'>"+model.id+"</a></td><td>"+model.name+"</td></tr>");
+						const row = $("<tr id='"+model.DOM+"'><td><a class='biomodels_id'>"+model.id+"</a></td><td><abbr title='"+model.name+"'>"+truncate (model.name,50)+"<abbr></td><td>"+model.metabolites+"</td><td>"+model.reactions+"</td><td>"+model.genes+"</td></tr>");
 						$('#biomodels-table').append(row);
 					}
 			

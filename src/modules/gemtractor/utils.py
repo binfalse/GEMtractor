@@ -331,7 +331,7 @@ class Utils:
     return f
   
   @staticmethod
-  def get_biomodels (force = False):
+  def get_biomodels (request, force = False):
     """ Retrieve the list of models from Biomodels
     
     :param force: should the cache be renewed even if it's not too old?
@@ -349,7 +349,10 @@ class Utils:
     f = os.path.join (d, "models.json")
     if force or not os.path.isfile (f):
       Utils.__logger.info('need to (re)download the list of models from biomodels')
-      urllib.request.urlretrieve (settings.URLS_BIOMODELS, f)
+      biomodels_url = settings.URLS_BIOMODELS
+      if 'http' not in biomodels_url:
+          biomodels_url = request.scheme + "://" + request.META['HTTP_HOST'] + biomodels_url
+      urllib.request.urlretrieve (biomodels_url, f)
     if time.time() - os.path.getmtime(f) > settings.CACHE_BIOMODELS:
       return Utils.get_biomodels (True)
     try:
