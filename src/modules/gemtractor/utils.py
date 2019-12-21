@@ -359,6 +359,7 @@ class Utils:
       if 'http' not in biomodels_url:
           biomodels_url = request.scheme + "://" + request.META['HTTP_HOST'] + biomodels_url
       Utils.__logger.info('need to (re)download the list of models from biomodels from ' + biomodels_url)
+      Utils.__logger.info('need to (re)download the list of models from biomodels from ' + request.get_host())
       urllib.request.urlretrieve (biomodels_url, f)
     if time.time() - os.path.getmtime(f) > settings.CACHE_BIOMODELS:
       return Utils.get_biomodels (True)
