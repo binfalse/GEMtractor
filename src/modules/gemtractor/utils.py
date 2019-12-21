@@ -22,6 +22,7 @@ import os
 import re
 import time
 import urllib.request
+from shutil import copyfile
 
 from django.conf import settings
 from django.http import HttpResponse
@@ -356,13 +357,10 @@ class Utils:
     f = os.path.join (d, "models.json")
     if force or not os.path.isfile (f):
       biomodels_url = settings.URLS_BIOMODELS
-      # if 'http' not in biomodels_url:
-      # TODO hardcoded URL/domain is not ok
-      biomodels_url = "https://gemtractor.bio.informatik.uni-rostock.de/" + biomodels_url
-      Utils.__logger.info('need to (re)download the list of models from biomodels from ' + biomodels_url)
-      # Utils.__logger.info('need to (re)download the list of models from biomodels from ' + request.get_host())
-      # Utils.__logger.info('need to (re)download the list of models from biomodels from ' + request.META['HTTP_X_FORWARDED_FOR'])
-      urllib.request.urlretrieve (biomodels_url, f)
+      if 'http' not in biomodels_url:
+        copyfile (biomodels_url, f)
+      else:
+        urllib.request.urlretrieve (biomodels_url, f)
     if time.time() - os.path.getmtime(f) > settings.CACHE_BIOMODELS:
       return Utils.get_biomodels (True)
     try:
