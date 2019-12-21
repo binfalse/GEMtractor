@@ -355,10 +355,10 @@ class Utils:
     Utils._create_dir(d)
     f = os.path.join (d, "models.json")
     if force or not os.path.isfile (f):
-      Utils.__logger.info('need to (re)download the list of models from biomodels')
       biomodels_url = settings.URLS_BIOMODELS
       if 'http' not in biomodels_url:
           biomodels_url = request.scheme + "://" + request.META['HTTP_HOST'] + biomodels_url
+      Utils.__logger.info('need to (re)download the list of models from biomodels from ' + biomodels_url)
       urllib.request.urlretrieve (biomodels_url, f)
     if time.time() - os.path.getmtime(f) > settings.CACHE_BIOMODELS:
       return Utils.get_biomodels (True)
