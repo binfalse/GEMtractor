@@ -1,0 +1,60 @@
+{
+  "models": [
+    {
+      "id": "MODEL1105100000",
+      "name": "Shlomi2011 - Warburg effect, metabolic model",
+      "metabolites":2767,
+      "reactions":4894,
+      "genes":3895
+    },
+    {
+      "id": "MODEL1311070000",
+      "name": "Ponce-de-Léon2013 - Genome scale metabolic model for Blattabacterium cuenoti (iMP240)",
+      "metabolites":413,
+      "reactions":411,
+      "genes":335
+    },
+    {
+      "id": "MODEL1508190002",
+      "name": "Kerkhoven2016 - Genome-scale metabolic model of Yarrowia lipolytica",
+      "metabolites":1683,
+      "reactions":1985,
+      "genes":1593
+    },
+    {
+      "id": "MODEL1601050000",
+      "name": "Ponce-de-Leon2015 - Genome-Scale Model of Bacterial Metabolism (MM130)",
+      "metabolites":2047,
+      "reactions":2716,
+      "genes":3
+    },
+    {
+      "id": "MODEL1612020000",
+      "name": "Peyraud2016 - Metabolic reconstruction (iRP1476) of Ralstonia solanacearum GMI1000",
+      "metabolites":2574,
+      "reactions":2644,
+      "genes":2219
+    },
+    {
+      "id": "MODEL1703150000",
+      "name": "Cetinkaya2017 - Engineering targets for Komagataella phaffii",
+      "metabolites":2129,
+      "reactions":1474,
+      "genes":1058
+    },
+    {
+      "id": "MODEL1704250001",
+      "name": "Kamminga2017 - Metabolic model of Mycoplasma hyopneumoniae growth",
+      "metabolites":298,
+      "reactions":293,
+      "genes":277
+    },
+    {
+      "id": "MODEL2784700357",
+      "name": "Feala2007_dros_mel_central_metabolism",
+      "metabolites":209,
+      "reactions":186,
+      "genes":254
+    }
+   ]
+  }

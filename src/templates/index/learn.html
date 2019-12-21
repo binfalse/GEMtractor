@@ -39,6 +39,7 @@ Learn
       <li><a href="#red-enzyme-complex">Why is a certain enzyme complex highlighted in red?</a></li>
       <li><a href="#enzyme-complex">What is an enzyme complex?</a></li>
       <li><a href="#batch-filter">How does the batch filtering work?</a></li>
+      <li><a href="#fbresults-format">How should I format my flux balance results?</a></li>
       <li><a href="#waiting">Why does it take so long?</a></li>
       <li><a href="#what-currency-metabolites">What are currency metabolites?</a></li>
       <li><a href="#currency-metabolites">How can I discard currency metabolites (such as H<sup>+</sup>, H<sub>2</sub>O or ATP)?</a></li>
@@ -389,6 +390,19 @@ Learn
 		<p>
 		  The text-field expects four lines, each starting with either <code>species</code>, <code>reactions</code>, <code>enzymes</code>, or <code>enzyme_complexes</code>, followed by a color (<code>:</code>) and the list of comma-separated entity-identifiers.
 		  Applying the batch-filter will send the lists to the backend, where they will stored in your session, and reload the page to update the trimming selection.
+		</p>
+	</div>
+	
+	<div class="w3-padding w3-card w3-white learn-entry">
+		<div class=" anchor-heading">
+			<a name="fbresults-format" id="fbresults-format"></a>
+			<h3>How should I format my flux balance results?</h3>
+		</div>
+		<p>
+		  GEMtractor allows for integrating of the results of flux balance analysis.
+		  If you provide your fluxes, you will find another column in the table for filtering reaction that lets you sort the reactions by their fluxes.
+		  To upload your fluxes you can use the upload box in the <em>Reactions</em> tab of the <em>Trim</em> page.
+		  Your fluxes need to be encoded in CSV, each row containing one reaction identifier and the corresponding flux (or vice versa: flux,reaction_id).
 		</p>
 	</div>
 	

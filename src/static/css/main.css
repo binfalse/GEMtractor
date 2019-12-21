@@ -108,7 +108,7 @@ a.bigg_id:hover {
 #skeleton-tabs-top {
   margin-bottom: 30px;
 }
-#custom-model {
+#custom-model,#fbresults {
   display: none;
 }
 .prev,.next {
@@ -162,4 +162,7 @@ td, th {
 }
 .learn-image-network {
   max-width: 400px;
+}
+#flux_column, #fluxinfo {
+  display: none
 }

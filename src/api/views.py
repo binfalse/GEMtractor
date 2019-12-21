@@ -19,6 +19,7 @@ import logging
 import os
 import tempfile
 import urllib
+import csv
 
 from django.conf import settings
 from django.http import (HttpResponseBadRequest, HttpResponseServerError,
@@ -85,6 +86,9 @@ def get_session_data (request):
   files = []
   if Constants.SESSION_MODEL_TYPE in request.session and request.session[Constants.SESSION_MODEL_TYPE] == Constants.SESSION_MODEL_TYPE_UPLOAD:
     files.append (request.session[Constants.SESSION_MODEL_ID] + " (" + Utils.human_readable_bytes (os.path.getsize(Utils.get_model_path (request.session[Constants.SESSION_MODEL_TYPE], request.session[Constants.SESSION_MODEL_ID], request.session.session_key))) + ")")
+  fbpath = Utils.get_upload_path (request.session.session_key) + "-fb-results"
+  if os.path.isfile(fbpath):
+      files.append ("FB results (" + Utils.human_readable_bytes (os.path.getsize(fbpath)) + ")")
   s = {}
   for key, value in request.session.items ():
     s[key] = value
@@ -110,6 +114,7 @@ def clear_data (request):
   """
   if Constants.SESSION_MODEL_TYPE in request.session and request.session[Constants.SESSION_MODEL_TYPE] == Constants.SESSION_MODEL_TYPE_UPLOAD:
     os.remove (Utils.get_model_path (request.session[Constants.SESSION_MODEL_TYPE], request.session[Constants.SESSION_MODEL_ID], request.session.session_key))
+  Utils.rm_flux_file (request)
   Utils.del_session_key (request, None, Constants.SESSION_HAS_SESSION)
   Utils.del_session_key (request, None, Constants.SESSION_MODEL_ID)
   Utils.del_session_key (request, None, Constants.SESSION_MODEL_NAME)
@@ -242,10 +247,23 @@ def get_network (request):
       if len (network.species) + len (network.reactions) + len (network.genes) + len (network.gene_complexes) > settings.MAX_ENTITIES_FILTER:
         raise TooBigForBrowser ("This model is probably too big for your browser... It contains "+str (len (network.species))+" species, "+str (len (network.reactions))+" reactions, "+str (len (network.genes))+" genes, and "+str (len (network.gene_complexes))+" gene complexes. We won't load it for filtering, as you're browser is very likely to die when trying to process that amount of data.. Max is currently set to "+str (settings.MAX_ENTITIES_FILTER)+" entities in total. Please export it w/o filtering or use the API instead.")
       net = network.serialize()
+      fluxfile = Utils.get_upload_path (request.session.session_key) + "-fb-results"
+      fluxes = {}
+      fbpath = Utils.get_upload_path (request.session.session_key) + "-fb-results"
+      if os.path.isfile(fbpath):
+        with open(fbpath) as csvDataFile:
+          csvReader = csv.reader(csvDataFile)
+          for row in csvReader:
+            if Utils.is_number (row[0]):
+              fluxes[row[1]] = row[0]
+            else:
+              fluxes[row[0]] = row[1]
+
       __logger.info ("serialised the network")
       return JsonResponse ({
             "status":"success",
             "network":net,
+            "fluxes": fluxes,
             "filter": {
             Constants.SESSION_FILTER_SPECIES: filter_species,
             Constants.SESSION_FILTER_REACTION: filter_reaction,
@@ -475,6 +493,7 @@ def select_bigg_model (request):
     request.session[Constants.SESSION_MODEL_ID] = data["bigg_id"]
     request.session[Constants.SESSION_MODEL_NAME] = data["bigg_id"]
     request.session[Constants.SESSION_MODEL_TYPE] = Constants.SESSION_MODEL_TYPE_BIGG
+    Utils.rm_flux_file (request)
     Utils.del_session_key (request, {}, Constants.SESSION_FILTER_SPECIES)
     Utils.del_session_key (request, {}, Constants.SESSION_FILTER_REACTION)
     Utils.del_session_key (request, {}, Constants.SESSION_FILTER_ENZYMES)
@@ -589,6 +608,7 @@ def select_biomodel (request):
     request.session[Constants.SESSION_MODEL_ID] = data["biomodels_id"]
     request.session[Constants.SESSION_MODEL_NAME] = data["biomodels_id"]
     request.session[Constants.SESSION_MODEL_TYPE] = Constants.SESSION_MODEL_TYPE_BIOMODELS
+    Utils.rm_flux_file (request)
     Utils.del_session_key (request, {}, Constants.SESSION_FILTER_SPECIES)
     Utils.del_session_key (request, {}, Constants.SESSION_FILTER_REACTION)
     Utils.del_session_key (request, {}, Constants.SESSION_FILTER_ENZYMES)

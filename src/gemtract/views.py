@@ -97,6 +97,7 @@ def index(request):
     request.session.save()
   
   if request.method == 'POST' and 'custom-model' in request.FILES and request.FILES['custom-model']:
+    Utils.clear_data (request)
     model = request.FILES['custom-model']
     
     filename = Utils.get_upload_path (request.session.session_key)
@@ -155,6 +156,13 @@ def filter(request):
   if Constants.SESSION_MODEL_ID not in request.session:
     return redirect('gemtract:index')
   
+  if request.method == 'POST' and 'fbresults' in request.FILES and request.FILES['fbresults']:
+    model = request.FILES['fbresults']
+    
+    filename = Utils.get_upload_path (request.session.session_key)
+    with open(filename + "-fb-results", 'wb+') as destination:
+      for chunk in model.chunks():
+        destination.write(chunk)
   
   context = __prepare_context (request)
   context['error'] = False

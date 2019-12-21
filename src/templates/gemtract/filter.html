@@ -85,6 +85,22 @@
       <div id="filter-reaction" class="w3-responsive" style="display:none" class="">
 		<p>You may sort the following table by clicking on the header cell.</p>
         <p>A red row indicates, that your filter would keep the reaction in the model, but some (or all) of its species and/or all associated genes were removed. So the reaction may be wrong afterwards, and you may want to exclude the reaction as well? If you export the <em>reaction network</em> and you removed all its species, the reaction will be removed as well. If you export the <em>enzyme network,</em> the reaction will be removed if all its species are removed or all its genes are removed. See also: <a href="{% url 'index:learn' %}#filter-reaction">What exactly happens when I remove a reaction during filtering?</a></p>
+	
+	<div id="upload-fbresults" class="">
+	  <form method="post" enctype="multipart/form-data">
+	    {% csrf_token %}
+	    <label for="fbresults" id="fbresults-label" class="w3-button w3-flat-clouds">
+	      <span id="fbresults-caption">Click to upload and integrate flux balance results:</span>
+	      <strong><span id="fbresults-name">none selected</span></strong>
+	    </label>
+	    <input type="file" name="fbresults" id="fbresults">
+	    <button type="submit" class="w3-button w3-flat-silver">Upload</button>
+	    (<a href="{% url 'index:learn' %}#fbresults-format">How to format FB results?</a>)
+	  </form>
+	</div>
+	
+	<p id="fluxinfo" class="w3-padding">Found fluxes for <span id="fluxinfo_reactions"></span> reactions. <span id="fluxinfo_missing_reactions"></span> reactions do not have a flux. <span id="fluxinfo_unused_fluxes"></span> fluxes were defined for non-existing reactions.</p>
+	
 	<p><small><a id="toggle-reactions">Toggle all reactions</a></small></p>
         <table class="w3-table w3-striped sortable notfirst">
            <thead>
@@ -93,6 +109,7 @@
              <th>Name <i class='fas fa-sort'></i></th>
              <th>In <i class="fas fa-arrow-right"></i> Out <i class='fas fa-sort'></i></th>
              <th>Genes <i class='fas fa-sort'></i></th>
+             <th id='flux_column'>Fluxes <i class='fas fa-sort'></i></th>
            </thead>
            <tbody id="reaction-table"></tbody>
         </table>

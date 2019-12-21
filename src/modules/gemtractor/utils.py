@@ -76,6 +76,13 @@ class Utils:
     Utils.__cleanup (os.path.join (settings.STORAGE, Constants.STORAGE_UPLOAD_DIR), settings.KEEP_UPLOADED)
             
   
+  
+  @staticmethod
+  def rm_flux_file (request):
+    fbpath = Utils.get_upload_path (request.session.session_key) + "-fb-results"
+    if os.path.isfile(fbpath):
+        os.remove (fbpath)
+  
   @staticmethod
   def __collect_stats (root_dir):
     """
@@ -531,3 +538,11 @@ class Utils:
         return "%3.1f %s" % (byt, count)
       byt /= 1024.
     return "%3.1f %s" % (byt, 'PB')
+  
+  @staticmethod
+  def is_number (s):
+    try:
+        float(s)
+        return True
+    except ValueError:
+        return False
