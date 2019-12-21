@@ -358,10 +358,10 @@ class Utils:
       biomodels_url = settings.URLS_BIOMODELS
       # if 'http' not in biomodels_url:
       # TODO hardcoded URL/domain is not ok
-      biomodels_url = "https://https://gemtractor.bio.informatik.uni-rostock.de/" + biomodels_url
+      biomodels_url = "https://gemtractor.bio.informatik.uni-rostock.de/" + biomodels_url
       Utils.__logger.info('need to (re)download the list of models from biomodels from ' + biomodels_url)
-      Utils.__logger.info('need to (re)download the list of models from biomodels from ' + request.get_host())
-      Utils.__logger.info('need to (re)download the list of models from biomodels from ' + request.META['HTTP_X_FORWARDED_FOR'])
+      # Utils.__logger.info('need to (re)download the list of models from biomodels from ' + request.get_host())
+      # Utils.__logger.info('need to (re)download the list of models from biomodels from ' + request.META['HTTP_X_FORWARDED_FOR'])
       urllib.request.urlretrieve (biomodels_url, f)
     if time.time() - os.path.getmtime(f) > settings.CACHE_BIOMODELS:
       return Utils.get_biomodels (True)
