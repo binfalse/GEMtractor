@@ -554,7 +554,7 @@ def get_biomodels (request):
   
   """
   try:
-    models = Utils.get_biomodels (request)
+    models = Utils.get_biomodels ()
     models["status"] = "success"
     return JsonResponse (models)
   except json.decoder.JSONDecodeError as e:

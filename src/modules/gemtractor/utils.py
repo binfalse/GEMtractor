@@ -339,7 +339,7 @@ class Utils:
     return f
   
   @staticmethod
-  def get_biomodels (request, force = False):
+  def get_biomodels (force = False):
     """ Retrieve the list of models from Biomodels
     
     :param force: should the cache be renewed even if it's not too old?
