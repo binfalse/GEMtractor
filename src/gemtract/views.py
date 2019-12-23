@@ -97,7 +97,7 @@ def index(request):
     request.session.save()
   
   if request.method == 'POST' and 'custom-model' in request.FILES and request.FILES['custom-model']:
-    Utils.clear_data (request)
+    Utils.rm_flux_file (request)
     model = request.FILES['custom-model']
     
     filename = Utils.get_upload_path (request.session.session_key)
