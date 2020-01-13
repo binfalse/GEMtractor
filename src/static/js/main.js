@@ -137,7 +137,7 @@ function updateNetwork () {
 	$("#gene-table tr").removeClass ("filter-inconsistent").removeClass ("filter-excluded");
 	$("#gene-complex-table tr").removeClass ("filter-inconsistent").removeClass ("filter-excluded").removeClass ("filter-supercomplex");
 	$("#gene-complex-table tr td:nth-child(2)").attr("title", "");
-	$(".fa-info-circle").hide().attr("title", "");
+	$(".w3-content .fa-info-circle").hide().attr("title", "");
 
 	// prepare inconsistency sets
 	var inconsistent = [new Set(),new Set(),new Set(),new Set()];
@@ -663,6 +663,7 @@ function loadNetwork () {
 			fileName = fileName.substring(fileName.lastIndexOf("\\") + 1, fileName.length);
 		$('#fbresults-name').html(fileName);
 	 });
+	 
 }
 
 /**
@@ -906,6 +907,7 @@ function prepareIndex () {
 			fileName = fileName.substring(fileName.lastIndexOf("\\") + 1, fileName.length);
 		$('#upload-name').html(fileName);
 	 });
+	 
 }
 
 
@@ -956,3 +958,21 @@ function prepareImprint () {
 		});
 	});
 }
+
+
+
+function startIntro (toggleNaviMobi = false) {
+	if (toggleNaviMobi)
+		toggleNaviMobile ();
+	
+	introJs().onbeforechange(function(targetElement) {
+		let cb = targetElement.getAttribute("data-intro-clickbefore");
+		if (cb) {
+			preclicks = cb.split (",");
+			for (i = 0; i < preclicks.length; i++)
+				$("#" + preclicks[i]).click();
+		}
+	}).start();
+}
+
+

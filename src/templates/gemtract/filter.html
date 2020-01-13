@@ -1,7 +1,7 @@
 {% extends "gemtract/skeleton.html" %}
 {% block gemtract %}
 
-<h1>Step 2. Trim the Model</h1>
+<h1 data-intro="You are currently in the process of trimming your model.">Step 2. Trim the Model</h1>
 
 <div id="loading"><i class="fa fa-spinner w3-spin"></i> loading network &mdash; this may take a few minutes for very large models</div>
 
@@ -16,7 +16,7 @@
 	  <li><strong>inconsistent:</strong> entities that may need special attention when applying the current filter</li>
   </ul>
   </p>
-  <table class="w3-table w3-bordered">
+  <table class="w3-table w3-bordered" data-intro="This table shows how many entities were in the original model, how many entities will be left after applying your filter, and how many entities are in an inconsistent state and may need extra attention.">
   <tr>
     <th></th>
     <th>original</th>
@@ -57,7 +57,7 @@
   </p>
 
 
-  <div class="w3-bar  w3-white w3-border">
+  <div class="w3-bar  w3-white w3-border" data-intro="Use this tabbed bar to trim the entities off your model. Let's go through the different options.">
     <div class="w3-bar-item w3-hide-small">Filter:</div>
     <button id="filter-species-tab" class="w3-bar-item w3-button" onclick="tab('filter-species', 'filter-species-tab')">Species</button>
     <button id="filter-reaction-tab" class="w3-bar-item w3-button" onclick="tab('filter-reaction', 'filter-reaction-tab')">Reactions</button>
@@ -73,7 +73,7 @@
         <p>A red row indicates, that the corresponding species does not participate in any reaction anymore, so you may want to exclude it as well? If uncheck a species, it will not be removed from the entire model, but it will be removed from all reactions (it may still be used in other entities, such as functions or triggers). However, there may be ghost species afterwards, not participating in any reaction. See also: <a href="{% url 'index:learn' %}#filter-species">What exactly happens when I remove a species during filtering?</a></p>
 	<p><small><a id="toggle-species">Toggle all species</a></small></p>
         <table class="w3-table w3-striped sortable notfirst">
-           <thead>
+           <thead data-intro="In the 'Species' tab you can remove individual species from you model. The table can be sorted by clicking the table headers. For example, click '#Reactions' to find and remove currency metabolites (i.e. species participating in almost every reaction)." data-intro-clickbefore="filter-species-tab">
              <th>include <i class='fas fa-sort'></i></th>
              <th>ID <i class='fas fa-sort'></i></th>
              <th>Name <i class='fas fa-sort'></i></th>
@@ -86,7 +86,7 @@
 		<p>You may sort the following table by clicking on the header cell.</p>
         <p>A red row indicates, that your filter would keep the reaction in the model, but some (or all) of its species and/or all associated genes were removed. So the reaction may be wrong afterwards, and you may want to exclude the reaction as well? If you export the <em>reaction network</em> and you removed all its species, the reaction will be removed as well. If you export the <em>enzyme network,</em> the reaction will be removed if all its species are removed or all its genes are removed. See also: <a href="{% url 'index:learn' %}#filter-reaction">What exactly happens when I remove a reaction during filtering?</a></p>
 	
-	<div id="upload-fbresults" class="">
+	<div id="upload-fbresults" class="" data-intro="In the 'Reactions' tab you can upload a CSV file containing the fluxes of the reactions in your model. This will create an additional row in the table below, so you can quickly remove (in-)active reactions." data-intro-clickbefore="filter-reaction-tab">
 	  <form method="post" enctype="multipart/form-data">
 	    {% csrf_token %}
 	    <label for="fbresults" id="fbresults-label" class="w3-button w3-flat-clouds">
@@ -103,7 +103,7 @@
 	
 	<p><small><a id="toggle-reactions">Toggle all reactions</a></small></p>
         <table class="w3-table w3-striped sortable notfirst">
-           <thead>
+           <thead data-intro="Use the table in the 'Reactions' tab to remove individual reactions from you model. Again, the table can be sorted by clicking the table headers. Upload your FBA results above to get another column to sort by activity." data-intro-clickbefore="filter-reaction-tab">
              <th>include <i class='fas fa-sort'></i></th>
              <th>ID <i class='fas fa-sort'></i></th>
              <th>Name <i class='fas fa-sort'></i></th>
@@ -119,7 +119,7 @@
         <p>Unselecting an enzyme will also remove all complexes in which it appears (they will be highlighted in read under the <em>Enzyme Complex</em> tab). A red enzyme indicates, that the enzyme is not used in any reaction anymore. Thus, it will be excluded even if you keep it selected here. See also: <a href="{% url 'index:learn' %}#gene-association">How does the GEMtractor identify genes that are associated to a reaction?</a> and <a href="{% url 'index:learn' %}#filter-gene">What exactly happens when I remove an enzyme during filtering?</a></p>
 	<p><small><a id="toggle-gene">Toggle all enzymes</a></small></p>
         <table class="w3-table w3-striped sortable notfirst">
-           <thead>
+           <thead data-intro="In the 'Enzymes' tab you can remove individual enzymes from you model. The table can be sorted by clicking the table headers. The columns '#Reactions' and '#Complexes' show in how many reactions and enzyme complexes the corresponding enzyme participates." data-intro-clickbefore="filter-gene-tab">
              <th>include <i class='fas fa-sort'></i></th>
              <th>ID <i class='fas fa-sort'></i></th>
              <th title="Occurences in Reactions">#Reactions <i class='fas fa-sort'></i></th>
@@ -133,7 +133,7 @@
         <p>Unselecting an enzyme complex will <strong>not</strong> remove the individual enzymes appearing in that complex! Other complexes, which are a superset of a removed complex, will be highlighted in red-italics &mdash; move your mouse over the complex' id to learn which sub-complexes are to be removed. If you do not remove those yourself, they are assumed to be still available in the model. See also: <a href="{% url 'index:learn' %}#gene-association">How does the GEMtractor identify genes that are associated to a reaction?</a> and <a href="{% url 'index:learn' %}#enzyme-complex">What is an enzyme complex?</a> and <a href="{% url 'index:learn' %}#filter-enzyme-complex">What exactly happens when I remove an enzyme complex during filtering?</a></p>
 	<p><small><a id="toggle-gene-complex">Toggle all enzyme complexes</a></small></p>
         <table class="w3-table w3-striped sortable notfirst">
-           <thead>
+           <thead data-intro="In the 'Enzyme Complexes' tab you can remove enzyme complexes from you model. The table can be sorted by clicking the table headers. The column '#Reactions' shows in how many reactions the corresponding enzyme complex participates." data-intro-clickbefore="filter-gene-complex-tab">
              <th>include <i class='fas fa-sort'></i></th>
              <th>ID <i class='fas fa-sort'></i></th>
              <th title="Occurences in Reactions">#Reactions <i class='fas fa-sort'></i></th>
@@ -141,7 +141,7 @@
            <tbody id="gene-complex-table"></tbody>
         </table>
       </div>
-      <div id="filter-batch" style="display:none" class="">
+      <div id="filter-batch" style="display:none" class="" data-intro="Using the 'Batch' tab you can import and export your trim-settings." data-intro-clickbefore="filter-batch-tab">
 	<p>
 	  Use the following text area to automatically alter the filtering.
 	  Every line begins with an entity identifier (species, reactions, enzymes, enzyme_complexes), followed by a colon (:) and a comma seperated list of identifiers:

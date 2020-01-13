@@ -1,7 +1,7 @@
 {% extends "gemtract/skeleton.html" %}
 {% block gemtract %}
 {% load template_tags %}
-<h1>Step 3. Export the Model</h1>
+<h1 data-intro="You are currently in the process of exporting your trimmed model.">Step 3. Export the Model</h1>
 
 
 <div id="error" class="w3-container w3-red w3-padding"></div>
@@ -13,7 +13,7 @@
       {{ form.non_field_errors }}
  </div>  
        <div class="w3-row">
-         <div class="w3-half w3-container">
+         <div class="w3-half w3-container" data-intro="First, decide on what to export. The 'Enzyme-centric Network' shows the interactions between enzymes, the 'Reaction-centric Network' lists interactions between reactions, and the 'Metabolite-Reaction Network' shows the interactions between metabolites and reactions.">
   <p>
     <div class="w3-red">
     {{ form.network_type.errors }}
@@ -22,7 +22,7 @@
 {{ form.network_type|addclass:'w3-select' }}
 </p>
   </div>
-  <div class="w3-half w3-container">
+  <div class="w3-half w3-container" data-intro="Then decide on the format. Choose SBML if you want to continue analysing the biology. GraphML, DOT, and GML are graph description formats to visualise and analyse the network of nodes. CSV is a comma separated list of interactions.">
   
   
   <p>
@@ -38,65 +38,65 @@
 
        <div class="w3-row">
          <div class="w3-container">
-  <p>    <div class="w3-red">
+  <div data-intro="Should reactions be removed if they are not catalysed by an enzyme after trimming?">    <div class="w3-red">
 
     {{ form.remove_reaction_enzymes_removed.errors }}
 </div>
     {{ form.remove_reaction_enzymes_removed|addclass:'w3-check' }}
 <label for="{{ form.remove_reaction_enzymes_removed.id_for_label }}">Remove reactions, whose enzymes were all removed.</label>
-</p>
+</div>
 
-  <p>    <div class="w3-red">
+  <div data-intro="Remove species that don't appear in any reaction? Those are probably left-overs from trimming.">    <div class="w3-red">
 
     {{ form.remove_ghost_species.errors }}
 </div>
     {{ form.remove_ghost_species|addclass:'w3-check' }}
 <label for="{{ form.remove_ghost_species.id_for_label }}">Remove ghost species, which are not participating in a reaction anymore.</label>
-</p>
+</div>
 
-  <p>    <div class="w3-red">
+  <div data-intro="If a reaction is not catalysed by an enzyme we invent fake enzymes for our analysis. Should those be removed again?">    <div class="w3-red">
 
     {{ form.discard_fake_enzymes.errors }}
 </div>
     {{ form.discard_fake_enzymes|addclass:'w3-check' }}
 <label for="{{ form.discard_fake_enzymes.id_for_label }}">Discard fake enzymes, implicitly introduced by the GEMtractor for reactions that lack an explicit enzyme.</label>
-</p>
+</div>
 
 
 
-  <p>    <div class="w3-red">
+  <div data-intro="If you trim species off a reaction, the reaction may be invalid afterwards. Should those reactions be trimmed as well?">    <div class="w3-red">
 
     {{ form.remove_reaction_missing_species.errors }}
 </div>
     {{ form.remove_reaction_missing_species|addclass:'w3-check' }}
 <label for="{{ form.remove_reaction_missing_species.id_for_label }}">Remove reactions, in which at least one species was removed.</label>
-</p>
+</div>
 
 
 
-  <p>    <div class="w3-red">
+  <div data-intro="A trimmed enzyme may be part of an untrimmed enzyme complex. Should such a complex be removed as well?">    <div class="w3-red">
 
     {{ form.removing_enzyme_removes_complex.errors }}
 </div>
     {{ form.removing_enzyme_removes_complex|addclass:'w3-check' }}
 <label for="{{ form.removing_enzyme_removes_complex.id_for_label }}">Removing an enzyme removes all complexes in which it participates.</label>
-</p>
+</div>
   
   
 
   </div>
   </div>
-       <div class="w3-row">
+       <div class="w3-row w3-margin-top">
   <div class="w3-half w3-container"> 
-    <p>
+    <div data-intro="Check the FAQ if you don't know what to select. :)">
     Not sure what to select? See:<br><i class="fas fa-info-circle "></i> <a href="{% url 'index:learn' %}#export-options" class="learnlink">What are the different export options?</a>
-</p>
+</div>
 </div>
   <div class="w3-half w3-container"> 
-  <p><div class="w3-red" id="download-error">
+  <div data-intro="Finally download you trimmed model."><div class="w3-red" id="download-error">
 </div>
     <button id="download-button" class="w3-btn w3-flat-nephritis">Download</button>
-</p>
+</div>
 
   </div>
   </div>

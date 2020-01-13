@@ -1,14 +1,14 @@
 {% extends "gemtract/skeleton.html" %}
 {% block gemtract %}
 
-<h1>Step 1: Select a model</h1>
+<h1 data-intro="You are currently in the process of selecting a model for you analysis.">Step 1: Select a model</h1>
 
 <p>
 To start your analysis you need to select a model.
 You can either choose a model from a public repository or upload your own model:
 </p>
 
-<div class="w3-bar  w3-white w3-border">
+<div class="w3-bar  w3-white w3-border" data-intro="Either select a public model or upload your own model. Let's check the public model first.">
   <div class="w3-bar-item w3-hide-small">Choose Method:</div>
   <button id="choose-public-model-tab" class="w3-bar-item w3-button" onclick="tab('choose-public-model', 'choose-public-model-tab')">Public Model</button>
   <button id="upload-model-tab" class="w3-bar-item w3-button" onclick="tab('upload-model', 'upload-model-tab')">Upload Model</button>
@@ -18,7 +18,7 @@ You can either choose a model from a public repository or upload your own model:
 <div class="w3-margin">
   <div id="choose-public-model" style="display:none" class="">
     <p>We currently support the following databases:</p>
-    <div class="w3-bar  w3-white w3-border">
+    <div class="w3-bar  w3-white w3-border" data-intro="We provide some example models from the BiGG repository and Biomodels." data-intro-clickbefore="choose-public-model-tab">
       <div class="w3-bar-item w3-hide-small">Choose Database:</div>
       <button id="choose-public-model-bigg-tab" class="w3-bar-item w3-button" onclick="tab('choose-bigg', 'choose-public-model-bigg-tab')">BiGG</button>
       <button id="choose-public-model-biomodels-tab" class="w3-bar-item w3-button" onclick="tab('choose-biomodels', 'choose-public-model-biomodels-tab')">Biomodels</button>
@@ -31,7 +31,7 @@ You can either choose a model from a public repository or upload your own model:
         </p>
         <div id="bigg_loading"><i class="fa fa-spinner w3-spin"></i> loading network</div>
         <table class="w3-table w3-striped sortable" style="display:none">
-           <thead>
+           <thead data-intro="In the BiGG tab you will find all models available from the BiGG database. The table can be sorted by clicking the table headers." data-intro-clickbefore="choose-public-model-tab,choose-public-model-bigg-tab">
              <tr>
                <th>ID <i class='fas fa-sort'></i></th>
                <th>Organism <i class='fas fa-sort'></i></th>
@@ -48,7 +48,7 @@ You can either choose a model from a public repository or upload your own model:
           Here you can select a model from <a href="https://www.ebi.ac.uk/biomodels/">Biomodels</a> to start your analysis &mdash; their models are dedicated to the public domain.
           Please consult the <a href="https://www.ebi.ac.uk/biomodels/termsofuse">Biomodels' Terms of Use</a> for more information and cite them where appropriate.
         </p>
-        <div class="w3-row">
+        <div class="w3-row" data-intro="In the Biomodels tab you can either load a specific model by specifying its model identifier, or..." data-intro-clickbefore="choose-public-model-tab,choose-public-model-biomodels-tab">
           <div class="w3-threequarter">
             <input type="text" name="biomodelsid" id="biomodelsid" placeholder="model id (BIOMD.... or MODEL...)" class="w3-input w3-flat-clouds" >
           </div>
@@ -61,7 +61,7 @@ You can either choose a model from a public repository or upload your own model:
         </p>
         <div id="biomodels_loading"><i class="fa fa-spinner w3-spin"></i> loading network</div>
         <table class="w3-table w3-striped sortable" style="display:none">
-           <thead>
+           <thead data-intro="Choose a model from the following table of pre-selected models from Biomodels. The table can be sorted by clicking the table headers." data-intro-clickbefore="choose-public-model-tab,choose-public-model-biomodels-tab">
              <tr>
                <th>ID <i class='fas fa-sort'></i></th>
                <th>Name <i class='fas fa-sort'></i></th>
@@ -77,7 +77,7 @@ You can either choose a model from a public repository or upload your own model:
   </div>
   <div id="upload-model" style="display:none" class="">
     <p>Upload a custom model from your system:</p>
-    <form method="post" enctype="multipart/form-data">
+    <form method="post" enctype="multipart/form-data" data-intro="if you want to analyse an unpublished model, choose the 'Upload Model' tab above and use this form to load your own file." data-intro-clickbefore="upload-model-tab">
       {% csrf_token %}
       <label for="custom-model" id="upload-label" class="w3-button w3-flat-clouds">
         <span id="upload-caption">Click to select a file for Upload:</span>
@@ -86,6 +86,7 @@ You can either choose a model from a public repository or upload your own model:
       <input type="file" name="custom-model" id="custom-model">
     <button type="submit" class="w3-button w3-flat-silver">Upload</button>
     </form>
+    <p><small>Currently, we only support <a href="{% url 'index:learn' %}#model-support">models in SBML format.</a></small></p>
   </div>
 </div>
 

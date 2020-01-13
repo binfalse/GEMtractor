@@ -12,7 +12,7 @@ GEMtract
 
 {% if model_name %}
 
-<div class="w3-bar w3-white w3-border" id="skeleton-tabs-top">
+<div class="w3-bar w3-white w3-border" id="skeleton-tabs-top" data-intro="This bar lets you jump through the different steps of farming.">
   <div class="w3-bar-item w3-hide-small">Model: {{model_name}}</div>
 <a href="{% url 'gemtract:index' %}" class="w3-bar-item {% if current_url == 'gemtract/' %}w3-flat-clouds{% endif %} w3-hide-small">1. Select other Model</a>
 <a href="{% url 'gemtract:index' %}" class="w3-bar-item {% if current_url == 'gemtract/' %}w3-flat-clouds{% endif %} w3-hide-large w3-hide-medium">1. Select</a>

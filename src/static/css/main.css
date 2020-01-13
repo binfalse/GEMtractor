@@ -90,7 +90,7 @@ a.bigg_id:hover {
 .fa-sort {
   color: #6c8095;
 }
-.fa-info-circle {
+.w3-content .fa-info-circle {
   color: #bdc3c7;
 }
 .sorted-desc .fa-sort,
