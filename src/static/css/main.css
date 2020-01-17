@@ -166,3 +166,6 @@ td, th {
 #flux_column, #fluxinfo {
   display: none
 }
+.introjs-helperNumberLayer {
+  background: linear-gradient(to bottom,#5d94c8 0,#0c3176 100%) !important;
+}
