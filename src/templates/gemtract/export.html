@@ -13,7 +13,7 @@
       {{ form.non_field_errors }}
  </div>  
        <div class="w3-row">
-         <div class="w3-half w3-container" data-intro="First, decide on what to export. The 'Enzyme-centric Network' shows the interactions between enzymes, the 'Reaction-centric Network' lists interactions between reactions, and the 'Metabolite-Reaction Network' shows the interactions between metabolites and reactions.">
+         <div class="w3-half w3-container" data-intro="First, decide on what to export. The <strong>'Enzyme-centric Network'</strong> shows the interactions between enzymes, the <strong>'Reaction-centric Network'</strong> lists interactions between reactions, and the <strong>'Metabolite-Reaction Network'</strong> shows the interactions between metabolites and reactions.">
   <p>
     <div class="w3-red">
     {{ form.network_type.errors }}
@@ -22,7 +22,7 @@
 {{ form.network_type|addclass:'w3-select' }}
 </p>
   </div>
-  <div class="w3-half w3-container" data-intro="Then decide on the format. Choose SBML if you want to continue analysing the biology. GraphML, DOT, and GML are graph description formats to visualise and analyse the network of nodes. CSV is a comma separated list of interactions.">
+  <div class="w3-half w3-container" data-intro="Then decide on the format, according to subsequent analyses.">
   
   
   <p>
@@ -88,12 +88,12 @@
   </div>
        <div class="w3-row w3-margin-top">
   <div class="w3-half w3-container"> 
-    <div data-intro="Check the FAQ if you don't know what to select. :)">
+    <div data-intro="Check the FAQ if you don't know what to select.">
     Not sure what to select? See:<br><i class="fas fa-info-circle "></i> <a href="{% url 'index:learn' %}#export-options" class="learnlink">What are the different export options?</a>
 </div>
 </div>
   <div class="w3-half w3-container"> 
-  <div data-intro="Finally download you trimmed model."><div class="w3-red" id="download-error">
+  <div data-intro="Finally download your trimmed model."><div class="w3-red" id="download-error">
 </div>
     <button id="download-button" class="w3-btn w3-flat-nephritis">Download</button>
 </div>
