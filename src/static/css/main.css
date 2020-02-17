@@ -169,3 +169,13 @@ td, th {
 .introjs-helperNumberLayer {
   background: linear-gradient(to bottom,#5d94c8 0,#0c3176 100%) !important;
 }
+.sponsors div {
+  height: 80px;
+}
+.sponsors div a {
+  border: none
+}
+.sponsors img {
+  max-height: 65px;
+  max-width: 100%;
+}
