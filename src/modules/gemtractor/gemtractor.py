@@ -292,29 +292,32 @@ class GEMtractor:
             continue
           
           if filter_species is not None:
-            for sn in range (reaction.getNumReactants() -1, -1, -1):
-                s = reaction.getReactant(sn).getSpecies()
-                if s in filter_species:
-                  if remove_reaction_missing_species:
-                    model.removeReaction (n)
-                    raise BreakLoops
-                  reaction.removeReactant (sn)
-                
-            for sn in range (reaction.getNumProducts() -1, -1, -1):
-                s = reaction.getProduct(sn).getSpecies()
-                if s in filter_species:
-                  if remove_reaction_missing_species:
-                    model.removeReaction (n)
-                    raise BreakLoops
-                  reaction.removeProduct (sn)
-                
-            for sn in range (reaction.getNumModifiers() -1, -1, -1):
-                s = reaction.getModifier(sn).getSpecies()
-                if s in filter_species:
-                  if remove_reaction_missing_species:
-                    model.removeReaction (n)
-                    raise BreakLoops
-                  reaction.removeModifier (sn)
+            try:
+              for sn in range (reaction.getNumReactants() -1, -1, -1):
+                  s = reaction.getReactant(sn).getSpecies()
+                  if s in filter_species:
+                    if remove_reaction_missing_species:
+                      model.removeReaction (n)
+                      raise BreakLoops
+                    reaction.removeReactant (sn)
+                  
+              for sn in range (reaction.getNumProducts() -1, -1, -1):
+                  s = reaction.getProduct(sn).getSpecies()
+                  if s in filter_species:
+                    if remove_reaction_missing_species:
+                      model.removeReaction (n)
+                      raise BreakLoops
+                    reaction.removeProduct (sn)
+                  
+              for sn in range (reaction.getNumModifiers() -1, -1, -1):
+                  s = reaction.getModifier(sn).getSpecies()
+                  if s in filter_species:
+                    if remove_reaction_missing_species:
+                      model.removeReaction (n)
+                      raise BreakLoops
+                    reaction.removeModifier (sn)
+            except BreakLoops:
+              continue
           
           if filter_genes is not None:
             current_genes = self._get_genes (reaction)
