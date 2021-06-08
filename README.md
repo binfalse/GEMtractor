@@ -1,6 +1,6 @@
 # GEMtractor
 
-The GEMtractor a platform for trimming and extracting genome-scale metabolic models (GEMs).
+The GEMtractor is a platform for trimming and extracting genome-scale metabolic models (GEMs).
 
 <object data="https://gemtractor.bio.informatik.uni-rostock.de/static/pics/gemtractor-landscape.svg" type="image/svg+xml">
   <img src="https://gemtractor.bio.informatik.uni-rostock.de//static/pics/gemtractor-landscape.png" title="GEMtractor" alt="GEMtractor" />
